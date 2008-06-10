@@ -37,7 +37,7 @@ sub next_block {
     while (<$fh>) {
 
         # we've reached the end
-        if (/^(commit|tag|reset|blob|checkpoint|progress)/) {
+        if (/^(commit|tag|reset|blob|checkpoint|progress)\b/) {
             $self->{header} = $_;
             last;
         }
