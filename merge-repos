@@ -117,7 +117,7 @@ sub read_commit {
     my $commit = { lines => [$head] };
     my $datasize;
     while (<$fh>) {
-        s/^mark :(\d+)/mark :@{[$1 + $offset]}/;
+        s/^(mark|merge) :(\d+)/$1 :@{[$2 + $offset]}/;
         if (/^(author|commiter) ([^<]*) <([^>]*)> (\d+) ([-+]\d+)/) {
             $commit->{$1}{name}   = $2;
             $commit->{$1}{email}  = $3;
