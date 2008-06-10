@@ -62,9 +62,10 @@ sub next_block {
 
 package Git::Export::Block;
 
-sub print {
+sub as_string {
     my ($self) = @_;
-    print map { $$_ =~ /^data / ? ( $$_, $self->{data} ) : $$_ }
+    return join '',
+        map { $$_ =~ /^data / ? ( $$_, $self->{data} ) : $$_ }
         @{ $self->{raw} };
 }
 
