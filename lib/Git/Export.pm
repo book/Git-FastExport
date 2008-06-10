@@ -50,7 +50,7 @@ sub next_block {
             $block->{data} = <$fh>;
         }
         elsif (/^(?:[MDRC] |deleteall)/) {
-            push @{ $block->{file} }, $_;
+            push @{ $block->{files} }, $_;
         }
         elsif (/^(\w+)/) {
             push @{ $block->{$1} }, $_;
@@ -70,7 +70,7 @@ package Git::Export::Block;
 my $LF = "\012";
 
 my %fields = (
-    commit     => [qw( mark author committer data from merge file )],
+    commit     => [qw( mark author committer data from merge files )],
     tag        => [qw( from tagger data )],
     reset      => [qw( from )],
     blob       => [qw( mark data )],
@@ -89,8 +89,7 @@ sub as_string {
                 .= 'data '
                 . length( $self->{data} )
                 . $LF
-                . $self->{data}
-                . $LF;
+                . $self->{data};
         }
         else {
             $string .= "$_$LF" for @{ $self->{$key} };
