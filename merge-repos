@@ -19,13 +19,9 @@ unshift @$_, fast_export( $_->[1] ) for @repos;
 
 # get the first commit
 for my $r (@repos) {
-    my $commit = next_commit( @$r );
+    my $commit = next_commit(@$r);
     unshift @$r, $commit;
 }
-
-use Data::Dumper;
-print STDERR Dumper \@repos;
-exit;
 
 # the arrays are now:
 # - next commit
@@ -35,6 +31,7 @@ exit;
 # - target directory
 
 while (@repos) {
+
     # sort by date
     @repos = sort { $a->[0]{author}{date} <=> $b->[0]{author}{date} } @repos;
 
@@ -43,16 +40,16 @@ while (@repos) {
     print @{ $commit->{lines} }, @{ $commit->{files} };
 
     # load up next commit
-    $commit = next_commit( @{ $repos[0] } );
+    unshift @{ $repos[0] }, $commit = next_commit( @{ $repos[0] } );
     shift @repos if !$commit;    # finished with this one
 }
 
 sub fast_export {
     my ($repo) = @_;
-    my ($out, $in);
+    my ( $out, $in );
     my $cwd = getcwd;
     chdir $repo or die "Can't chdir to $repo: $!";
-    my $pid = open2($out, $in, 'git fast-export --progress=1 HEAD' )
+    my $pid = open2( $out, $in, 'git fast-export --progress=1 HEAD' )
         or die "Can't git fast-export on $repo: $!";
     chdir $cwd or die "Can't chdir back to $cwd: $!";
     return $out;
@@ -67,6 +64,10 @@ sub next_commit {
     # look for a commit indicator
     while ( !eof $fh ) {
         my $head = <$fh>;
+        if ( $head =~ /^progress / ) {
+            print $head;
+            next;
+        }
         my ( $type, $args ) = $head =~ /^(\w+) ?(.*)/g;
 
         # return the commit
@@ -126,7 +127,7 @@ sub read_commit {
     my $size = 0;
     while (<$fh>) {
         push @{ $commit->{lines} }, $_;
-        print $size += length;
+        $size += length;
         last if $size >= $datasize;
     }
 
