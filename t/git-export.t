@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Slurp;
 
 my @latin = split m!^----\n!m, << 'EOT';
 perferendis
@@ -60,9 +61,26 @@ my @blocks = (
         committer => [
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115458 +0200'
         ],
-        file => ['M 0100644 :1 loremipsum.txt'],
+        files => ['M 0100644 :1 loremipsum.txt'],
     },
-
+    {   type   => 'blob',
+        header => 'blob',
+        data   => join( '', @latin[ 0, 1, 2, 3 ] ),
+        mark   => ['mark :3'],
+    },
+    {   type   => 'commit',
+        header => 'commit refs/heads/master',
+        mark   => ['mark :4'],
+        author => [
+            'author Philippe Bruhat (BooK) <book@cpan.org> 1213115469 +0200'
+        ],
+        committer => [
+            'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115469 +0200'
+        ],
+        data  => "second commit\n",
+        from  => ['from :2'],
+        files => ['M 0100644 :3 loremipsum.txt'],
+    },
 );
 
 plan tests => 1 + 2 * @blocks;
