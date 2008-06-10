@@ -1,0 +1,282 @@
+blob
+mark :1
+data 126
+perferendis
+sit
+praesentium
+doloribus
+itaque
+illum
+facere
+aliquip
+harum
+rerum
+magnam
+nam
+laboriosam
+tempora
+ullam
+odit
+quidem
+
+commit refs/heads/master
+mark :2
+author Philippe Bruhat (BooK) <book@cpan.org> 1213115458 +0200
+committer Philippe Bruhat (BooK) <book@cpan.org> 1213115458 +0200
+data 13
+first commit
+M 0100644 :1 loremipsum.txt
+
+blob
+mark :3
+data 154
+perferendis
+sit
+praesentium
+doloribus
+itaque
+illum
+facere
+aliquip
+harum
+rerum
+magnam
+nam
+laboriosam
+tempora
+ullam
+odit
+quidem
+blanditiis
+nulla
+laboriosam
+
+commit refs/heads/master
+mark :4
+author Philippe Bruhat (BooK) <book@cpan.org> 1213115469 +0200
+committer Philippe Bruhat (BooK) <book@cpan.org> 1213115469 +0200
+data 14
+second commit
+from :2
+M 0100644 :3 loremipsum.txt
+
+blob
+mark :5
+data 173
+perferendis
+sit
+praesentium
+doloribus
+itaque
+illum
+facere
+aliquip
+harum
+rerum
+magnam
+nam
+laboriosam
+tempora
+ullam
+odit
+quidem
+blanditiis
+nulla
+laboriosam
+vitae
+proident
+sit
+
+commit refs/heads/master
+mark :6
+author Philippe Bruhat (BooK) <book@cpan.org> 1213115504 +0200
+committer Philippe Bruhat (BooK) <book@cpan.org> 1213115504 +0200
+data 25
+another commit on master
+from :4
+M 0100644 :5 loremipsum.txt
+
+blob
+mark :7
+data 135
+perferendis
+sit
+praesentium
+doloribus
+itaque
+illum
+facere
+aliquip
+nam
+laboriosam
+tempora
+ullam
+odit
+quidem
+blanditiis
+nulla
+laboriosam
+
+commit refs/heads/master
+mark :8
+author Philippe Bruhat (BooK) <book@cpan.org> 1213115522 +0200
+committer Philippe Bruhat (BooK) <book@cpan.org> 1213115522 +0200
+data 19
+removed some lines
+from :4
+M 0100644 :7 loremipsum.txt
+
+blob
+mark :9
+data 155
+perferendis
+sit
+praesentium
+doloribus
+itaque
+illum
+facere
+aliquip
+nam
+laboriosam
+tempora
+ullam
+odit
+quidem
+blanditiis
+nulla
+laboriosam
+officiis
+fuga
+ipsum
+
+commit refs/heads/master
+mark :10
+author Philippe Bruhat (BooK) <book@cpan.org> 1213115555 +0200
+committer Philippe Bruhat (BooK) <book@cpan.org> 1213115555 +0200
+data 21
+added some lines too
+from :8
+M 0100644 :9 loremipsum.txt
+
+blob
+mark :11
+data 194
+perferendis
+sit
+praesentium
+doloribus
+itaque
+illum
+facere
+aliquip
+harum
+rerum
+magnam
+nam
+laboriosam
+tempora
+ullam
+odit
+quidem
+blanditiis
+nulla
+laboriosam
+vitae
+proident
+sit
+beatae
+dicta
+debitis
+
+commit refs/heads/master
+mark :12
+author Philippe Bruhat (BooK) <book@cpan.org> 1213115577 +0200
+committer Philippe Bruhat (BooK) <book@cpan.org> 1213115577 +0200
+data 31
+added some lines on the master
+from :6
+M 0100644 :11 loremipsum.txt
+
+blob
+mark :13
+data 195
+perferendis
+sit
+praesentium
+doloribus
+itaque
+illum
+facere
+aliquip
+nam
+laboriosam
+tempora
+ullam
+odit
+quidem
+blanditiis
+nulla
+laboriosam
+vitae
+proident
+sit
+beatae
+dicta
+debitis
+officiis
+fuga
+ipsum
+
+commit refs/heads/master
+mark :14
+author Philippe Bruhat (BooK) <book@cpan.org> 1213115620 +0200
+committer Philippe Bruhat (BooK) <book@cpan.org> 1213115620 +0200
+data 26
+merged branch into master
+from :12
+merge :10
+M 0100644 :13 loremipsum.txt
+
+blob
+mark :15
+data 224
+perferendis
+sit
+praesentium
+doloribus
+itaque
+illum
+facere
+aliquip
+nam
+laboriosam
+tempora
+ullam
+odit
+quidem
+blanditiis
+nulla
+laboriosam
+vitae
+proident
+sit
+beatae
+dicta
+debitis
+officiis
+fuga
+ipsum
+vitae
+repudiandae
+laboriosam
+
+commit refs/heads/master
+mark :16
+author Philippe Bruhat (BooK) <book@cpan.org> 1213115889 +0200
+committer Philippe Bruhat (BooK) <book@cpan.org> 1213115889 +0200
+data 17
+more latin words
+from :14
+M 0100644 :15 loremipsum.txt
+
