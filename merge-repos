@@ -18,11 +18,13 @@ while (@ARGV) {
 unshift @$_, fast_export( $_->[1] ) for @repos;
 
 # get the first commit
-unshift @$_, next_commit( $_->[0], $_->[1], $_->[3] ) for @repos;
+for my $r (@repos) {
+    my $commit = next_commit( @$r );
+    unshift @$r, $commit;
+}
 
-# FIXME
 use Data::Dumper;
-print Dumper \@repos;
+print STDERR Dumper \@repos;
 exit;
 
 # the arrays are now:
