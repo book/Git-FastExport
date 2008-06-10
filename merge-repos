@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Cwd;
 use IPC::Open2;
-my $N = 1; # global counter
+my $N = 1;    # global counter
 
 my @repos;
 my $base = 1_000_000;
@@ -93,8 +93,9 @@ sub filter_block {
     print $head;
     my $datasize;
     while (<$fh>) {
+        next if /^from /;    # ignore from information
         s/^mark :(\d+)/mark :@{[$1 + $offset]}/;
-        print;    # let the data through
+        print;               # let the data through
         last if ($datasize) = /^data (\d+)/g;
     }
 
