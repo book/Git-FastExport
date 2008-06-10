@@ -117,7 +117,7 @@ sub read_commit {
     my $commit = { lines => [$head] };
     my $datasize;
     while (<$fh>) {
-        s/^(mark|merge) :(\d+)/$1 :@{[$2 + $offset]}/;
+        s/^(mark) :(\d+)/$1 :@{[$2 + $offset]}/;
         if (/^(author|commiter) ([^<]*) <([^>]*)> (\d+) ([-+]\d+)/) {
             $commit->{$1}{name}   = $2;
             $commit->{$1}{email}  = $3;
@@ -137,7 +137,7 @@ sub read_commit {
     # file stuff:
     # filemodify | filedelete | filecopy | filerename | filedeleteall
     while (<$fh>) {
-        s/^from :(\d+)/from :@{[$1 + $offset]}/;
+        s/^(from|merge) :(\d+)/$1 :@{[$2 + $offset]}/;
 
         # offset the mark
         s/(M \d+ ):(\d+)/$1:@{[$2 + $offset]}/;
