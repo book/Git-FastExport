@@ -140,6 +140,56 @@ my @blocks = (
         data   => join( '', @latin[ 0, 1, 2, 3, 4, 6 ] ),
         mark   => ['mark :11'],
     },
+    {   type   => 'commit',
+        header => 'commit refs/heads/master',
+        mark   => ['mark :12'],
+        author => [
+            'author Philippe Bruhat (BooK) <book@cpan.org> 1213115577 +0200'
+        ],
+        committer => [
+            'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115577 +0200'
+        ],
+        data  => "added some lines on the master\n",
+        from  => ['from :6'],
+        files => ['M 0100644 :11 loremipsum.txt'],
+    },
+    {   type   => 'blob',
+        header => 'blob',
+        data   => join( '', @latin[ 0, 2, 3, 4, 6, 5 ] ),
+        mark   => ['mark :13'],
+    },
+    {   type   => 'commit',
+        header => 'commit refs/heads/master',
+        mark   => ['mark :14'],
+        author => [
+            'author Philippe Bruhat (BooK) <book@cpan.org> 1213115620 +0200'
+        ],
+        committer => [
+            'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115620 +0200'
+        ],
+        data  => "merged branch into master\n",
+        from  => ['from :12'],
+        merge => ['merge :10'],
+        files => ['M 0100644 :13 loremipsum.txt'],
+    },
+    {   type   => 'blob',
+        header => 'blob',
+        data   => join( '', @latin[ 0, 2, 3, 4, 6, 5, 7 ] ),
+        mark   => ['mark :15'],
+    },
+    {   type   => 'commit',
+        header => 'commit refs/heads/master',
+        mark   => ['mark :16'],
+        author => [
+            'author Philippe Bruhat (BooK) <book@cpan.org> 1213115889 +0200'
+        ],
+        committer => [
+            'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115889 +0200'
+        ],
+        data  => "more latin words\n",
+        from  => ['from :14'],
+        files => ['M 0100644 :15 loremipsum.txt'],
+    },
 );
 
 plan tests => 1 + 3 * @blocks;
