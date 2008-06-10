@@ -137,7 +137,7 @@ sub read_commit {
     # file stuff:
     # filemodify | filedelete | filecopy | filerename | filedeleteall
     while (<$fh>) {
-        s/^from :(\d+)/$1 :@{[$1 + $offset]}/ and next;
+        s/^from :(\d+)/from :@{[$1 + $offset]}/ and next;
 
         # offset the mark
         s/(M \d+ ):(\d+)/$1:@{[$2 + $offset]}/;
