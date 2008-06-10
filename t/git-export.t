@@ -81,6 +81,65 @@ my @blocks = (
         from  => ['from :2'],
         files => ['M 0100644 :3 loremipsum.txt'],
     },
+    {   type   => 'blob',
+        header => 'blob',
+        data   => join( '', @latin[ 0, 1, 2, 3, 4 ] ),
+        mark   => ['mark :5'],
+    },
+    {   type   => 'commit',
+        header => 'commit refs/heads/master',
+        mark   => ['mark :6'],
+        author => [
+            'author Philippe Bruhat (BooK) <book@cpan.org> 1213115504 +0200'
+        ],
+        committer => [
+            'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115504 +0200'
+        ],
+        data  => "another commit on master\n",
+        from  => ['from :4'],
+        files => ['M 0100644 :5 loremipsum.txt'],
+    },
+    {   type   => 'blob',
+        header => 'blob',
+        data   => join( '', @latin[ 0, 2, 3 ] ),
+        mark   => ['mark :7'],
+    },
+    {   type   => 'commit',
+        header => 'commit refs/heads/master',
+        mark   => ['mark :8'],
+        author => [
+            'author Philippe Bruhat (BooK) <book@cpan.org> 1213115522 +0200'
+        ],
+        committer => [
+            'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115522 +0200'
+        ],
+        data  => "removed some lines\n",
+        from  => ['from :4'],
+        files => ['M 0100644 :7 loremipsum.txt'],
+    },
+    {   type   => 'blob',
+        header => 'blob',
+        data   => join( '', @latin[ 0, 2, 3, 5 ] ),
+        mark   => ['mark :9'],
+    },
+    {   type   => 'commit',
+        header => 'commit refs/heads/master',
+        mark   => ['mark :10'],
+        author => [
+            'author Philippe Bruhat (BooK) <book@cpan.org> 1213115555 +0200'
+        ],
+        committer => [
+            'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115555 +0200'
+        ],
+        data  => "added some lines too\n",
+        from  => ['from :8'],
+        files => ['M 0100644 :9 loremipsum.txt'],
+    },
+    {   type   => 'blob',
+        header => 'blob',
+        data   => join( '', @latin[ 0, 1, 2, 3, 4, 6 ] ),
+        mark   => ['mark :11'],
+    },
 );
 
 plan tests => 1 + 3 * @blocks;
