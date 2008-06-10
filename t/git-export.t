@@ -192,7 +192,7 @@ my @blocks = (
     },
 );
 
-plan tests => 1 + 3 * @blocks;
+plan tests => 1 + 3 * @blocks + 1;
 
 use_ok('Git::Export');
 
@@ -216,4 +216,6 @@ for my $block (@blocks) {
     is_deeply( $b, $block, $mesg );
     is( $b->as_string, shift @strings, "$mesg string dump" );
 }
+
+is( $export->next_block(), undef, 'no more blocks' );
 

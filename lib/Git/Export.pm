@@ -29,6 +29,8 @@ sub next_block {
     my $block = bless {}, 'Git::Export::Block';
     my $fh = $self->{out};
 
+    return if eof $fh;
+
     # use the header from last time, or read it (first time)
     $block->{header} = $self->{header} ||= <$fh>;
     chomp $block->{header};
