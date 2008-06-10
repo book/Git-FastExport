@@ -45,11 +45,23 @@ laboriosam
 EOT
 
 my @blocks = (
-    {   type => 'blob',
-        data => join( '', @latin[ 0, 1, 2 ] ),
-        raw  => [ "blob\n", "mark :1\n", "data 126\n", "\n", ],
-        mark => ["mark :1\n"],
-    }
+    {   type   => 'blob',
+        header => 'blob',
+        data   => join( '', @latin[ 0, 1, 2 ] ),
+        mark   => ['mark :1'],
+    },
+    {   type   => 'commit',
+        header => 'commit refs/heads/master',
+        data   => "first commit\n",
+        mark   => ['mark :2'],
+        author => [
+            'author Philippe Bruhat (BooK) <book@cpan.org> 1213115458 +0200'
+        ],
+        committer => [
+            'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115458 +0200'
+        ],
+        file => ['M 0100644 :1 loremipsum.txt'],
+    },
 
 );
 

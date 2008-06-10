@@ -26,32 +26,37 @@ sub fast_export {
 
 sub next_block {
     my ($self) = @_;
-    my $block = bless { raw => [] }, 'Git::Export::Block';
+    my $block = bless {}, 'Git::Export::Block';
     my $fh = $self->{out};
 
     # use the header from last time, or read it (first time)
-    $self->{header} ||= <$fh>;
-    ( $block->{type} ) = $self->{header} =~ /^(\w+)/g;
-    push @{ $block->{raw} }, \"$self->{header}";
+    $block->{header} = $self->{header} ||= <$fh>;
+    chomp $block->{header};
+    ( $block->{type} ) = $block->{header} =~ /^(\w+)/g;
 
     while (<$fh>) {
 
-        # we've reached the end
+        # we've reached the beginning of the next block
         if (/^(commit|tag|reset|blob|checkpoint|progress)\b/) {
             $self->{header} = $_;
             last;
         }
-        push @{ $block->{raw} }, \"$_";
+
+        chomp;
 
         # special case of data block
         if (/^data (\d+)/) {
             local $/ = \"$1";
             $block->{data} = <$fh>;
         }
-        elsif( /^(\w+)/) {
-            push @{ $block->{$1} }, $block->{raw}[-1];
+        elsif (/^(?:[MDRC] |deleteall)/) {
+            push @{ $block->{file} }, $_;
+        }
+        elsif (/^(\w+)/) {
+            push @{ $block->{$1} }, $_;
         }
         else {
+
             # ignore empty lines, but choke on others
             die "Unexpected line:\n$_\n" if !/^$/;
         }
@@ -62,11 +67,36 @@ sub next_block {
 
 package Git::Export::Block;
 
+my $LF = "\012";
+
+my %fields = (
+    commit     => [qw( mark author committer data from merge file )],
+    tag        => [qw( from tagger data )],
+    reset      => [qw( from )],
+    blob       => [qw( mark data )],
+    checkpoint => [],
+    progress   => [],
+);
+
 sub as_string {
     my ($self) = @_;
-    return join '',
-        map { $$_ =~ /^data / ? ( $$_, $self->{data} ) : $$_ }
-        @{ $self->{raw} };
+    my $string = $self->{header} . $LF;
+
+    for my $key ( @{ $fields{ $self->{type} } } ) {
+        next if !exists $self->{$key};
+        if ( $key eq 'data' ) {
+            $string
+                .= 'data '
+                . length( $self->{data} )
+                . $LF
+                . $self->{data}
+                . $LF;
+        }
+        else {
+            $string .= "$_$LF" for @{ $self->{$key} };
+        }
+    }
+    return $string .= $LF;
 }
 
 1;
