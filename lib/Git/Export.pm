@@ -32,7 +32,7 @@ sub next_block {
     # use the header from last time, or read it (first time)
     $self->{header} ||= <$fh>;
     ( $block->{type} ) = $self->{header} =~ /^(\w+)/g;
-    push @{ $block->{raw} }, $self->{header};
+    push @{ $block->{raw} }, \"$self->{header}";
 
     while (<$fh>) {
 
@@ -41,7 +41,7 @@ sub next_block {
             $self->{header} = $_;
             last;
         }
-        push @{ $block->{raw} }, $_;
+        push @{ $block->{raw} }, \"$_";
 
         # special case of data block
         if (/^data (\d+)/) {
@@ -49,7 +49,7 @@ sub next_block {
             $block->{data} = <$fh>;
         }
         elsif( /^(\w+)/) {
-            push @{ $block->{$1} }, $_;
+            push @{ $block->{$1} }, $block->{raw}[-1];
         }
         else {
             # ignore empty lines, but choke on others
@@ -64,7 +64,7 @@ package Git::Export::Block;
 
 sub print {
     my ($self) = @_;
-    print map { $_ =~ /^data / ? ( $_, $self->{data} ) : $_ }
+    print map { $$_ =~ /^data / ? ( $$_, $self->{data} ) : $$_ }
         @{ $self->{raw} };
 }
 
