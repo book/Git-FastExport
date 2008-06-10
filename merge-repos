@@ -3,10 +3,11 @@ use strict;
 use warnings;
 use Cwd;
 use IPC::Open2;
+my $N = 1; # global counter
 
 my @repos;
 my $base = 1_000_000;
-my $n    = 0;
+my $n    = 1;
 
 # process command-line parameters
 while (@ARGV) {
@@ -64,7 +65,8 @@ sub next_commit {
     # look for a commit indicator
     while ( !eof $fh ) {
         my $head = <$fh>;
-        if ( $head =~ /^progress / ) {
+        if ( $head =~ s/^(progress .*)/$1 $repo $N/ ) {
+            $N++;
             print $head;
             next;
         }
@@ -115,6 +117,7 @@ sub read_commit {
     my $commit = { lines => [$head] };
     my $datasize;
     while (<$fh>) {
+        s/^mark :(\d+)/mark :@{[$1 + $offset]}/;
         if (/^(author|commiter) ([^<]*) <([^>]*)> (\d+) ([-+]\d+)/) {
             $commit->{$1}{name}   = $2;
             $commit->{$1}{email}  = $3;
@@ -148,6 +151,7 @@ sub read_commit {
                 if /^[CR] \S+ \S+ /;
             s!^([CR]) (\S+) (\S+)!$1 $dir/$2 $dir/$3!; # filecopy | filerename
         }
+        s/^(progress .*)/$1 $repo $N/ && $N++;
         push @{ $commit->{files} }, $_;
         last if /^$/;
     }
