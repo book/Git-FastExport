@@ -83,12 +83,19 @@ my @blocks = (
     },
 );
 
-plan tests => 1 + 2 * @blocks;
+plan tests => 1 + 3 * @blocks;
 
 use_ok('Git::Export');
 
 my $export = Git::Export->new();
 open my $fh, 't/fast-export' or die "Can't open t/fast-export: $!";
+my @strings;
+{
+    open my $gh, 't/fast-export' or die "Can't open t/fast-export: $!";
+    my $string = join '', <$gh>;
+    close $gh;
+    @strings = split /(?<=\012\012)/m, $string;
+}
 
 $export->{out} = $fh;
 
@@ -98,5 +105,6 @@ for my $block (@blocks) {
     my $mesg = $block->{mark}[0];
     chomp $mesg;
     is_deeply( $b, $block, $mesg );
+    is( $b->as_string, shift @strings, "$mesg string dump" );
 }
 
