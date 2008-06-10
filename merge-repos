@@ -93,7 +93,6 @@ sub filter_block {
     print $head;
     my $datasize;
     while (<$fh>) {
-        next if /^from /;    # ignore from information
         s/^mark :(\d+)/mark :@{[$1 + $offset]}/;
         print;               # let the data through
         last if ($datasize) = /^data (\d+)/g;
@@ -138,6 +137,7 @@ sub read_commit {
     # file stuff:
     # filemodify | filedelete | filecopy | filerename | filedeleteall
     while (<$fh>) {
+        next if /^from /;    # ignore from information
 
         # offset the mark
         s/(M \d+ ):(\d+)/$1:@{[$2 + $offset]}/;
