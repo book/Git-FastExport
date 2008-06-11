@@ -200,7 +200,7 @@ my @blocks = (
     },
 );
 
-plan tests => 1 + 4 * @blocks + 1;
+plan tests => 1 + 3 * @blocks + 1;
 
 use_ok('Git::Export');
 
@@ -221,7 +221,6 @@ for my $block (@blocks) {
     isa_ok( $b, 'Git::Export::Block' );
     my $mesg = $block->{mark}[0];
     chomp $mesg;
-    is( $b->date, $block->{date}, "$mesg date" ); # creates the date key
     is_deeply( $b, $block, "$mesg object" );
     is( $b->as_string, shift @strings, "$mesg string dump" );
 }
