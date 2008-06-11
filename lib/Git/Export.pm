@@ -61,6 +61,7 @@ sub next_block {
 
             # ignore empty lines, but choke on others
             die "Unexpected line:\n$_\n" if !/^$/;
+            $block->{footer} .= "\012";
         }
     }
 
@@ -100,7 +101,7 @@ sub as_string {
             $string .= "$_$LF" for @{ $self->{$key} };
         }
     }
-    return $string .= $LF;
+    return $string .= $self->{footer} || '';
 }
 
 1;
