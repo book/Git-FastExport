@@ -92,7 +92,7 @@ while (@repos) {
     }
 
     # update the parents information
-    for my $parent (@parents) {
+    for my $parent ( map { $parent_map{$_} } @parents ) {
         push @{ $commits{$parent}{children} }, $node;
     }
 
