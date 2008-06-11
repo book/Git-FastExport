@@ -19,7 +19,7 @@ ullam
 odit
 quidem
 
-commit refs/heads/master
+commit refs/heads/before
 mark :2
 author Philippe Bruhat (BooK) <book@cpan.org> 1213115458 +0200
 committer Philippe Bruhat (BooK) <book@cpan.org> 1213115458 +0200
@@ -51,7 +51,7 @@ blanditiis
 nulla
 laboriosam
 
-commit refs/heads/master
+commit refs/heads/before
 mark :4
 author Philippe Bruhat (BooK) <book@cpan.org> 1213115469 +0200
 committer Philippe Bruhat (BooK) <book@cpan.org> 1213115469 +0200
@@ -118,7 +118,7 @@ blanditiis
 nulla
 laboriosam
 
-commit refs/heads/master
+commit refs/tags/deletion
 mark :8
 author Philippe Bruhat (BooK) <book@cpan.org> 1213115522 +0200
 committer Philippe Bruhat (BooK) <book@cpan.org> 1213115522 +0200
@@ -282,4 +282,7 @@ data 17
 more latin words
 from :14
 M 0100644 :15 loremipsum.txt
+
+reset refs/tags/removal
+from :8
 
