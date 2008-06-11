@@ -78,9 +78,6 @@ while (@repos) {
     # this commit's parents
     my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
         @{ $commit->{merge} || [] };
-    for my $parent (@parents) {
-        push @{ $commits{$parent}{children} }, $node;
-    }
 
     # map each parent to its last "alien" commit
     my %parent_map
@@ -92,6 +89,11 @@ while (@repos) {
         if (m/^(from|merge) /) {
             s/:(\d+)/:$parent_map{$1}/g;
         }
+    }
+
+    # update the parents information
+    for my $parent (@parents) {
+        push @{ $commits{$parent}{children} }, $node;
     }
 
     # dump the commit
