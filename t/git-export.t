@@ -93,6 +93,9 @@ my @blocks = (
         mark   => ['mark :5'],
         footer => "\012",
     },
+    {   type   => 'progress',
+        header => 'progress 5 objects',
+    },
     {   type   => 'commit',
         header => 'commit refs/heads/master',
         mark   => ['mark :6'],
@@ -150,6 +153,9 @@ my @blocks = (
         date  => 1213115555,
         footer => "\012",
     },
+    {   type   => 'progress',
+        header => 'progress 10 objects',
+    },
     {   type   => 'blob',
         header => 'blob',
         data   => join( '', @latin[ 0, 1, 2, 3, 4, 6 ] ),
@@ -199,6 +205,9 @@ my @blocks = (
         mark   => ['mark :15'],
         footer => "\012",
     },
+    {   type   => 'progress',
+        header => 'progress 15 objects',
+    },
     {   type   => 'commit',
         header => 'commit refs/heads/master',
         mark   => ['mark :16'],
@@ -227,7 +236,7 @@ my @strings;
     open my $gh, 't/fast-export' or die "Can't open t/fast-export: $!";
     my $string = join '', <$gh>;
     close $gh;
-    @strings = split /(?<=\012\012)/m, $string;
+    @strings = split /(?<=\012\012)|(?<=progress . objects\012)|(?<=progress .. objects\012)/m, $string;
 }
 
 $export->{out} = $fh;
@@ -235,7 +244,7 @@ $export->{out} = $fh;
 for my $block (@blocks) {
     my $b = $export->next_block();
     isa_ok( $b, 'Git::Export::Block' );
-    my $mesg = $block->{mark}[0];
+    my $mesg = $block->{mark} ? $block->{mark}[0] : $block->{header};
     chomp $mesg;
     is_deeply( $b, $block, "$mesg object" );
     is( $b->as_string, shift @strings, "$mesg string dump" );

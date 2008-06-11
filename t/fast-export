@@ -87,6 +87,7 @@ vitae
 proident
 sit
 
+progress 5 objects
 commit refs/heads/master
 mark :6
 author Philippe Bruhat (BooK) <book@cpan.org> 1213115504 +0200
@@ -159,6 +160,7 @@ added some lines too
 from :8
 M 0100644 :9 loremipsum.txt
 
+progress 10 objects
 blob
 mark :11
 data 194
@@ -271,6 +273,7 @@ vitae
 repudiandae
 laboriosam
 
+progress 15 objects
 commit refs/heads/master
 mark :16
 author Philippe Bruhat (BooK) <book@cpan.org> 1213115889 +0200
