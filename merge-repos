@@ -110,8 +110,6 @@ sub next_commit {
     my $block;
 
     while ( $block = $parser->next_block() ) {
-        last if $block->{type} eq 'commit';
-
         # map to the new mark
         for ( @{ $block->{mark} || [] } ) {
             s/:(\d+)/:$mark/ and
@@ -123,6 +121,7 @@ sub next_commit {
                 s/:(\d+)/:$mark_map{$parser->{source}}{$1}/g;
             }   
         }
+        last if $block->{type} eq 'commit';
         print $block->as_string();
     }
     return $block;
