@@ -47,11 +47,11 @@ while (@repos) {
     my $commit = $repo->{commit};
 
     # update marks in from & merge
-    for (@{ $commit->{from} || [] }, @{ $commit->{merge} || [] }) {
-        if (m/^(from|merge) /){
-            s/:(\d+)/:$mark_map{$repo->{repo}}{$1}/g;
-        }   
-    }
+    #for (@{ $commit->{from} || [] }, @{ $commit->{merge} || [] }) {
+    #    if (m/^(from|merge) /){
+    #        s/:(\d+)/:$mark_map{$repo->{repo}}{$1}/g;
+    #    }   
+    #}
     
     # update marks & dir in files
     for ( @{ $commit->{files} } ) {
@@ -98,6 +98,12 @@ sub next_commit {
                 s/:(\d+)/:$mark/;
                 $mark_map{ $parser->{source} }{$1} = $mark++;
             }
+        }
+        # update marks in from & merge
+        for (@{ $block->{from} || [] }, @{ $block->{merge} || [] }) {
+            if (m/^(?:from|merge) /){
+                s/:(\d+)/:$mark_map{$parser->{source}}{$1}/g;
+            }   
         }
         last if $block->{type} eq 'commit';
         print $block->as_string();
