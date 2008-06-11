@@ -37,7 +37,9 @@ $_->{commit} = next_commit( $_->{parser} ) for @repos;
 
 # main loop
 use Data::Dumper;
-my @commits;
+my $last;
+my %ancestors;
+my %heads;
 while (@repos) {
 
     # sort by date
@@ -65,12 +67,23 @@ while (@repos) {
 
     # first commit in the old repo linked to latest commit in new repo
     if ( @commits && !$commit->{from} ) {
-        $commit->{from} = [ 'from :' . max @commits ];
+        $commit->{from} = [ "from :$last" ];
     }
 
     # dump the commit
     print $commit->as_string;
-    push @commits, $commit->{mark}[0] =~ /:(\d+)/g;
+
+    # update historical information
+    my ($id) = $commit->{mark}[0] =~ /:(\d+)/g;
+    $last = $id; # last commit applied
+    my @ancestors = map {/:(\d+)/g} @{ $commit->{from} || [] },
+        @{ $commit->{merge} || [] };
+    $ancestors{$id} = {
+        map( { %{ $ancestors{$_} } } @ancestors ),
+        map( { $_ => undef } @ancestors ),
+    };
+    delete $heads{$_} for @ancestors;
+    $heads{$id} = undef;
 
     # load next commit
     $repo->{commit} = next_commit( $repo->{parser} )
