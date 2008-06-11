@@ -53,7 +53,7 @@ my @blocks = (
         footer => "\012",
     },
     {   type   => 'commit',
-        header => 'commit refs/heads/master',
+        header => 'commit refs/heads/before',
         data   => "first commit\n",
         mark   => ['mark :2'],
         author => [
@@ -73,7 +73,7 @@ my @blocks = (
         footer => "\012",
     },
     {   type   => 'commit',
-        header => 'commit refs/heads/master',
+        header => 'commit refs/heads/before',
         mark   => ['mark :4'],
         author => [
             'author Philippe Bruhat (BooK) <book@cpan.org> 1213115469 +0200'
@@ -118,7 +118,7 @@ my @blocks = (
         footer => "\012",
     },
     {   type   => 'commit',
-        header => 'commit refs/heads/master',
+        header => 'commit refs/tags/deletion',
         mark   => ['mark :8'],
         author => [
             'author Philippe Bruhat (BooK) <book@cpan.org> 1213115522 +0200'
@@ -221,6 +221,11 @@ my @blocks = (
         from  => ['from :14'],
         files => ['M 0100644 :15 loremipsum.txt'],
         date  => 1213115889,
+        footer => "\012",
+    },
+    {   type   => 'reset',
+        header => 'reset refs/tags/removal',
+        from   => ['from :8'],
         footer => "\012",
     },
 );
