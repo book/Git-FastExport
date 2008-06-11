@@ -62,8 +62,8 @@ my @blocks = (
         committer => [
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115458 +0200'
         ],
-        files => ['M 0100644 :1 loremipsum.txt'],
-        date  => 1213115458,
+        files  => ['M 0100644 :1 loremipsum.txt'],
+        date   => 1213115458,
         footer => "\012",
     },
     {   type   => 'blob',
@@ -81,10 +81,10 @@ my @blocks = (
         committer => [
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115469 +0200'
         ],
-        data  => "second commit\n",
-        from  => ['from :2'],
-        files => ['M 0100644 :3 loremipsum.txt'],
-        date  => 1213115469,
+        data   => "second commit\n",
+        from   => ['from :2'],
+        files  => ['M 0100644 :3 loremipsum.txt'],
+        date   => 1213115469,
         footer => "\012",
     },
     {   type   => 'blob',
@@ -105,10 +105,10 @@ my @blocks = (
         committer => [
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115504 +0200'
         ],
-        data  => "another commit on master\n",
-        from  => ['from :4'],
-        files => ['M 0100644 :5 loremipsum.txt'],
-        date  => 1213115504,
+        data   => "another commit on master\n",
+        from   => ['from :4'],
+        files  => ['M 0100644 :5 loremipsum.txt'],
+        date   => 1213115504,
         footer => "\012",
     },
     {   type   => 'blob',
@@ -126,10 +126,10 @@ my @blocks = (
         committer => [
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115522 +0200'
         ],
-        data  => "removed some lines\n",
-        from  => ['from :4'],
-        files => ['M 0100644 :7 loremipsum.txt'],
-        date  => 1213115522,
+        data   => "removed some lines\n",
+        from   => ['from :4'],
+        files  => ['M 0100644 :7 loremipsum.txt'],
+        date   => 1213115522,
         footer => "\012",
     },
     {   type   => 'blob',
@@ -147,10 +147,10 @@ my @blocks = (
         committer => [
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115555 +0200'
         ],
-        data  => "added some lines too\n",
-        from  => ['from :8'],
-        files => ['M 0100644 :9 loremipsum.txt'],
-        date  => 1213115555,
+        data   => "added some lines too\n",
+        from   => ['from :8'],
+        files  => ['M 0100644 :9 loremipsum.txt'],
+        date   => 1213115555,
         footer => "\012",
     },
     {   type   => 'progress',
@@ -171,10 +171,10 @@ my @blocks = (
         committer => [
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115577 +0200'
         ],
-        data  => "added some lines on the master\n",
-        from  => ['from :6'],
-        files => ['M 0100644 :11 loremipsum.txt'],
-        date  => 1213115577,
+        data   => "added some lines on the master\n",
+        from   => ['from :6'],
+        files  => ['M 0100644 :11 loremipsum.txt'],
+        date   => 1213115577,
         footer => "\012",
     },
     {   type   => 'blob',
@@ -192,11 +192,11 @@ my @blocks = (
         committer => [
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115620 +0200'
         ],
-        data  => "merged branch into master\n",
-        from  => ['from :12'],
-        merge => ['merge :10'],
-        files => ['M 0100644 :13 loremipsum.txt'],
-        date  => 1213115620,
+        data   => "merged branch into master\n",
+        from   => ['from :12'],
+        merge  => ['merge :10'],
+        files  => ['M 0100644 :13 loremipsum.txt'],
+        date   => 1213115620,
         footer => "\012",
     },
     {   type   => 'blob',
@@ -217,10 +217,10 @@ my @blocks = (
         committer => [
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115889 +0200'
         ],
-        data  => "more latin words\n",
-        from  => ['from :14'],
-        files => ['M 0100644 :15 loremipsum.txt'],
-        date  => 1213115889,
+        data   => "more latin words\n",
+        from   => ['from :14'],
+        files  => ['M 0100644 :15 loremipsum.txt'],
+        date   => 1213115889,
         footer => "\012",
     },
     {   type   => 'reset',
@@ -241,7 +241,10 @@ my @strings;
     open my $gh, 't/fast-export' or die "Can't open t/fast-export: $!";
     my $string = join '', <$gh>;
     close $gh;
-    @strings = split /(?<=\012\012)|(?<=progress . objects\012)|(?<=progress .. objects\012)/m, $string;
+    @strings
+        = split
+        /(?<=\012\012)|(?<=progress . objects\012)|(?<=progress .. objects\012)/m,
+        $string;
 }
 
 $export->{out} = $fh;
