@@ -17,7 +17,7 @@ sub fast_export {
     chdir $repo or die "Can't chdir to $repo: $!";
     $self->{pid}
         = open2( $self->{out}, $self->{in},
-        'git fast-export --progress=1 HEAD' )
+        'git fast-export --progress=1 --all' )
         or die "Can't git fast-export on $repo: $!";
     chdir $cwd or die "Can't chdir back to $cwd: $!";
 
