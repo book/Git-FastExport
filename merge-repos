@@ -22,6 +22,7 @@ while (@ARGV) {
 for my $repo ( keys %repo ) {
     my $parser = Git::Export->new();
     $parser->fast_export( $repo{$repo}{repo} );
+    $parser->{mapdir}= $repo{$repo}{dir};
     $repo{$repo}{parser} = $parser;
 }
 
@@ -46,13 +47,6 @@ while (@repos) {
     # next commit to dump
     my $commit = $repo->{commit};
 
-    # update marks in from & merge
-    #for (@{ $commit->{from} || [] }, @{ $commit->{merge} || [] }) {
-    #    if (m/^(from|merge) /){
-    #        s/:(\d+)/:$mark_map{$repo->{repo}}{$1}/g;
-    #    }   
-    #}
-    
     # update marks & dir in files
     for ( @{ $commit->{files} } ) {
         s/^M (\d+) :(\d+)/M $1 :$mark_map{$repo->{repo}}{$2}/;
@@ -91,17 +85,14 @@ sub next_commit {
     my $block;
 
     while ( $block = $parser->next_block() ) {
-
         # map to the new mark
-        if ( $block->{mark} ) {
-            for ( @{ $block->{mark} } ) {
-                s/:(\d+)/:$mark/;
+        for ( @{ $block->{mark} || [] } ) {
+            s/:(\d+)/:$mark/ and
                 $mark_map{ $parser->{source} }{$1} = $mark++;
-            }
         }
         # update marks in from & merge
         for (@{ $block->{from} || [] }, @{ $block->{merge} || [] }) {
-            if (m/^(?:from|merge) /){
+            if (m/^(from|merge) /){
                 s/:(\d+)/:$mark_map{$parser->{source}}{$1}/g;
             }   
         }

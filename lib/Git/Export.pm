@@ -41,6 +41,7 @@ sub next_block {
 
         # we've reached the beginning of the next block
         if (/^(commit|tag|reset|blob|checkpoint|progress)\b/) {
+            s/^progress /progress [$self->{mapdir}] /;
             $self->{header} = $_;
             last;
         }
