@@ -1,161 +1,105 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Cwd;
-use IPC::Open2;
-my $N = 1;    # global counter
+use File::Basename;
+use lib dirname($0) . '/lib';
+use Git::Export;
+use List::Util qw( min max );
 
-my @repos;
-my $base = 1_000_000;
-my $n    = 1;
+my %repo;
+
+die "Odd number of parameters\nUsage: merge-repos [ repo dir ] ...\n"
+    if @ARGV % 2;
 
 # process command-line parameters
 while (@ARGV) {
-    push @repos, [ $n * $base, splice( @ARGV, 0, 2 ) ];
-    $n++;
+    my ( $repo, $dir ) = splice( @ARGV, 0, 2 );
+    $repo{$repo}{dir}  = $dir;
+    $repo{$repo}{repo} = $repo;
 }
 
-# open the pipes
-unshift @$_, fast_export( $_->[1] ) for @repos;
-
-# get the first commit
-for my $r (@repos) {
-    my $commit = next_commit(@$r);
-    unshift @$r, $commit;
+# create an export parser for each repo
+for my $repo ( keys %repo ) {
+    my $parser = Git::Export->new();
+    $parser->fast_export( $repo{$repo}{repo} );
+    $repo{$repo}{parser} = $parser;
 }
 
-# the arrays are now:
-# - next commit
-# - filehandle to read from git fast-export
-# - mark offset
-# - repo name
-# - target directory
+# repositories that we will process
+my @repos = values %repo;
 
+my $mark = 1;    # mark counter in the new rpo
+my %mark_map;    # map marks in source repos to marks in the new repo
+
+# get the first commits
+$_->{commit} = next_commit( $_->{parser} ) for @repos;
+
+# main loop
+use Data::Dumper;
+my @commits;
 while (@repos) {
 
     # sort by date
-    @repos = sort { $a->[0]{author}{date} <=> $b->[0]{author}{date} } @repos;
+    @repos = sort { $a->{commit}{date} <=> $b->{commit}{date} } @repos;
+    my $repo = $repos[0];
 
-    # dump next commit
-    my $commit = shift @{ $repos[0] };
-    print @{ $commit->{lines} }, @{ $commit->{files} };
+    # next commit to dump
+    my $commit = $repo->{commit};
 
-    # load up next commit
-    unshift @{ $repos[0] }, $commit = next_commit( @{ $repos[0] } );
-    shift @repos if !$commit;    # finished with this one
-}
+    # update marks in from & merge
+    s/^(from|merge) :(\d+)/$1 :$mark_map{$repo->{repo}}{$2}/
+        for @{ $commit->{from} || [] }, @{ $commit->{merge} || [] };
 
-sub fast_export {
-    my ($repo) = @_;
-    my ( $out, $in );
-    my $cwd = getcwd;
-    chdir $repo or die "Can't chdir to $repo: $!";
-    my $pid = open2( $out, $in, 'git fast-export --progress=1 HEAD' )
-        or die "Can't git fast-export on $repo: $!";
-    chdir $cwd or die "Can't chdir back to $cwd: $!";
-    return $out;
-}
-
-# return the next commit
-# and print out the intermediate block
-# while offseting the marks
-sub next_commit {
-    my ( $fh, $offset, $repo, $dir ) = @_;
-
-    # look for a commit indicator
-    while ( !eof $fh ) {
-        my $head = <$fh>;
-        if ( $head =~ s/^(progress .*)/$1 $repo $N/ ) {
-            $N++;
-            print $head;
-            next;
-        }
-        my ( $type, $args ) = $head =~ /^(\w+) ?(.*)/g;
-
-        # return the commit
-        return read_commit( $fh, $offset, $head, $repo, $dir )
-            if $type eq 'commit';
-
-        # filter the next block and loop
-        filter_block( $fh, $offset, $head );
-    }
-
-    # end of stream
-    return;
-}
-
-# print out the next block
-# and offset the marks
-sub filter_block {
-    my ( $fh, $offset, $head ) = @_;
-
-    # read the headers and let them through
-    print $head;
-    my $datasize;
-    while (<$fh>) {
-        s/^mark :(\d+)/mark :@{[$1 + $offset]}/;
-        print;               # let the data through
-        last if ($datasize) = /^data (\d+)/g;
-    }
-
-    # let the raw data through
-    my $size = 0;
-    while (<$fh>) {
-        print;
-        $size += length;
-        last if $size >= $datasize;
-    }
-
-    # skip next empty line
-    print scalar <$fh>;
-}
-
-# load the next commit
-# and offset the marks
-sub read_commit {
-    my ( $fh, $offset, $head, $repo, $dir ) = @_;
-    my $commit = { lines => [$head] };
-    my $datasize;
-    while (<$fh>) {
-        s/^(mark) :(\d+)/$1 :@{[$2 + $offset]}/;
-        if (/^(author|commiter) ([^<]*) <([^>]*)> (\d+) ([-+]\d+)/) {
-            $commit->{$1}{name}   = $2;
-            $commit->{$1}{email}  = $3;
-            $commit->{$1}{date}   = $4;
-            $commit->{$1}{offset} = $5;
-        }
-        push @{ $commit->{lines} }, $_;
-        last if ($datasize) = /^data (\d+)/g;
-    }
-    my $size = 0;
-    while (<$fh>) {
-        push @{ $commit->{lines} }, $_;
-        $size += length;
-        last if $size >= $datasize;
-    }
-
-    # file stuff:
-    # filemodify | filedelete | filecopy | filerename | filedeleteall
-    while (<$fh>) {
-        s/^(from|merge) :(\d+)/$1 :@{[$2 + $offset]}/;
-
-        # offset the mark
-        s/(M \d+ ):(\d+)/$1:@{[$2 + $offset]}/;
-
-        # handle paths
-        if ($dir) {
+    # update marks & dir in files
+    for ( @{ $commit->{files} } ) {
+        s/^M (\d+) :(\d+)/M $1 :$mark_map{$repo->{repo}}{$2}/;
+        if ( my $dir = $repo->{dir} ) {
             s!^(M \d+ :\d+) (.*)!$1 $dir/$2!;    # filemodify
             s!^D (.*)!D $dir/$1!;                # filedelete
 
             # /!\ quotes may happen - die and fix if needed
-            die "Choked on quoted paths in $repo! Culprit:\n$_\n"
+            die "Choked on quoted paths in $repo->{repo}! Culprit:\n$_\n"
                 if /^[CR] \S+ \S+ /;
-            s!^([CR]) (\S+) (\S+)!$1 $dir/$2 $dir/$3!; # filecopy | filerename
+
+            # filecopy | filerename
+            s!^([CR]) (\S+) (\S+)!$1 $dir/$2 $dir/$3!;
         }
-        s/^(progress .*)/$1 $repo $N/ && $N++;
-        push @{ $commit->{files} }, $_;
-        last if /^$/;
     }
-    return $commit;
+
+    # first commit in the old repo linked to latest commit in new repo
+    if ( @commits && !$commit->{from} ) {
+        $commit->{from} = [ 'from :' . max @commits ];
+    }
+
+    # dump the commit
+    print $commit->as_string;
+    push @commits, $commit->{mark}[0] =~ /:(\d+)/g;
+
+    # load next commit
+    $repo->{commit} = next_commit( $repo->{parser} )
+        or shift @repos;    # no more blocks in this export
+}
+
+# return the next commit
+# - print out the intermediate blocks
+# - offset the old marks
+sub next_commit {
+    my ($parser) = @_;
+    my $block;
+
+    while ( $block = $parser->next_block() ) {
+
+        # map to the new mark
+        if ( $block->{mark} ) {
+            for ( @{ $block->{mark} } ) {
+                s/:(\d+)/:$mark/;
+                $mark_map{ $parser->{source} }{$1} = $mark;
+            }
+            $mark++;
+        }
+        last if $block->{type} eq 'commit';
+        print $block->as_string();
+    }
+    return $block;
 }
 
