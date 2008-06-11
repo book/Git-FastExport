@@ -230,7 +230,7 @@ my @blocks = (
     },
 );
 
-plan tests => 1 + 3 * @blocks + 1;
+plan tests => 1 + 3 * @blocks + 2;
 
 use_ok('Git::Export');
 
@@ -249,6 +249,8 @@ my @strings;
 
 $export->{out} = $fh;
 
+$_ = 'canari';
+
 for my $block (@blocks) {
     my $b = $export->next_block();
     isa_ok( $b, 'Git::Export::Block' );
@@ -259,4 +261,6 @@ for my $block (@blocks) {
 }
 
 is( $export->next_block(), undef, 'no more blocks' );
+
+is( $_, 'canari', 'the canari survived' );
 

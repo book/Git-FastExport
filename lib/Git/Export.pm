@@ -36,6 +36,7 @@ sub next_block {
     chomp $block->{header};
     ( $block->{type} ) = $block->{header} =~ /^(\w+)/g;
 
+    local $_;
     while (<$fh>) {
 
         # we've reached the beginning of the next block
