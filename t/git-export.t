@@ -62,6 +62,7 @@ my @blocks = (
             'committer Philippe Bruhat (BooK) <book@cpan.org> 1213115458 +0200'
         ],
         files => ['M 0100644 :1 loremipsum.txt'],
+        date  => 1213115458,
     },
     {   type   => 'blob',
         header => 'blob',
@@ -80,6 +81,7 @@ my @blocks = (
         data  => "second commit\n",
         from  => ['from :2'],
         files => ['M 0100644 :3 loremipsum.txt'],
+        date  => 1213115469,
     },
     {   type   => 'blob',
         header => 'blob',
@@ -98,6 +100,7 @@ my @blocks = (
         data  => "another commit on master\n",
         from  => ['from :4'],
         files => ['M 0100644 :5 loremipsum.txt'],
+        date  => 1213115504,
     },
     {   type   => 'blob',
         header => 'blob',
@@ -116,6 +119,7 @@ my @blocks = (
         data  => "removed some lines\n",
         from  => ['from :4'],
         files => ['M 0100644 :7 loremipsum.txt'],
+        date  => 1213115522,
     },
     {   type   => 'blob',
         header => 'blob',
@@ -134,6 +138,7 @@ my @blocks = (
         data  => "added some lines too\n",
         from  => ['from :8'],
         files => ['M 0100644 :9 loremipsum.txt'],
+        date  => 1213115555,
     },
     {   type   => 'blob',
         header => 'blob',
@@ -152,6 +157,7 @@ my @blocks = (
         data  => "added some lines on the master\n",
         from  => ['from :6'],
         files => ['M 0100644 :11 loremipsum.txt'],
+        date  => 1213115577,
     },
     {   type   => 'blob',
         header => 'blob',
@@ -171,6 +177,7 @@ my @blocks = (
         from  => ['from :12'],
         merge => ['merge :10'],
         files => ['M 0100644 :13 loremipsum.txt'],
+        date  => 1213115620,
     },
     {   type   => 'blob',
         header => 'blob',
@@ -189,10 +196,11 @@ my @blocks = (
         data  => "more latin words\n",
         from  => ['from :14'],
         files => ['M 0100644 :15 loremipsum.txt'],
+        date  => 1213115889,
     },
 );
 
-plan tests => 1 + 3 * @blocks + 1;
+plan tests => 1 + 4 * @blocks + 1;
 
 use_ok('Git::Export');
 
@@ -213,7 +221,8 @@ for my $block (@blocks) {
     isa_ok( $b, 'Git::Export::Block' );
     my $mesg = $block->{mark}[0];
     chomp $mesg;
-    is_deeply( $b, $block, $mesg );
+    is( $b->date, $block->{date}, "$mesg date" ); # creates the date key
+    is_deeply( $b, $block, "$mesg object" );
     is( $b->as_string, shift @strings, "$mesg string dump" );
 }
 

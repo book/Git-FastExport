@@ -100,5 +100,13 @@ sub as_string {
     return $string .= $LF;
 }
 
+sub date {
+    my ($self) = @_;
+    return if $self->{type} ne 'commit';
+    $self->{date}
+        ||= ( $self->{committer}[0] =~ /^committer [^>]*> (\d+) [-+]\d+$/g )
+        [0];
+}
+
 1;
 
