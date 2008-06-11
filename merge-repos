@@ -28,8 +28,8 @@ for my $repo ( keys %repo ) {
 # repositories that we will process
 my @repos = values %repo;
 
-my $mark = 1;    # mark counter in the new rpo
-my %mark_map;    # map marks in source repos to marks in the new repo
+my $mark = 1_000_000;    # mark counter in the new rpo
+my %mark_map;            # map marks in source repos to marks in the new repo
 
 # get the first commits
 $_->{commit} = next_commit( $_->{parser} ) for @repos;
@@ -47,9 +47,12 @@ while (@repos) {
     my $commit = $repo->{commit};
 
     # update marks in from & merge
-    s/^(from|merge) :(\d+)/$1 :$mark_map{$repo->{repo}}{$2}/
-        for @{ $commit->{from} || [] }, @{ $commit->{merge} || [] };
-
+    for (@{ $commit->{from} || [] }, @{ $commit->{merge} || [] }) {
+        if (m/^(from|merge) /){
+            s/:(\d+)/:$mark_map{$repo->{repo}}{$1}/g;
+        }   
+    }
+    
     # update marks & dir in files
     for ( @{ $commit->{files} } ) {
         s/^M (\d+) :(\d+)/M $1 :$mark_map{$repo->{repo}}{$2}/;
