@@ -38,8 +38,7 @@ $_->{commit} = next_commit( $_->{parser} ) for @repos;
 # main loop
 use Data::Dumper;
 my $last;
-my %ancestors;
-my %heads;
+my %commits;
 while (@repos) {
 
     # sort by date
@@ -66,24 +65,37 @@ while (@repos) {
     }
 
     # first commit in the old repo linked to latest commit in new repo
-    if ( @commits && !$commit->{from} ) {
+    if ( $last && !$commit->{from} ) {
         $commit->{from} = [ "from :$last" ];
+    }
+
+    # update historical information
+    my ($id) = $commit->{mark}[0] =~ /:(\d+)/g;
+    $last = $id;    # last commit applied
+    my $node = $commits{$id}
+        = { name => $id, repo => $repo->{repo}, children => [] };
+
+    # this commit's parents
+    my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
+        @{ $commit->{merge} || [] };
+    for my $parent (@parents) {
+        push @{$commits{$parent}{children}}, $node;
+    }
+
+    # map each parent to its last "alien" commit
+    my %parent_map
+        = map { $_ => last_alien_child( $commits{$_}, $repo->{repo} )->{name} }
+        @parents;
+
+    # map parent marks
+    for (@{ $commit->{from} || [] }, @{ $commit->{merge} || [] }) {
+        if (m/^(from|merge) /){
+            s/:(\d+)/:$parent_map{$1}/g;
+        }   
     }
 
     # dump the commit
     print $commit->as_string;
-
-    # update historical information
-    my ($id) = $commit->{mark}[0] =~ /:(\d+)/g;
-    $last = $id; # last commit applied
-    my @ancestors = map {/:(\d+)/g} @{ $commit->{from} || [] },
-        @{ $commit->{merge} || [] };
-    $ancestors{$id} = {
-        map( { %{ $ancestors{$_} } } @ancestors ),
-        map( { $_ => undef } @ancestors ),
-    };
-    delete $heads{$_} for @ancestors;
-    $heads{$id} = undef;
 
     # load next commit
     $repo->{commit} = next_commit( $repo->{parser} )
@@ -115,3 +127,21 @@ sub next_commit {
     return $block;
 }
 
+# find the last child of this node
+# that has either no child
+# or a child in our repo
+sub last_alien_child {
+    my ( $node, $repo ) = @_;
+
+    while (1) {
+
+        # no children nodes
+        return $node if ( !@{ $node->{children} } );
+
+        # some children nodes are local
+        return $node if grep { $_->{repo} eq $repo } @{ $node->{children} };
+
+        # always pick the first child
+        $node = $node->{children}[0];
+    }
+}
