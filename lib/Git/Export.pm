@@ -49,8 +49,13 @@ sub next_block {
 
         # special case of data block
         if (/^data (\d+)/) {
-            local $/ = \"$1";
-            $block->{data} = <$fh>;
+            my $bytes= 0 + $1;
+            if ($bytes) {
+                local $/ = \$bytes;
+                $block->{data} = <$fh>;
+            } else {
+                $block->{data} = "";
+            }
         }
         elsif (/^(?:[MDRC] |deleteall)/) {
             push @{ $block->{files} }, $_;

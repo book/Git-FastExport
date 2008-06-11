@@ -96,9 +96,8 @@ sub next_commit {
         if ( $block->{mark} ) {
             for ( @{ $block->{mark} } ) {
                 s/:(\d+)/:$mark/;
-                $mark_map{ $parser->{source} }{$1} = $mark;
+                $mark_map{ $parser->{source} }{$1} = $mark++;
             }
-            $mark++;
         }
         last if $block->{type} eq 'commit';
         print $block->as_string();
