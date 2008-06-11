@@ -94,10 +94,7 @@ sub as_string {
         next if !exists $self->{$key};
         if ( $key eq 'data' ) {
             $string
-                .= 'data '
-                . length( $self->{data} )
-                . $LF
-                . $self->{data};
+                .= 'data ' . length( $self->{data} ) . $LF . $self->{data};
         }
         else {
             $string .= "$_$LF" for @{ $self->{$key} };
