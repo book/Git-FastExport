@@ -94,7 +94,7 @@ my @blocks = (
         footer => "\012",
     },
     {   type   => 'progress',
-        header => 'progress 5 objects',
+        header => 'progress [] 5 objects',
     },
     {   type   => 'commit',
         header => 'commit refs/heads/master',
@@ -154,7 +154,7 @@ my @blocks = (
         footer => "\012",
     },
     {   type   => 'progress',
-        header => 'progress 10 objects',
+        header => 'progress [] 10 objects',
     },
     {   type   => 'blob',
         header => 'blob',
@@ -206,7 +206,7 @@ my @blocks = (
         footer => "\012",
     },
     {   type   => 'progress',
-        header => 'progress 15 objects',
+        header => 'progress [] 15 objects',
     },
     {   type   => 'commit',
         header => 'commit refs/heads/master',
@@ -245,6 +245,9 @@ my @strings;
         = split
         /(?<=\012\012)|(?<=progress . objects\012)|(?<=progress .. objects\012)/m,
         $string;
+
+    # we actually change the progress markers
+    s/progress/progress []/g for @strings;
 }
 
 $export->{out} = $fh;
