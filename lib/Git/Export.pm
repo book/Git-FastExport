@@ -6,7 +6,7 @@ use IPC::Open2;
 
 sub new {
     my ($class) = @_;
-    return bless {}, $class;
+    return bless { source => '' }, $class;
 }
 
 sub fast_export {
@@ -41,7 +41,7 @@ sub next_block {
 
         # we've reached the beginning of the next block
         if (/^(commit|tag|reset|blob|checkpoint|progress)\b/) {
-            s/^progress /progress [$self->{mapdir}] /;
+            s/^progress /progress [$self->{source}] /;
             $self->{header} = $_;
             last;
         }
