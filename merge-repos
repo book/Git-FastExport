@@ -22,7 +22,7 @@ while (@ARGV) {
 for my $repo ( keys %repo ) {
     my $parser = Git::Export->new();
     $parser->fast_export( $repo{$repo}{repo} );
-    $parser->{mapdir}= $repo{$repo}{dir};
+    $parser->{mapdir} = $repo{$repo}{dir};
     $repo{$repo}{parser} = $parser;
 }
 
@@ -66,7 +66,7 @@ while (@repos) {
 
     # first commit in the old repo linked to latest commit in new repo
     if ( $last && !$commit->{from} ) {
-        $commit->{from} = [ "from :$last" ];
+        $commit->{from} = ["from :$last"];
     }
 
     # update historical information
@@ -79,7 +79,7 @@ while (@repos) {
     my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
         @{ $commit->{merge} || [] };
     for my $parent (@parents) {
-        push @{$commits{$parent}{children}}, $node;
+        push @{ $commits{$parent}{children} }, $node;
     }
 
     # map each parent to its last "alien" commit
@@ -88,10 +88,10 @@ while (@repos) {
         @parents;
 
     # map parent marks
-    for (@{ $commit->{from} || [] }, @{ $commit->{merge} || [] }) {
-        if (m/^(from|merge) /){
+    for ( @{ $commit->{from} || [] }, @{ $commit->{merge} || [] } ) {
+        if (m/^(from|merge) /) {
             s/:(\d+)/:$parent_map{$1}/g;
-        }   
+        }
     }
 
     # dump the commit
@@ -110,16 +110,18 @@ sub next_commit {
     my $block;
 
     while ( $block = $parser->next_block() ) {
+
         # map to the new mark
         for ( @{ $block->{mark} || [] } ) {
-            s/:(\d+)/:$mark/ and
-                $mark_map{ $parser->{source} }{$1} = $mark++;
+            s/:(\d+)/:$mark/
+                and $mark_map{ $parser->{source} }{$1} = $mark++;
         }
+
         # update marks in from & merge
-        for (@{ $block->{from} || [] }, @{ $block->{merge} || [] }) {
-            if (m/^(from|merge) /){
+        for ( @{ $block->{from} || [] }, @{ $block->{merge} || [] } ) {
+            if (m/^(from|merge) /) {
                 s/:(\d+)/:$mark_map{$parser->{source}}{$1}/g;
-            }   
+            }
         }
         last if $block->{type} eq 'commit';
         print $block->as_string();
