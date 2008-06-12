@@ -10,15 +10,18 @@ sub new {
 }
 
 sub fast_export {
-    my ( $self, $repo ) = @_;
+    my ( $self, $repo, @args ) = @_;
     $self->{source} = $repo;
+
+    # just export everything by default (in correct order)
+    my $args = "@args" || '--progress=1 --all --topo-order';
+    die "Invalid characters in argument list"
+        if $args =~ /[`;]/;    # really basic protection
 
     my $cwd = getcwd;
     chdir $repo or die "Can't chdir to $repo: $!";
-    $self->{pid}
-        = open2( $self->{out}, $self->{in},
-        'git fast-export --progress=1 --all' )
-        or die "Can't git fast-export on $repo: $!";
+    $self->{pid} = open2( $self->{out}, $self->{in}, "git fast-export $args" )
+        or die "Can't run 'git fast-export $args' on $repo: $!";
     chdir $cwd or die "Can't chdir back to $cwd: $!";
 
     return $self->{pid};
