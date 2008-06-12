@@ -21,7 +21,8 @@ while (@ARGV) {
 # create an export parser for each repo
 for my $repo ( keys %repo ) {
     my $parser = Git::Export->new();
-    $parser->fast_export( $repo{$repo}{repo} );
+    $parser->fast_export( $repo{$repo}{repo},
+        '--progress=1 --all --date-order' );
     $parser->{mapdir} = $repo{$repo}{dir};
     $repo{$repo}{parser} = $parser;
 }
