@@ -232,9 +232,9 @@ my @blocks = (
 
 plan tests => 1 + 3 * @blocks + 2;
 
-use_ok('Git::Export');
+use_ok('Git::FastExport');
 
-my $export = Git::Export->new();
+my $export = Git::FastExport->new();
 open my $fh, 't/fast-export' or die "Can't open t/fast-export: $!";
 my @strings;
 {
@@ -256,7 +256,7 @@ $_ = 'canari';
 
 for my $block (@blocks) {
     my $b = $export->next_block();
-    isa_ok( $b, 'Git::Export::Block' );
+    isa_ok( $b, 'Git::FastExport::Block' );
     my $mesg = $block->{mark} ? $block->{mark}[0] : $block->{header};
     chomp $mesg;
     is_deeply( $b, $block, "$mesg object" );

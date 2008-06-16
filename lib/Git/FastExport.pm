@@ -1,8 +1,10 @@
-package Git::Export;
+package Git::FastExport;
 use strict;
 use warnings;
 use Cwd;
 use IPC::Open2;
+
+our $VERSION = '0.01';
 
 sub new {
     my ($class) = @_;
@@ -29,7 +31,7 @@ sub fast_export {
 
 sub next_block {
     my ($self) = @_;
-    my $block = bless {}, 'Git::Export::Block';
+    my $block = bless {}, 'Git::FastExport::Block';
     my $fh = $self->{out};
 
     return if eof $fh;
@@ -84,7 +86,7 @@ sub next_block {
     return $block;
 }
 
-package Git::Export::Block;
+package Git::FastExport::Block;
 
 my $LF = "\012";
 
