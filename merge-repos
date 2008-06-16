@@ -73,17 +73,22 @@ while (@repos) {
     # update historical information
     my ($id) = $commit->{mark}[0] =~ /:(\d+)/g;
     $last = $id;    # last commit applied
-    my $node = $commits{$id}
-        = { name => $id, repo => $repo->{repo}, children => [] };
+    my $branch = ( split / /, $commit->{header} )[1];
+    my $node = $commits{$id} = {
+        name     => $id,
+        repo     => $repo->{repo},
+        branch   => $branch,
+        children => []
+    };
 
     # this commit's parents
     my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
         @{ $commit->{merge} || [] };
 
     # map each parent to its last "alien" commit
-    my %parent_map
-        = map { $_ => last_alien_child( $commits{$_}, $repo->{repo} )->{name} }
-        @parents;
+    my %parent_map = map {
+        $_ => last_alien_child( $commits{$_}, $repo->{repo}, $branch )->{name}
+    } @parents;
 
     # map parent marks
     for ( @{ $commit->{from} || [] }, @{ $commit->{merge} || [] } ) {
@@ -136,7 +141,7 @@ sub next_commit {
 # that has either no child
 # or a child in our repo
 sub last_alien_child {
-    my ( $node, $repo ) = @_;
+    my ( $node, $repo, $branch ) = @_;
 
     while (1) {
 
@@ -146,7 +151,17 @@ sub last_alien_child {
         # some children nodes are local
         return $node if grep { $_->{repo} eq $repo } @{ $node->{children} };
 
-        # always pick the first child
-        $node = $node->{children}[0];
+        # there's a child in the same branch
+        if ( my ($peer)
+            = grep { $_->{branch} eq $branch } @{ $node->{children} } )
+        {
+            $node = $peer;
+        }
+
+        # or pick the first child (as good as any)
+        else {
+
+            $node = $node->{children}[0];
+        }
     }
 }
