@@ -78,7 +78,8 @@ while (@repos) {
         name     => $id,
         repo     => $repo->{repo},
         branch   => $branch,
-        children => []
+        children => [],
+        merge    => exists $commit->{merge},
     };
 
     # this commit's parents
@@ -155,6 +156,8 @@ sub last_alien_child {
         if ( my ($peer)
             = grep { $_->{branch} eq $branch } @{ $node->{children} } )
         {
+            # but don't attach on another repo's merges
+            return $node if $peer->{merge};
             $node = $peer;
         }
 
