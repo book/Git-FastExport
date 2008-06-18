@@ -118,3 +118,34 @@ sub as_string {
 
 1;
 
+__END__
+
+=head1 NAME
+
+Git-::FastExport - A module to parse the output of git-fast-export
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK)
+
+=head1 ACKNOWLEDGEMENTS
+
+This module was created as part of my work for BOOKING.COM,
+which authorized its publication/distribution
+under the same terms as Perl itself.
+
+=head1 COPYRIGHT
+
+Copyright 2008 Philippe Bruhat (BooK), All Rights Reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
