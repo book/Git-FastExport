@@ -140,6 +140,11 @@ Git::FastExport - A module to parse the output of git-fast-export
 
 =head1 DESCRIPTION
 
+C<Git::FastExport> is a module that parses the output of
+B<git-fast-export> and returns C<Git::FastExport::Block> objects that
+can be inspected or modified before being eventually passed on as the
+input to B<git-fast-import>.
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK)
