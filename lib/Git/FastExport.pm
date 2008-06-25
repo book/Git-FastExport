@@ -122,7 +122,7 @@ __END__
 
 =head1 NAME
 
-Git-::FastExport - A module to parse the output of git-fast-export
+Git::FastExport - A module to parse the output of git-fast-export
 
 =head1 SYNOPSIS
 
