@@ -151,8 +151,8 @@ Philippe Bruhat (BooK)
 
 =head1 ACKNOWLEDGEMENTS
 
-This module was created as part of my work for BOOKING.COM,
-which authorized its publication/distribution
+The original version of this module was created as part of my work
+for BOOKING.COM, which authorized its publication/distribution
 under the same terms as Perl itself.
 
 =head1 COPYRIGHT
