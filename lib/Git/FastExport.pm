@@ -11,25 +11,17 @@ sub new {
     my ( $class, $repo ) = @_;
     croak 'No repository object given' if !$repo;
     croak "$repo is not a Git object"  if !$repo->isa('Git');
-    return bless { repo => $repo }, $class;
+    return bless { git => $repo }, $class;
 }
 
 sub fast_export {
-    my ( $self, $repo, @args ) = @_;
-    $self->{source} = $repo;
+    my ( $self, @args ) = @_;
+    my $repo = $self->{git};
+    $self->{source} = $repo->wc_path || $repo->repo_path;
 
-    # just export everything by default (in correct order)
-    my $args = "@args" || '--progress=1 --all --topo-order';
-    die "Invalid characters in argument list"
-        if $args =~ /[`;]/;    # really basic protection
-
-    my $cwd = getcwd;
-    chdir $repo or die "Can't chdir to $repo: $!";
-    $self->{pid} = open2( $self->{out}, $self->{in}, "git fast-export $args" )
-        or die "Can't run 'git fast-export $args' on $repo: $!";
-    chdir $cwd or die "Can't chdir back to $cwd: $!";
-
-    return $self->{pid};
+    # call the fast-export command (no default arguments)
+    ( $self->{output}, $self->{ctx} )
+        = $repo->command_output_pipe( 'fast-export', @args );
 }
 
 sub next_block {
@@ -163,9 +155,6 @@ a C<Git::FastExport> object attached to it.
 
 Initialize a B<git-fast-export> command on the repository, using the
 arguments given in C<@args>.
-
-If C<@args> is not given, the default parameters are:
-C<--all --date-order>.
 
 =item next_block()
 
