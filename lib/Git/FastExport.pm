@@ -145,6 +145,34 @@ B<git-fast-export> and returns C<Git::FastExport::Block> objects that
 can be inspected or modified before being eventually passed on as the
 input to B<git-fast-import>.
 
+=head1 METHODS
+
+This class provides the following methods:
+
+=over 4
+
+=item new( $repository )
+
+The constructor takes a C<Git> repository object, and returns
+a C<Git::FastExport> object attached to it.
+
+=item fast_export( @args )
+
+Initialize a B<git-fast-export> command on the repository, using the
+arguments given in C<@args>.
+
+If C<@args> is not given, the default parameters are:
+C<--all --date-order>.
+
+=item next_block()
+
+Return the next block in the B<git-fast-export> stream as a
+C<Git::FastExport::Block> object.
+
+Return nothing at the end of stream.
+
+=back
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK)
