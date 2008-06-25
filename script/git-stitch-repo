@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use File::Basename;
 use lib dirname($0) . '/lib';
-use Git::Export;
+use Git::FastExport;
 use List::Util qw( min max );
 
 my %repo;
@@ -20,7 +20,7 @@ while (@ARGV) {
 
 # create an export parser for each repo
 for my $repo ( keys %repo ) {
-    my $parser = Git::Export->new();
+    my $parser = Git::FastExport->new();
     $parser->fast_export( $repo{$repo}{repo},
         '--progress=1 --all --date-order' );
     $parser->{mapdir} = $repo{$repo}{dir};
