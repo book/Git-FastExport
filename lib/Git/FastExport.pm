@@ -126,6 +126,18 @@ Git-::FastExport - A module to parse the output of git-fast-export
 
 =head1 SYNOPSIS
 
+    use Git;
+    use Git::FastExport;
+
+    my $repo = Git->repository( Repository => $path );
+    my $export = Git::FastExport->new($repo);
+
+    while ( my $block = $parser->next_block() ) {
+
+        # do something with $block
+
+    }
+
 =head1 DESCRIPTION
 
 =head1 AUTHOR
