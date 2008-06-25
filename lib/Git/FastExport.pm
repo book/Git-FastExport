@@ -1,14 +1,17 @@
 package Git::FastExport;
 use strict;
 use warnings;
+use Carp;
 use Cwd;
 use IPC::Open2;
 
 our $VERSION = '0.01';
 
 sub new {
-    my ($class) = @_;
-    return bless { source => '' }, $class;
+    my ( $class, $repo ) = @_;
+    croak 'No repository object given' if !$repo;
+    croak "$repo is not a Git object"  if !$repo->isa('Git');
+    return bless { repo => $repo }, $class;
 }
 
 sub fast_export {
