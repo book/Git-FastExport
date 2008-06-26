@@ -9,9 +9,14 @@ our $VERSION = '0.01';
 
 sub new {
     my ( $class, $repo ) = @_;
-    croak 'No repository object given' if !$repo;
-    croak "$repo is not a Git object"  if !$repo->isa('Git');
-    return bless { git => $repo }, $class;
+    my $self = bless {}, $class;
+
+    if ($repo) {
+        croak "$repo is not a Git object"
+            if !( ref $repo && $repo->isa('Git') );
+        $self->{git} = $repo;
+    }
+    return $self;
 }
 
 sub fast_export {
@@ -146,9 +151,9 @@ This class provides the following methods:
 
 =over 4
 
-=item new( $repository )
+=item new( [ $repository ] )
 
-The constructor takes a C<Git> repository object, and returns
+The constructor takes an optional C<Git> repository object, and returns
 a C<Git::FastExport> object attached to it.
 
 =item fast_export( @args )
