@@ -8,11 +8,6 @@ use List::Util qw( min max );
 
 my %repo;
 
-die "Odd number of parameters\nUsage: merge-repos [ repo dir ] ...\n"
-    if @ARGV % 2;
-
-my %repo;
-
 # process command-line parameters
 while (@ARGV) {
     my ( $repo, $dir ) = split /:/, shift @ARGV, 2;
