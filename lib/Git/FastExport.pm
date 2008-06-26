@@ -168,6 +168,15 @@ C<Git::FastExport::Block> object.
 
 Return nothing at the end of stream.
 
+This methods reads from the C<export_fh> filehandle of the C<Git::FastExport>
+object. It is normally setup via the C<fast_export()> method, but it is
+possible to read from STDIN by doing:
+
+    $export->{export_fh} = \*STDIN;
+    while ( my $block = $export->next_block() ) {
+        ...
+    }
+
 =back
 
 =head1 AUTHOR
