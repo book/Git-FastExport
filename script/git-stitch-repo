@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use File::Basename;
-use lib dirname($0) . '/lib';
 use Git;
 use Git::FastExport;
 use List::Util qw( min max );
