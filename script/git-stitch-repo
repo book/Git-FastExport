@@ -167,3 +167,84 @@ sub last_alien_child {
         }
     }
 }
+
+__END__
+
+=head1 NAME
+
+git-stitch-repo - Stitch several git repositories into a git-fast-import stream
+
+=head1 SYNOPSIS
+
+git-stitch-repo repo1 repo2:dir2 ...
+
+=head1 DESCRIPTION
+
+B<git-stitch-repo> will process the output of C<git-fast-export --all
+--date-order> on the git repositories given on the command-line,
+and create a stream suitable for B<git-fast-import> that will create
+a new repository containing all the commits in a new commit tree
+that respects the history of all the source repositories.
+
+=head2 Example
+
+Imagine we have two repositories A and B that we want to stitch into
+a repository C so that all the files from A are in subdirectory F<A>
+and all the files from B are in subdirectory F<B>.
+
+Repository A:
+
+           topic
+           '     ,master
+           A3---A5
+          /    /
+    A1---A2---A4
+
+Branch I<master> points to A5 and branch I<topic> points to A3.
+
+Repository B:
+                 ,topic    ,master
+           B3---B5---B7---B8
+          /         /
+    B1---B2---B4---B6
+
+Branch I<master> points to B8 and branch I<topic> points to B5.
+
+The C repository should preserve chronology, commit relationships and
+branches as much as possible, while giving the impression that the
+directories F<A> & F<B> did live side-by-side all the time.
+
+Assuming additional timestamps not shown on the above graphs,
+B<git-stitch-repo> will produce a B<git-fast-import> stream that will
+create the following history:
+
+                                    ,topic    ,master
+                    A3---B3---A5---B5---B7---B8
+                   /         /         /
+   A1---B1---A2---B2---A4---B4--------B6
+
+
+Note that the current result is slightly buggy, since A5 wasn't on the
+I<topic> branch in the original graph for A.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
+
+=head1 ACKNOWLEDGEMENTS
+
+The original version of this script was created as part of my work
+for BOOKING.COM, which authorized its publication/distribution
+under the same terms as Perl itself.
+
+=head1 COPYRIGHT
+
+Copyright 2008 Philippe Bruhat (BooK), All Rights Reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
