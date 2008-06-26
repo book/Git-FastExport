@@ -25,14 +25,14 @@ sub fast_export {
     $self->{source} = $repo->wc_path || $repo->repo_path;
 
     # call the fast-export command (no default arguments)
-    ( $self->{output}, $self->{ctx} )
+    ( $self->{export_fh}, $self->{ctx} )
         = $repo->command_output_pipe( 'fast-export', @args );
 }
 
 sub next_block {
     my ($self) = @_;
     my $block = bless {}, 'Git::FastExport::Block';
-    my $fh = $self->{out};
+    my $fh = $self->{export_fh};
 
     return if eof $fh;
 
