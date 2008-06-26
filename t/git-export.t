@@ -250,7 +250,7 @@ my @strings;
     s/progress/progress []/g for @strings;
 }
 
-$export->{out} = $fh;
+$export->{export_fh} = $fh;
 
 $_ = 'canari';
 
