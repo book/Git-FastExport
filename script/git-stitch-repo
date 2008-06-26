@@ -11,19 +11,23 @@ my %repo;
 die "Odd number of parameters\nUsage: merge-repos [ repo dir ] ...\n"
     if @ARGV % 2;
 
+my %repo;
+
 # process command-line parameters
 while (@ARGV) {
     my ( $repo, $dir ) = split /:/, shift @ARGV, 2;
-    $repo{$repo}{dir}  = $dir || '';
-    $repo{$repo}{repo} = $repo;
-}
+    $dir ||= '';
 
-# create an export parser for each repo
-for my $repo ( keys %repo ) {
-    my $parser = Git::FastExport->new(
-        Git->repository( Directory => $repo{$repo}{repo} ) );
-    $parser->fast_export( qw( --progress=1 --all --date-order ) );
-    $parser->{mapdir} = $repo{$repo}{dir};
+    # create an export parser for each repo
+    my $parser
+        = Git::FastExport->new( Git->repository( Directory => $repo ) );
+    $parser->fast_export(qw( --progress=1 --all --date-order ));
+    $parser->{mapdir} = $dir;
+
+    # update the %repo hash
+    $repo                = $parser->{source};
+    $repo{$repo}{repo}   = $repo;
+    $repo{$repo}{dir}    = $dir;
     $repo{$repo}{parser} = $parser;
 }
 
