@@ -1,6 +1,6 @@
 Revision history for Perl extension Git::FastExport
 
-0.01 
+0.01 Thu Jun 26 14:00:01 CEST 2008
         [FEATURES]
         - process git-fast-export output
         - uses the Git.pm module provided with git
