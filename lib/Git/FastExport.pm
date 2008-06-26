@@ -34,7 +34,12 @@ sub next_block {
     my $block = bless {}, 'Git::FastExport::Block';
     my $fh = $self->{export_fh};
 
-    return if eof $fh;
+    if ( eof $fh ) {
+        $self->{git}->command_close_pipe( $fh, $self->{ctx} )
+            if $self->{git} && $self->{ctx};
+        delete @{$self}{qw( export_fh ctx )};
+        return;
+    }
 
     # use the header from last time, or read it (first time)
     $block->{header} = $self->{header} ||= <$fh>;
