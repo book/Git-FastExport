@@ -9,7 +9,7 @@ our $VERSION = '0.01';
 
 sub new {
     my ( $class, $repo ) = @_;
-    my $self = bless {}, $class;
+    my $self = bless { source => '' }, $class;
 
     if ($repo) {
         croak "$repo is not a Git object"
