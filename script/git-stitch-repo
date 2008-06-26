@@ -4,6 +4,8 @@ use warnings;
 use Git;
 use Git::FastExport;
 
+our $VERSION = 0.01;
+
 my %repo;
 
 # process command-line parameters
