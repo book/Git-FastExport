@@ -1,0 +1,9 @@
+Revision history for Perl extension Git::FastExport
+
+0.01 
+        [FEATURES]
+        - process git-fast-export output
+        - uses the Git.pm module provided with git
+        [SCRIPTS]
+        - git-stitch-repo can "stitch" together two unrelated repositories
+
