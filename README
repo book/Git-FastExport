@@ -1,0 +1,7 @@
+Git::FastExport
+---------------
+
+This module processes the output of git-fast-export and returns
+Perl data structures that can be inspected and modified to produce
+a slightly different stream, suitable to be passed to git-fast-import.
+
