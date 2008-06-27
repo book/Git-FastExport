@@ -1,5 +1,10 @@
 Revision history for Perl extension Git::FastExport
 
+0.02
+        [DOCUMENTATION]
+        - added a README file
+        - added documentation for git-stitch-repo
+
 0.01 Thu Jun 26 14:00:01 CEST 2008
         [FEATURES]
         - process git-fast-export output
