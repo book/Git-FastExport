@@ -19,9 +19,13 @@ my @tests = (
     [ "Git->new( Directory => $dir )", $git ],
 );
 
-plan tests => 3 * @tests;
+my @fails = (
 
-my $export;
+    # desc, error, regex, args
+    [ q('zlonk'), qr/^zlonk is not a Git object/, 'zlonk' ],
+);
+
+plan tests => 3 * @tests + 3 * @fails;
 
 for my $t (@tests) {
     my ( $desc, @args ) = @$t;
@@ -31,5 +35,15 @@ for my $t (@tests) {
     is( $@, '', "No error calling Git::FastExport->new($desc)" );
     isa_ok( $export, 'Git::FastExport' );
 
+}
+
+# some failure tests
+for my $t (@fails) {
+    my ( $desc, $regex, @args ) = @$t;
+    my $export;
+    ok( !eval { $export = Git::FastExport->new(@args); 1 },
+        "Git::FastExport->new($desc) failed" );
+    like( $@, $regex, 'Expected error message' );
+    is( $export, undef, 'No object created' );
 }
 
