@@ -4,7 +4,10 @@ lib/Git/FastExport.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+README
 script/git-stitch-repo
+t/00load.t
+t/01new.t
 t/fast-export
 t/git-fast-export.t
 t/pod-coverage.t
