@@ -23,6 +23,7 @@ my @fails = (
 
     # desc, error, regex, args
     [ q('zlonk'), qr/^zlonk is not a Git object/, 'zlonk' ],
+    [ q('zlonk'), qr/^Zlonk=HASH\S+ is not a Git object/, bless {}, 'Zlonk' ],
 );
 
 plan tests => 3 * @tests + 3 * @fails;
