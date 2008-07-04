@@ -1,9 +1,11 @@
 Revision history for Perl extension Git::FastExport
 
-0.02
+0.02 Fri Jul  4 11:03:54 CEST 2008
         [DOCUMENTATION]
         - added a README file
         - added documentation for git-stitch-repo
+        [TESTS]
+        - added t/00load.t and t/01new.t to increase test coverage
 
 0.01 Thu Jun 26 14:00:01 CEST 2008
         [FEATURES]
