@@ -203,6 +203,7 @@ Repository A:
 Branch I<master> points to A5 and branch I<topic> points to A3.
 
 Repository B:
+
                  ,topic    ,master
            B3---B5---B7---B8
           /         /
