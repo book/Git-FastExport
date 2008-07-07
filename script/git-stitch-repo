@@ -99,7 +99,7 @@ while (@repos) {
 
     # update the parents information
     for my $parent ( map { $parent_map{$_} } @parents ) {
-        push @{ $commits{$parent}{children} }, $node;
+        push @{ $commits{$parent}{children} }, $node->{name};
     }
 
     # dump the commit
@@ -149,21 +149,23 @@ sub last_alien_child {
         return $node if ( !@{ $node->{children} } );
 
         # some children nodes are local
-        return $node if grep { $_->{repo} eq $repo } @{ $node->{children} };
+        return $node
+            if grep { $commits{$_}->{repo} eq $repo } @{ $node->{children} };
 
         # there's a child in the same branch
         if ( my ($peer)
-            = grep { $_->{branch} eq $branch } @{ $node->{children} } )
+            = grep { $commits{$_}->{branch} eq $branch }
+            @{ $node->{children} } )
         {
+
             # but don't go past another repo's merges
-            return $node if $peer->{merge};
-            $node = $peer;
+            return $node if $commits{$peer}->{merge};
+            $node = $commits{$peer};
         }
 
         # or pick the first child (as good as any)
         else {
-
-            $node = $node->{children}[0];
+            $node = $commits{ $node->{children}[0] };
         }
     }
 }
