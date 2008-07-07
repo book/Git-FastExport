@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Git;
 use Git::FastExport;
+use File::Spec::Functions qw( rel2abs );
 
 our $VERSION = 0.02;
 
@@ -11,6 +12,7 @@ my %repo;
 # process command-line parameters
 while (@ARGV) {
     my ( $repo, $dir ) = split /:/, shift @ARGV, 2;
+    $repo = rel2abs( $repo );
     $dir ||= '';
 
     # create an export parser for each repo
