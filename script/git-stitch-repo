@@ -31,7 +31,7 @@ while (@ARGV) {
 # repositories that we will process
 my @repos = values %repo;
 
-my $mark = 1_000_000;    # mark counter in the new rpo
+my $mark = 1_000_000;    # mark counter in the new repo
 my %mark_map;            # map marks in source repos to marks in the new repo
 
 # get the first commits
