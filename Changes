@@ -1,5 +1,11 @@
 Revision history for Perl extension Git::FastExport
 
+0.03 Mon Jul  7 19:29:23 CEST 2008
+        [ENHANCEMENTS]
+        - git-stitch-repo: fixed a segmentation fault that occured
+          at program destruction, because of a huge self-referential
+          hash of hashes
+
 0.02 Fri Jul  4 11:03:54 CEST 2008
         [DOCUMENTATION]
         - added a README file
