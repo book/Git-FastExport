@@ -40,7 +40,6 @@ my %mark_map;            # map marks in source repos to marks in the new repo
 $_->{commit} = next_commit( $_->{parser} ) for @repos;
 
 # main loop
-use Data::Dumper;
 my $last;
 my %commits;
 while (@repos) {
