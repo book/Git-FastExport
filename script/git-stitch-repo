@@ -5,11 +5,12 @@ use Git;
 use Git::FastExport;
 use File::Spec::Functions qw( rel2abs );
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 my %repo;
 
 # process command-line parameters
+my $name = 'A';
 while (@ARGV) {
     my ( $repo, $dir ) = split /:/, shift @ARGV, 2;
     $repo = rel2abs( $repo );
@@ -26,6 +27,7 @@ while (@ARGV) {
     $repo{$repo}{repo}   = $repo;
     $repo{$repo}{dir}    = $dir;
     $repo{$repo}{parser} = $parser;
+    $repo{$repo}{name}   = $name++;
 }
 
 # repositories that we will process
@@ -82,6 +84,9 @@ while (@repos) {
         children => [],
         merge    => exists $commit->{merge},
     };
+
+    # mark our original source
+    $commit->{header} =~ s/$/-$repo->{name}/;
 
     # this commit's parents
     my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
