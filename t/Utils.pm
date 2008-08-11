@@ -22,23 +22,23 @@ sub new_repo {
 sub repo_description {
     my ($repo) = @_;
     my %log;    # map sha1 to log message
-    my $desc;
+    my @commits;
 
     # process the whole tree
     my ( $fh, $c )
         = $repo->command_output_pipe( 'log', '--pretty=format:%H-%P-%s',
         '--date-order', '--all' );
     while (<$fh>) {
-        print;
         chomp;
         my ( $h, $p, $log ) = split /-/, $_, 3;
         $log{$h} = $log;
         $p =~ y/ //d;
-        $desc = join ' ', $p ? "$log-$p" : $log, $desc;
+        push @commits, $p ? "$log-$p" : $log;
     }
     $repo->command_close_pipe( $fh, $c );
 
     # replace SHA-1 by log name
+    my $desc = join ' ', reverse @commits;
     $desc =~ s/(\w{40})/$log{$1}/g;
 
     return $desc;
