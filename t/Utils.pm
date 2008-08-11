@@ -1,8 +1,22 @@
 use strict;
 use warnings;
+use File::Path;
+use File::Spec;
 use Git;
 
 1;
+
+# create a new, empty repository
+sub new_repo {
+    my ( $dir, $name ) = @_;
+
+    # alas, this can't be done with Git.pm
+    my $wc = File::Spec->rel2abs( File::Spec->catfile( $dir, $name ) );
+    mkpath $wc;
+    chdir $wc;
+    `git-init`;
+    return Git->repository( Directory => $wc );
+}
 
 # produce a text description of a given repository
 sub repo_description {
