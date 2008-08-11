@@ -8,7 +8,9 @@ use t::Utils;
 my @tests = (
 
     # source repositories, expected repository
-    [ 'A1 A2-A1 A3-A2' => 'A1 A2-A1 A3-A2' ],
+    [ 'A1 A2-A1 A3-A2'                => 'A1 A2-A1 A3-A2' ],
+    [ 'A1 A2-A1 A3-A2 B1 B2-B1 B3-B2' => 'A1 A2-A1 A3-A2 B1-A3 B2-B1 B3-B2' ],
+    [ 'A1 A2-A1 B1 B2-B1 A3-A2 B3-B2' => 'A1 A2-A1 B1-A2 B2-B1 A3-B2 B3-A3' ],
 );
 
 plan tests => scalar @tests;
