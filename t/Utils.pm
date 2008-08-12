@@ -79,7 +79,8 @@ sub create_repos {
         my ( $name, $type, $commit ) = split /([>=])/, $ref;
         my $repo = $info->{repo}{ substr( $commit, 0, 1 ) };
         if ( $type eq '=' ) {      # branch
-            $repo->command( 'branch', '-D', $name );
+            $repo->command( 'branch', '-D', $name )
+                if grep {/^..$name$/} $repo->command('branch');
             $repo->command( 'branch', $name, $info->{sha1}{$commit} );
         }
         else {                     # tag
