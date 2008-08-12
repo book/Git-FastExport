@@ -23,7 +23,7 @@ for my $t (@tests) {
     my ( $src, $dst ) = @$t;
 
     # a temporary directory for our tests
-    my $dir = tempdir( CLEANUP => 1 );
+    my $dir = File::Spec->rel2abs( tempdir( 'git-XXXXX', CLEANUP => 1 ) );
 
     # create the source repositories
     my @src = create_repos( $dir => $src );
@@ -48,6 +48,6 @@ for my $t (@tests) {
 
     # get the description of the resulting repository
     my $result = repo_description($repo);
-    is( $result, $dst, $src );
+    is( $result, $dst, "$src => $dst" );
 }
 
