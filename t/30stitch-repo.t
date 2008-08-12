@@ -21,6 +21,9 @@ my @tests = (
 
 );
 
+# useful hack for quick testing
+@tests = @tests[@ARGV] if @ARGV;
+
 plan tests => scalar @tests;
 
 # the program we want to test
