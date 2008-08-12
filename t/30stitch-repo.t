@@ -31,7 +31,7 @@ my $gsr = File::Spec->rel2abs('script/git-stitch-repo');
 my $lib = File::Spec->rel2abs('lib');
 
 for my $t (@tests) {
-    my ( $src, $refs, $dst ) = @$t;
+    my ( $src, $refs, $dst, $todo ) = @$t;
 
     # a temporary directory for our tests
     my $dir = File::Spec->rel2abs( tempdir( 'git-XXXXX', CLEANUP => 1 ) );
@@ -59,6 +59,14 @@ for my $t (@tests) {
 
     # get the description of the resulting repository
     my $result = repo_description($repo);
-    is( $result, $dst, "$src => $dst" );
+    if ($todo) {
+    TODO: {
+            local $TODO = $todo;
+            is( $result, $dst, "$src => $dst" );
+        }
+    }
+    else {
+        is( $result, $dst, "$src => $dst" );
+    }
 }
 
