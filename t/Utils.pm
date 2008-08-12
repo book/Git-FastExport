@@ -52,12 +52,11 @@ sub repo_description {
 
 # create a set of repositories from a given description
 sub create_repos {
-    my ( $dir, $desc ) = @_;
-    my @nodes = split / /, $desc;
+    my ( $dir, $desc, $refs ) = @_;
     my $info = { dir => $dir, repo => {}, sha1 => {} };
 
-    for my $node (@nodes) {
-        my ( $child, $parent ) = split /-/, $node;
+    for my $commit ( split / /, $desc ) {
+        my ( $child, $parent ) = split /-/, $commit;
         my @child = $child =~ /([A-Z]\d+)/g;
         my @parent = $parent =~ /([A-Z]\d+)/g if $parent;
 
@@ -71,6 +70,20 @@ sub create_repos {
         }
         else {                     # simple, linear commit
             create_linear_commit( $info, $child[0], $parent[0] );
+        }
+        sleep 1;
+    }
+
+    # setup the refs (branches & tags)
+    for my $ref ( split / /, $refs ) {
+        my ( $name, $type, $commit ) = split /([>=])/, $ref;
+        my $repo = $info->{repo}{ substr( $commit, 0, 1 ) };
+        if ( $type eq '=' ) {      # branch
+            $repo->command( 'branch', '-D', $name );
+            $repo->command( 'branch', $name, $info->{sha1}{$commit} );
+        }
+        else {                     # tag
+            $repo->command( 'tag', $name, $info->{sha1}{$commit} );
         }
     }
 
@@ -96,7 +109,6 @@ sub create_linear_commit {
     $repo->command( 'commit', '-m', $child );
     $info->{sha1}{$child}
         = $repo->command_oneline(qw( log -n 1 --pretty=format:%H HEAD ));
-    sleep 1;
 }
 
 sub create_merge_commit {
