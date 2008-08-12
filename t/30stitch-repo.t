@@ -18,6 +18,10 @@ my @tests = (
         'master=A3 master=B3',
         'A1 B1-A1 A2-B1 B2-A2 A3-B2 B3-A3'
     ],
+    [   'A1 B1 C1 A2-A1 B2-B1 C2-C1 A3-A2 B3-B2 C3-C2',
+        'master=A3 master=B3 master=C3',
+        'A1 B1-A1 C1-B1 A2-C1 B2-A2 C2-B2 A3-C2 B3-A3 C3-B3'
+    ],
 
 );
 
