@@ -7,10 +7,18 @@ use t::Utils;
 
 my @tests = (
 
-    # source repositories, expected repository
-    [ 'A1 A2-A1 A3-A2'                => 'A1 A2-A1 A3-A2' ],
-    [ 'A1 A2-A1 A3-A2 B1 B2-B1 B3-B2' => 'A1 A2-A1 A3-A2 B1-A3 B2-B1 B3-B2' ],
-    [ 'A1 A2-A1 B1 B2-B1 A3-A2 B3-B2' => 'A1 A2-A1 B1-A2 B2-B1 A3-B2 B3-A3' ],
+    # source repositories, refs, expected repository
+    # linear trees
+    [ 'A1 A2-A1 A3-A2', 'master=A3', 'A1 A2-A1 A3-A2' ],
+    [   'A1 A2-A1 A3-A2 B1 B2-B1 B3-B2',
+        'master=A3 master=B3',
+        'A1 A2-A1 A3-A2 B1-A3 B2-B1 B3-B2'
+    ],
+    [   'A1 B1 A2-A1 B2-B1 A3-A2 B3-B2',
+        'master=A3 master=B3',
+        'A1 B1-A1 A2-B1 B2-A2 A3-B2 B3-A3'
+    ],
+
 );
 
 plan tests => scalar @tests;
@@ -20,13 +28,13 @@ my $gsr = File::Spec->rel2abs('script/git-stitch-repo');
 my $lib = File::Spec->rel2abs('lib');
 
 for my $t (@tests) {
-    my ( $src, $dst ) = @$t;
+    my ( $src, $refs, $dst ) = @$t;
 
     # a temporary directory for our tests
     my $dir = File::Spec->rel2abs( tempdir( 'git-XXXXX', CLEANUP => 1 ) );
 
     # create the source repositories
-    my @src = create_repos( $dir => $src );
+    my @src = create_repos( $dir => $src, $refs );
 
     # create the destination repository
     my $repo = new_repo( $dir => 'RESULT' );
