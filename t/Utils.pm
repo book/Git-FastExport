@@ -94,6 +94,8 @@ sub create_linear_commit {
     update_file( $base, $name );
     $repo->command( 'add', $name );
     $repo->command( 'commit', '-m', $child );
+    $info->{sha1}{$child}
+        = $repo->command_oneline(qw( log -n 1 --pretty=format:%H HEAD ));
     sleep 1;
 }
 
