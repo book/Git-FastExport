@@ -100,7 +100,29 @@ sub create_linear_commit {
 }
 
 sub create_merge_commit {
+    my ( $info, $child, @parents ) = @_;
+    my $name = substr( $child, 0, 1 );
+    my $repo = $info->{repo}{$name};
 
+    # checkout the first parent
+    my $parent = shift @parents;
+    $repo->command( 'checkout', '-q', $info->{sha1}{$parent} );
+
+    # merge the other parents
+    eval {
+        $repo->command_noisy( 'merge', '-n',
+            map { $info->{sha1}{$_} } @parents,
+        );
+        1;
+        }
+        or do {
+        my $base = File::Spec->catfile( $info->{dir}, $name );
+        update_file( $base, $name );
+        $repo->command( 'add', $name );
+        $repo->command( 'commit', '-m', $child );
+        };
+    $info->{sha1}{$child}
+        = $repo->command_oneline(qw( log -n 1 --pretty=format:%H HEAD ));
 }
 
 sub update_file {
