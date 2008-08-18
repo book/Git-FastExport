@@ -39,6 +39,11 @@ my @tests = (
         'A1 B1-A1 A2-B1 B2-B1 A3-B2 B3-A2 A4-B3A3 B3-A4',
         'The two master branches should be the same'
     ],
+    [   'A1 B1 A2-A1 A3-A1 B2-B1 B3-B1 B4-B2B3 A4-A2A3 B5-B4 A5-A4',
+        'master=A5 master=B5',
+        'A1 B1-A1 A2-B1 B2-B1 A3-B2 B3-A2 B4-B3B2 B3-A4',
+        'The two master branches should be the same'
+    ],
 
     # other trees
     [   'A1 B1 A2-A1 B2-B1 A3-22 A4-A2 B3-B2 B4-B2 A5-A4A3 B5-B3 B6-B4 B7-B6B5 B8-B7 A6-A5 A7-A3 A8-A6',
