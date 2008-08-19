@@ -166,6 +166,7 @@ sub last_alien_child {
         {
 
             # but don't go past another repo's merges
+            # FIXME - unless it only includes ancestors of ours
             return $node if $commits{$peer}->{merge};
             $node = $commits{$peer};
         }
@@ -195,47 +196,81 @@ and create a stream suitable for B<git-fast-import> that will create
 a new repository containing all the commits in a new commit tree
 that respects the history of all the source repositories.
 
+Typical usage is like this:
+
+    $ ls
+    A  B
+    $ mkdir RESULT
+    $ cd RESULT
+    $ git-init
+    $ git-stitch-repo ../A:A ../B:B | git-fast-import
+
+The C<RESULT> repository will contain all commits from repositories A
+and B, with the files from A in subdirectory F<A/> and the files from
+B in subdirectory F<B/>.
+
+B<git-stich-repo> works perfectly with repositories that have a B<linear>
+history (no merges). It has successfully been tested with 16 linear
+repositories, and produced the expected result.
+
 =head2 Example
 
 Imagine we have two repositories A and B that we want to stitch into
 a repository C so that all the files from A are in subdirectory F<A>
 and all the files from B are in subdirectory F<B>.
 
+Note: in the following ASCII art graphs, horizontal order is chronological.
+
 Repository A:
 
-           topic
-           '     ,master
-           A3---A5
-          /    /
-    A1---A2---A4
+                topic
+                '    ,master
+          ,----A3---A5
+         /         /
+    A1--A2---A4---'
 
 Branch I<master> points to A5 and branch I<topic> points to A3.
 
 Repository B:
 
-                 ,topic    ,master
-           B3---B5---B7---B8
-          /         /
-    B1---B2---B4---B6
+                           ,topic    ,master
+           ,---------B3---B5---B7---B8
+          /                   /
+    B1---B2---B4---B6--------'
 
 Branch I<master> points to B8 and branch I<topic> points to B5.
 
-The C repository should preserve chronology, commit relationships and
+The RESULT repository should preserve chronology, commit relationships and
 branches as much as possible, while giving the impression that the
-directories F<A> & F<B> did live side-by-side all the time.
+directories F<A/> & F<B/> did live side-by-side all the time.
 
 Assuming additional timestamps not shown on the above graphs,
 B<git-stitch-repo> will produce a B<git-fast-import> stream that will
 create the following history:
 
-                                    ,topic    ,master
-                    A3---B3---A5---B5---B7---B8
-                   /         /         /
-   A1---B1---A2---B2---A4---B4--------B6
+                                       ,topic-A
+                      ,---------------A3---B3 master-A
+                     /                      \ '    ,topic-B
+                    /         ,--------------A5---B5
+                   /         /                     \      ,master-B
+   A1---B1---A2---B2---A4---B4---B6-----------------B7---B8
 
 
-Note that the current result is slightly buggy, since A5 wasn't on the
-I<topic> branch in the original graph for A.
+=head1 BUGS & IMPROVEMENTS
+
+Any mathematician will tell you there are many many ways to stitch two
+trees together. This programs tries very hard not to create inconsistent
+history with regard to each input repository.
+
+The current implementation can (and will be) improved. I'm very interested
+in test repositories that do not give the expected results.
+
+One of the issues is that we currently refuse to stitch a node after
+a merge from another repository. For the current example, that would
+mean that any commit having A5 as a parent would be attached to B5,
+and not to B8.
+
+Fixing this is in the TODO list.
 
 =head1 AUTHOR
 
