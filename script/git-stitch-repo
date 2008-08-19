@@ -27,7 +27,8 @@ while (@ARGV) {
     $repo{$repo}{repo}   = $repo;
     $repo{$repo}{dir}    = $dir;
     $repo{$repo}{parser} = $parser;
-    $repo{$repo}{name}   = $name++;
+    $repo{$repo}{name}   = $dir;
+    $name++;
 }
 
 # repositories that we will process
