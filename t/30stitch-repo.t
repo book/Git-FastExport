@@ -54,7 +54,7 @@ my @tests = (
 );
 
 # useful hack for quick testing
-@tests = grep  { $_ } @tests[@ARGV] if @ARGV;
+@tests = grep {$_} @tests[@ARGV] if @ARGV;
 
 plan skip_all => 'No test selected' if !@tests;
 plan tests => scalar @tests;
@@ -67,7 +67,8 @@ for my $t (@tests) {
     my ( $src, $refs, $dst, $todo ) = @$t;
 
     # a temporary directory for our tests
-    my $dir = File::Spec->rel2abs( tempdir( 'git-XXXXX', CLEANUP => !@ARGV ) );
+    my $dir
+        = File::Spec->rel2abs( tempdir( 'git-XXXXX', CLEANUP => !@ARGV ) );
 
     # create the source repositories
     my @src = create_repos( $dir => $src, $refs );
