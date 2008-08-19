@@ -27,7 +27,7 @@ while (@ARGV) {
     $repo{$repo}{repo}   = $repo;
     $repo{$repo}{dir}    = $dir;
     $repo{$repo}{parser} = $parser;
-    $repo{$repo}{name}   = $dir;
+    $repo{$repo}{name}   = $dir || $name;
     $name++;
 }
 
