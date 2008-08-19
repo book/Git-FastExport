@@ -13,7 +13,7 @@ my %repo;
 my $name = 'A';
 while (@ARGV) {
     my ( $repo, $dir ) = split /:/, shift @ARGV, 2;
-    $repo = rel2abs( $repo );
+    $repo = rel2abs($repo);
     $dir ||= '';
 
     # create an export parser for each repo
