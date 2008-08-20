@@ -7,6 +7,7 @@ use Git;
 
 # some data for the file content
 my @data = <DATA>;
+my $idx = 0;
 
 1;
 
@@ -141,7 +142,7 @@ sub create_merge_commit {
 sub update_file {
     my ($file) = File::Spec->catfile(@_);
     open my $fh, '>', $file or die "Can't open $file: $!";
-    print $fh shift @data;
+    print $fh $data[ $idx++ % @data ];
     close $fh;
 }
 
