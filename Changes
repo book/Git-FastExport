@@ -1,9 +1,14 @@
 Revision history for Perl extension Git::FastExport
 
-0.04
+0.04 Wed Aug 20 22:04:30 CEST 2008
         [ENHANCEMENTS]
         - git-stitch-repo: fixed a bug that caused many commits/branches
           to be lost because different branches were given the same name.
+        [DOCUMENTATION]
+        - improved documentation for git-stitch-repo
+        [TESTS]
+        - t/30stitch-repot.t actually tests the results of running
+          git-stitch-repo on several different configurations
 
 0.03 Mon Jul  7 19:29:23 CEST 2008
         [ENHANCEMENTS]

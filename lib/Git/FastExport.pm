@@ -5,7 +5,7 @@ use Carp;
 use Cwd;
 use IPC::Open2;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
     my ( $class, $repo ) = @_;
