@@ -8,7 +8,9 @@ README
 script/git-stitch-repo
 t/00load.t
 t/01new.t
+t/10fast-export.t
+t/30stitch-repo.t
 t/fast-export
-t/git-fast-export.t
 t/pod-coverage.t
 t/pod.t
+t/Utils.pm
