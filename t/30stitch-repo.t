@@ -5,6 +5,14 @@ use File::Temp qw( tempdir );
 use IPC::Open2;
 use t::Utils;
 
+# first, make sure we have the right git version
+use Git;
+my @version = split /\./, my $version = Git->version;
+
+plan skip_all => "Git version $version doesn't provide git-fast-export"
+    . ' -- Minimum version needed: 1.5.4'
+    if !( $version[0] >= 1 && $version[1] >= 5 && $version[2] >= 4 );
+
 my @tests = (
 
     # source repositories, refs, expected repository
