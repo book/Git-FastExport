@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Slurp;
 
 my @latin = split m!^----\n!m, << 'EOT';
 perferendis
