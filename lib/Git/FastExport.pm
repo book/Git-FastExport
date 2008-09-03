@@ -5,6 +5,8 @@ use Carp;
 use Cwd;
 use IPC::Open2;
 
+use Git::FastExport::Block;
+
 our $VERSION = '0.04';
 
 'progress 1 objects';
