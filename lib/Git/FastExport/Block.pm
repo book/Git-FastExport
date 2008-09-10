@@ -1,6 +1,11 @@
 package Git::FastExport::Block;
 
+use strict;
+use warnings;
+
 my $LF = "\012";
+
+our $VERSION = '0.05';
 
 my %fields = (
     commit     => [qw( mark author committer data from merge files )],
@@ -31,3 +36,112 @@ sub as_string {
 }
 
 __END__
+
+=head1 NAME
+
+Git::FastExport::Block - A block in a fast-export stream
+
+=head1 SYNOSPSIS
+
+=head1 DESCRIPTION
+
+C<Git::FastExport::Block> represents blocks from a B<git-fast-export>
+stream.
+
+Internally, it is a simple hash with keys pointing either to a string
+or a reference to an array of strings, which makes it very
+easing to edit (when obtained via C<Git::FastExport> C<next_block()>
+method) or create.
+
+The following two keys are pointing to strings:
+
+=over 4
+
+=item *
+
+header
+
+first line of the block
+
+=item *
+
+data
+
+content of the block data section
+
+=back
+
+All the other keys are pointing to references to arrays of strings
+(each string representing a line in the B<fast-export> stream:
+
+=over 4
+
+=item *
+
+mark
+
+=item *
+
+author
+
+=item *
+
+commiter
+
+=item *
+
+from
+
+=item *
+
+merge
+
+=item *
+
+files
+
+=item *
+
+tagger
+
+=back
+
+Of course, which keys are present depend on the type of the block, 
+which is conveniently stored in the C<type> key.
+
+=head1 METHODS
+
+A C<Git::FastExport::Block> structure is meant to be used as a hash,
+and is not protected by an accessor/mutator interface.
+
+However, the module provides a method for ouputing blocks:
+
+=over 4
+
+=item as_string()
+
+Return the block as a string suitable for B<git-fast-import>.
+
+=back
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK)
+
+=head1 ACKNOWLEDGEMENTS
+
+The original version of this module was created as part of my work
+for BOOKING.COM, which authorized its publication/distribution
+under the same terms as Perl itself.
+
+=head1 COPYRIGHT
+
+Copyright 2008 Philippe Bruhat (BooK), All Rights Reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
