@@ -7,7 +7,7 @@ use IPC::Open2;
 
 use Git::FastExport::Block;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 'progress 1 objects';
 
