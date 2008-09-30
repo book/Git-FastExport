@@ -22,7 +22,11 @@ sub new_repo {
     chdir $wc;
     `git-init`;
     chdir $cwd;
-    return Git->repository( Directory => $wc );
+    my $repo = Git->repository( Directory => $wc );
+    $repo->command( qw( config user.email test@example.com ),
+        { STDERR => '' } );
+    $repo->command( qw( config user.name  Test ), { STDERR => '' } );
+    return $repo;
 }
 
 # produce a text description of a given repository
