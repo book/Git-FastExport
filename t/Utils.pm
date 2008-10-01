@@ -62,8 +62,8 @@ sub create_repos {
 
     for my $commit ( split / /, $desc ) {
         my ( $child, $parent ) = split /-/, $commit;
-        my @child = $child =~ /([A-Z]\d+)/g;
-        my @parent = $parent =~ /([A-Z]\d+)/g if $parent;
+        my @child = $child =~ /([A-Z]+\d+)/g;
+        my @parent = $parent =~ /([A-Z]+\d+)/g if $parent;
 
         die "bad node description" if @child > 1 && @parent > 1;
 
@@ -82,7 +82,8 @@ sub create_repos {
     # setup the refs (branches & tags)
     for my $ref ( split / /, $refs ) {
         my ( $name, $type, $commit ) = split /([>=])/, $ref;
-        my $repo = $info->{repo}{ substr( $commit, 0, 1 ) };
+        my ($repo_name) = $commit =~ /^([A-Z]+)/;
+        my $repo = $info->{repo}{$repo_name};
         if ( $type eq '=' ) {      # branch
             $repo->command( 'branch', '-D', $name )
                 if grep {/^..$name$/} $repo->command('branch');
@@ -99,7 +100,7 @@ sub create_repos {
 
 sub create_linear_commit {
     my ( $info, $child, $parent ) = @_;
-    my $name = substr( $child, 0, 1 );
+    my ($name) = $child =~ /^([A-Z]+)/g;
 
     # create the repo if needed
     my $repo = $info->{repo}{$name};
@@ -119,7 +120,7 @@ sub create_linear_commit {
 
 sub create_merge_commit {
     my ( $info, $child, @parents ) = @_;
-    my $name = substr( $child, 0, 1 );
+    my ($name) = $child =~ /^([A-Z]+)/g;
     my $repo = $info->{repo}{$name};
 
     # checkout the first parent
