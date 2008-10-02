@@ -99,6 +99,12 @@ sub create_repos {
         }
     }
 
+    # delete the dummy branch and checkout master in each repo
+    for my $repo ( values %{ $info->{repo} } ) {
+        $repo->command( [ 'checkout', 'master' ], { STDERR => '' } );
+        $repo->command( [ branch => '-D', 'dummy' ], { STDERR => '' } );
+    }
+
     # return the repository objects
     return map { $info->{repo}{$_} } sort keys %{ $info->{repo} };
 }
