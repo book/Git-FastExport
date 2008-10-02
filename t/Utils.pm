@@ -7,7 +7,10 @@ use Git;
 
 # some data for the file content
 my @data = <DATA>;
-my $idx = 0;
+my $idx  = 0;
+
+# Git.pm options for silencing git
+my $gitopts = { STDERR => '' };
 
 1;
 
@@ -23,9 +26,8 @@ sub new_repo {
     `git-init`;
     chdir $cwd;
     my $repo = Git->repository( Directory => $wc );
-    $repo->command( qw( config user.email test@example.com ),
-        { STDERR => '' } );
-    $repo->command( qw( config user.name  Test ), { STDERR => '' } );
+    $repo->command( [qw( config user.email test@example.com )], $gitopts );
+    $repo->command( [qw( config user.name  Test )],             $gitopts );
     return $repo;
 }
 
@@ -81,7 +83,7 @@ sub create_repos {
 
     # checkout a new dummy branch in each repo
     for my $repo ( values %{ $info->{repo} } ) {
-        $repo->command( [ 'checkout', '-b', 'dummy' ], { STDERR => '' } );
+        $repo->command( [ 'checkout', '-b', 'dummy' ], $gitopts );
     }
 
     # setup the refs (branches & tags)
@@ -89,20 +91,22 @@ sub create_repos {
         my ( $name, $type, $commit ) = split /([>=])/, $ref;
         my ($repo_name) = $commit =~ /^([A-Z]+)/;
         my $repo = $info->{repo}{$repo_name};
-        if ( $type eq '=' ) {      # branch
-            $repo->command( 'branch', '-D', $name )
+        if ( $type eq '=' ) {    # branch
+            $repo->command( [ branch => '-D', $name ], $gitopts )
                 if grep {/^..$name$/} $repo->command('branch');
-            $repo->command( 'branch', $name, $info->{sha1}{$commit} );
+            $repo->command( [ branch => $name, $info->{sha1}{$commit} ],
+                $gitopts );
         }
-        else {                     # tag
-            $repo->command( 'tag', $name, $info->{sha1}{$commit} );
+        else {                   # tag
+            $repo->command( [ tag => $name, $info->{sha1}{$commit} ],
+                $gitopts );
         }
     }
 
     # delete the dummy branch and checkout master in each repo
     for my $repo ( values %{ $info->{repo} } ) {
-        $repo->command( [ 'checkout', 'master' ], { STDERR => '' } );
-        $repo->command( [ branch => '-D', 'dummy' ], { STDERR => '' } );
+        $repo->command( [ 'checkout', 'master' ], $gitopts );
+        $repo->command( [ branch => '-D', 'dummy' ], $gitopts );
     }
 
     # return the repository objects
