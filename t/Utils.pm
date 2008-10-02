@@ -79,6 +79,11 @@ sub create_repos {
         sleep 1;
     }
 
+    # checkout a new dummy branch in each repo
+    for my $repo ( values %{ $info->{repo} } ) {
+        $repo->command( [ 'checkout', '-b', 'dummy' ], { STDERR => '' } );
+    }
+
     # setup the refs (branches & tags)
     for my $ref ( split / /, $refs ) {
         my ( $name, $type, $commit ) = split /([>=])/, $ref;
