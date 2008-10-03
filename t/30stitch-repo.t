@@ -75,7 +75,6 @@ plan tests => scalar @nums;
 
 # the program we want to test
 my $gsr = File::Spec->rel2abs('script/git-stitch-repo');
-my $lib = File::Spec->rel2abs('lib');
 
 for my $n (@nums) {
     my ( $src, $refs, $dst, $todo ) = @{ $tests[$n] };
@@ -119,7 +118,7 @@ for my $n (@nums) {
     # run git-stitch-repo on the source repositories
     my ( $in, $out );
     my $pid
-        = open2( $out, $in, $^X, "-I$lib", $gsr, map { $_->wc_path } @src );
+        = open2( $out, $in, $^X, "-Mblib", $gsr, map { $_->wc_path } @src );
 
     # run git-fast-import on the destination repository
     my ( $fh, $c ) = $repo->command_input_pipe( 'fast-import', '--quiet' );
