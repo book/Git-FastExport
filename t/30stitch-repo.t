@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-use File::Temp qw( tempdir );
 use IPC::Open2;
+use File::Path;
 use t::Utils;
 
 # first, make sure we have the right git version
@@ -67,24 +67,51 @@ my @tests = (
 );
 
 # useful hack for quick testing
-@tests = grep {$_} @tests[@ARGV] if @ARGV;
+my @nums = 0 .. @tests - 1;
+@nums = grep { $_ < @tests } @ARGV if @ARGV;
 
-plan skip_all => 'No test selected' if !@tests;
-plan tests => scalar @tests;
+plan skip_all => 'No test selected' if !@nums;
+plan tests => scalar @nums;
 
 # the program we want to test
 my $gsr = File::Spec->rel2abs('script/git-stitch-repo');
 my $lib = File::Spec->rel2abs('lib');
 
-for my $t (@tests) {
-    my ( $src, $refs, $dst, $todo ) = @$t;
+for my $n (@nums) {
+    my ( $src, $refs, $dst, $todo ) = @{ $tests[$n] };
 
     # a temporary directory for our tests
-    my $dir
-        = File::Spec->rel2abs( tempdir( 'git-XXXXX', CLEANUP => !@ARGV ) );
+    my $dir = File::Spec->rel2abs( File::Spec->catdir( 'git-test', $n ) );
+
+    # check if we have cached the source repositories
+    my @src;
+    my $build = 0;
+    if ( -d $dir ) {
+
+        # are the source repositories correct?
+        for my $desc ( split_description($src) ) {
+            my ($name) = $desc =~ /^([A-Z]+)/;
+            push @src, my $repo = eval {
+                Git->repository(
+                    Directory => File::Spec->catdir( $dir, $name ) );
+            };
+            $build++ if !$repo || repo_description($repo) ne $desc;
+        }
+
+        # remove the old RESULT dir
+        rmtree( [ File::Spec->catdir( $dir, 'RESULT' ) ] );
+    }
+    else {
+        $build = 1;
+    }
 
     # create the source repositories
-    my @src = create_repos( $dir => $src, $refs );
+    if ($build) {
+        my $nodes = 1 + $src =~ y/ //;
+        diag "Building repositories - please wait $nodes seconds";
+        rmtree( [$dir] );
+        @src = create_repos( $dir => $src, $refs );
+    }
 
     # create the destination repository
     my $repo = new_repo( $dir => 'RESULT' );
