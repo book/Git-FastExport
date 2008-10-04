@@ -39,3 +39,7 @@
 \B\._
 # Avoid archives of this distribution
 \bGit-FastExport-[\d\.\_]+
+
+# avoid local stuff
+git-test
+mess
