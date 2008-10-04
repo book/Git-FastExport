@@ -1,5 +1,13 @@
 Revision history for Perl extension Git::FastExport
 
+0.05 Sun Oct  5 01:22:53 CEST 2008
+        [ENHANCEMENTS]
+        - made Git::FastExport::Block an independent module
+        [TESTS]
+        - t/30stitch-repo.t now caches the source repositories used in
+          the tests. This speed up considerably this test script after
+          the first run (from 2 minutes to 2 seconds)
+
 0.04 Wed Aug 20 22:04:30 CEST 2008
         [ENHANCEMENTS]
         - git-stitch-repo: fixed a bug that caused many commits/branches
