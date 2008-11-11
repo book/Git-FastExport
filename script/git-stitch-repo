@@ -209,6 +209,17 @@ The C<RESULT> repository will contain all commits from repositories A
 and B, with the files from A in subdirectory F<A/> and the files from
 B in subdirectory F<B/>.
 
+    $ git checkout master-A
+    warning: You appear to be on a branch yet to be born.
+    warning: Forcing checkout of master-A.
+    Switched to branch "master-A"
+    $ git checkout master-B
+    Switched to branch "master-B"
+
+Both branches can be seen Using C<gitk --all>. It is now possible to
+create the I<master> branch and have it point at the right commit,
+and delete the two I<master-A> and I<master-B> branches.
+
 B<git-stich-repo> works perfectly with repositories that have a B<linear>
 history (no merges). It has successfully been tested with 16 linear
 repositories, and produced the expected result.
