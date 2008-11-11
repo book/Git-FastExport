@@ -1,11 +1,20 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use Pod::Usage;
+use Getopt::Long;
 use Git;
 use Git::FastExport;
 use File::Spec::Functions qw( rel2abs );
 
-our $VERSION = '0.04';
+our $VERSION = $Git::FastExport::VERSION;
+
+# basic command-line options
+GetOptions( \my %option, 'help', 'manual', 'version' )
+    or pod2usage( -verbose => 0 );
+print "git-stitch-repo version $VERSION\n" and exit if $option{version};
+pod2usage( -verbose => 1 ) if $option{help};
+pod2usage( -verbose => 2 ) if $option{manual};
 
 my %repo;
 
@@ -187,6 +196,12 @@ git-stitch-repo - Stitch several git repositories into a git-fast-import stream
 =head1 SYNOPSIS
 
 git-stitch-repo repo1 repo2:dir2 ...
+
+=head1 OPTIONS
+
+    --help       Print a short online help and exit
+    --manual     Print the full manual page and exit
+    --version    Print version information and exit
 
 =head1 DESCRIPTION
 
