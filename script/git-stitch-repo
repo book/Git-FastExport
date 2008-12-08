@@ -231,7 +231,7 @@ B in subdirectory F<B/>.
     $ git checkout master-B
     Switched to branch "master-B"
 
-Both branches can be seen Using C<gitk --all>. It is now possible to
+Both branches can be seen using C<gitk --all>. It is now possible to
 create the I<master> branch and have it point at the right commit,
 and delete the two I<master-A> and I<master-B> branches.
 
