@@ -52,6 +52,7 @@ $_->{commit} = next_commit( $_->{parser} ) for @repos;
 # main loop
 my $last;
 my %commits;
+my %parents;
 while (@repos) {
 
     # sort by date
@@ -116,6 +117,11 @@ while (@repos) {
     # update the parents information
     for my $parent ( map { $parent_map{$_} } @parents ) {
         push @{ $commits{$parent}{children} }, $node->{name};
+        for my $repo_name ( keys %{ $parents{$parent} } ) {
+            $parents{ $node->{name} }{$repo_name}{$_} = 1
+                for keys %{ $parents{$parent}{$repo_name} || {} };
+        }
+        $parents{ $node->{name} }{ $commits{$parent}{repo} }{$parent} = 1;
     }
 
     # dump the commit
