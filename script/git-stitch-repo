@@ -52,6 +52,7 @@ $_->{commit} = next_commit( $_->{parser} ) for @repos;
 # main loop
 my $last;
 my %commits;
+my @heads;
 while (@repos) {
 
     # sort by date
@@ -138,6 +139,9 @@ while (@repos) {
 
     # dump the commit
     print $commit->as_string;
+
+    # update currents heads information
+    @heads = grep { !@{ $commits{$_}{children} } } @heads, $node->{name};
 
     # load next commit
     $repo->{commit} = next_commit( $repo->{parser} )
