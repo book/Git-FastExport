@@ -102,9 +102,20 @@ while (@repos) {
     my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
         @{ $commit->{merge} || [] };
 
+    # get the reference parent list used by last_alien_child()
+    my $parents = {};
+    for my $parent (@parents) {
+        for my $repo ( keys %{ $commits{$parent}{parents} } ) {
+            $parents->{$repo}{$_} = 1
+                for keys %{ $commits{$parent}{parents}{$repo} };
+        }
+    }
+
     # map each parent to its last "alien" commit
     my %parent_map = map {
-        $_ => last_alien_child( $commits{$_}, $repo->{repo}, $branch )->{name}
+        $_ =>
+            last_alien_child( $commits{$_}, $repo->{repo}, $branch, $parents )
+            ->{name}
     } @parents;
 
     # map parent marks
@@ -163,35 +174,43 @@ sub next_commit {
 # find the last child of this node
 # that has either no child
 # or a child in our repo
+# or an alien child that has the same parent list
 sub last_alien_child {
-    my ( $node, $repo, $branch ) = @_;
+    my ( $node, $repo, $branch, $parents ) = @_;
+    my $old = '';
 
-    while (1) {
+    while ( $node ne $old ) {
+        $old = $node;
 
         # no children nodes
         return $node if ( !@{ $node->{children} } );
 
         # some children nodes are local
         return $node
-            if grep { $commits{$_}->{repo} eq $repo } @{ $node->{children} };
+            if grep { $commits{$_}{repo} eq $repo } @{ $node->{children} };
 
-        # there's a child in the same branch
-        if ( my ($peer)
-            = grep { $commits{$_}->{branch} eq $branch }
-            @{ $node->{children} } )
-        {
+        # all children are alien to us
+        for my $peer ( @{ $node->{children} } ) {
 
-            # but don't go past another repo's merges
-            # FIXME - unless it only includes ancestors of ours
-            return $node if $commits{$peer}->{merge};
+            # the child parent list
+            my $peer_parents = join( ',',
+                sort keys
+                    %{ $commits{$peer}{parents}{ $commits{$peer}{repo} } } );
+
+            # the valid parent list for the node we want to attach
+            my $ref_parents = join( ',',
+                sort keys %{ $parents->{ $commits{$peer}{repo} } } );
+
+            next if $commits{$peer}->{merge} && $peer_parents ne $ref_parents;
+
+            # this child node has a valid parent list
             $node = $commits{$peer};
-        }
-
-        # or pick the first child (as good as any)
-        else {
-            $node = $commits{ $node->{children}[0] };
+            last;    # stop at the first we find
         }
     }
+
+    # return last valid child
+    return $node;
 }
 
 __END__
