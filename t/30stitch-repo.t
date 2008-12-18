@@ -20,6 +20,7 @@ my @tests = (
 
     # source repositories, refs, expected repository
     # linear trees
+    # 0 - 3
     [ 'A1 A2-A1 A3-A2', 'master=A3', 'A1 A2-A1 A3-A2' ],
     [   'A1 A2-A1 A3-A2 B1 B2-B1 B3-B2',
         'master=A3 master=B3',
@@ -35,6 +36,7 @@ my @tests = (
     ],
 
     # simple diamonds
+    # 4 - 8
     [ 'A1 A2-A1 A3-A1 A4-A2A3', 'master=A4', 'A1 A2-A1 A3-A1 A4-A2A3' ],
     [   'A1 A2-A1 A3-A1 A4-A2A3 B1 B2-B1 B3-B1 B4-B2B3',
         'master=A4 master=B4',
@@ -42,30 +44,27 @@ my @tests = (
     ],
     [   'A1 B1 A2-A1 A3-A1 B2-B1 B3-B1 A4-A2A3 B4-B2B3',
         'master=A4 master=B4',
-        'A1 B1-A1 A2-B1 B2-B1 A3-B2 B3-A2 A4-B3A3 B3-A4',
-        'The two master branches should be the same'
+        'A1 B1-A1 A2-B1 A3-B1 B2-A3 B3-A3 A4-A2B3 B4-B2A4',
     ],
     [   'A1 B1 A2-A1 B2-B1 A3-A1 B3-B1 A4-A2A3 B4-B2B3',
         'master=A4 master=B4',
-        'A1 B1-A1 A2-B1 B2-B1 A3-B2 B3-A2 A4-B3A3 B3-A4',
-        'The two master branches should be the same'
+        'A1 B1-A1 A2-B1 B2-A2 A3-B1 B3-A3 A4-B2B3 B4-A4',
+        'B4 shouldn\'t be a merge of A4 and A4'
     ],
     [   'A1 B1 A2-A1 A3-A1 B2-B1 B3-B1 B4-B2B3 A4-A2A3 B5-B4 A5-A4',
         'master=A5 master=B5',
-        'A1 B1-A1 A2-B1 B2-B1 A3-B2 B3-A2 B4-B3B2 B3-A4',
-        'The two master branches should be the same'
+        'A1 B1-A1 A2-B1 A3-B1 B2-A3 B3-A3 B4-B2B3 A4-A2B4 B5-A4 A5-B5'
     ],
 
     # other trees
+    # 9 - 10
     [   'A1 B1 A2-A1 B2-B1 A3-A2 A4-A2 B3-B2 B4-B2 A5-A4A3 B5-B3 B6-B4 B7-B6B5 B8-B7 A6-A5',
         'master=A6 master=B8 topic=A3 topic=B5',
-        'A1 B1-A1 A2-B1 B2-A2 A3-B2 A4-B2 B3-A3 B4-A4 A5-B4B3 B5-A5 B6-B4 B7-B6B5 B8-B7 A6-B8',
-        'A6 should be attached to B8'
+        'A1 B1-A1 A2-B1 B2-A2 A3-B2 A4-B2 B3-A4 B4-A4 A5-B4A3 B5-B3 B6-A5 B7-B6B5 B8-B7 A6-B8',
     ],
     [   'A1 B1 A2-A1 B2-B1 A3-A2 A4-A2 B3-B2 B4-B2 A5-A4A3 B5-B3 B6-B4 B7-B6B5 B8-B7 A6-A5 A7-A3 A8-A6',
         'master=A8 master=B8 topic=A7 topic=B5',
-        'A1 B1-A1 A2-B1 B2-A2 A4-B2 B4-A4 B6-B4 A3-B2 B3-A3 A5-B4B3 B5-A5 B7-B5 B8-B7 A7-A5 A6-B8 A8-A6',
-        'The two master branches should be the same'
+        'A1 B1-A1 A2-B1 B2-A2 A3-B2 A4-B2 B3-A4 B4-A4 A5-B4A3 B5-B3 B6-A5 B7-B6B5 B8-B7 A6-B8 A7-A3 A8-A6',
     ],
 );
 
