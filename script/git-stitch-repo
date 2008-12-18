@@ -141,7 +141,32 @@ while (@repos) {
     print $commit->as_string;
 
     # update currents heads information
-    @heads = grep { !@{ $commits{$_}{children} } } @heads, $node->{name};
+    @heads = grep { !@{ $_->{children} } } @heads, $commits{ $node->{name} };
+
+    # merge alien heads if possible
+    if ( @heads > 1 ) {
+        for my $head (@heads) {
+            for my $other ( grep { $_->{repo} ne $head->{repo} } @heads ) {
+
+                # parents of $head in $head's repo contains
+                # all parents of $other in $head's repo
+                next
+                    if grep { !exists $head->{parents}{ $head->{repo} }{$_} }
+                        keys %{ $other->{parents}{ $head->{repo} } };
+
+                # parents of $other in $other's repo contains
+                # all parents of $head in $other's repo
+                next
+                    if
+                    grep { !exists $other->{parents}{ $other->{repo} }{$_} }
+                        keys %{ $head->{parents}{ $other->{repo} } };
+
+                # we can create a new merge commit
+                # merging $head and $other
+                # FIXME
+            }
+        }
+    }
 
     # load next commit
     $repo->{commit} = next_commit( $repo->{parser} )
