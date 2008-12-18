@@ -10,11 +10,16 @@ use File::Spec::Functions qw( rel2abs );
 our $VERSION = $Git::FastExport::VERSION;
 
 # basic command-line options
-GetOptions( \my %option, 'help', 'manual', 'version' )
+my %option = ( select => 'last' );
+GetOptions( \%option, 'help', 'manual', 'version', 'select=s' )
     or pod2usage( -verbose => 0 );
 print "git-stitch-repo version $VERSION\n" and exit if $option{version};
 pod2usage( -verbose => 1 ) if $option{help};
 pod2usage( -verbose => 2 ) if $option{manual};
+pod2usage(
+    -message => "Invalid selection algorithm: $option{select}\n",
+    -verbose => 1
+) if $option{select} !~ /^(?:first|last|random)$/;
 
 my %repo;
 
@@ -199,6 +204,7 @@ sub last_alien_child {
             if grep { $commits{$_}{repo} eq $repo } @{ $node->{children} };
 
         # all children are alien to us
+        my @valid;
         for my $id ( @{ $node->{children} } ) {
 
             my $peer = $commits{$id};
@@ -210,9 +216,14 @@ sub last_alien_child {
                     keys %{ $parents->{ $peer->{repo} } };
 
             # this child node has a valid parent list
-            $node = $commits{$id};
-            last;    # stop at the first we find
+            push @valid, $commits{$id};
         }
+
+        $node
+            = $option{select} eq 'last'  ? $valid[-1]
+            : $option{select} eq 'first' ? $valid[0]
+            :                              $valid[ rand @valid ]
+            if @valid;
     }
 
     # return last valid child
@@ -227,9 +238,12 @@ git-stitch-repo - Stitch several git repositories into a git-fast-import stream
 
 =head1 SYNOPSIS
 
-git-stitch-repo repo1 repo2:dir2 ...
+git-stitch-repo [ options ] repo1 repo2:dir2 ...
 
 =head1 OPTIONS
+
+    --select < first | last | random >
+                 Algorithm for selection the attachment commit 
 
     --help       Print a short online help and exit
     --manual     Print the full manual page and exit
@@ -270,6 +284,33 @@ and delete the two I<master-A> and I<master-B> branches.
 B<git-stich-repo> works perfectly with repositories that have a B<linear>
 history (no merges). It has successfully been tested with 16 linear
 repositories, and produced the expected result.
+
+=head2 Commit attachement algorithm
+
+B<git-stitch-repo> processes the input commits in B<--date-order>
+fashion, and build a graph by attaching the new commit to another
+commit of the graph being constructed. It starts from the "original"
+parents of the node, and tries do follow the graph as far as possible.
+
+When a commit has several suitable child commits, it needs to make a
+selection. There are currently three selection algorithms:
+
+=over 4
+
+=item last
+
+Pick the last child commit, i.e. the most recent one.
+This is the default.
+
+=item first
+
+Pick the first child commit, i.e. the oldest one.
+
+=item random
+
+Pick a random child.
+
+=back
 
 =head2 Example
 
