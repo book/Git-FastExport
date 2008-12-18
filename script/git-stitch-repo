@@ -275,21 +275,18 @@ sub last_alien_child {
             if grep { $commits{$_}{repo} eq $repo } @{ $node->{children} };
 
         # all children are alien to us
-        for my $peer ( @{ $node->{children} } ) {
+        for my $id ( @{ $node->{children} } ) {
 
-            # the child parent list
-            my $peer_parents = join( ',',
-                sort keys
-                    %{ $commits{$peer}{parents}{ $commits{$peer}{repo} } } );
+            my $peer = $commits{$id};
 
-            # the valid parent list for the node we want to attach
-            my $ref_parents = join( ',',
-                sort keys %{ $parents->{ $commits{$peer}{repo} } } );
-
-            next if $commits{$peer}->{merge} && $peer_parents ne $ref_parents;
+            # parents of $peer in $peer's repo contains
+            # all parents from $parent in $peer's repo
+            next
+                if grep { !exists $peer->{parents}{ $peer->{repo} }{$_} }
+                    keys %{ $parents->{ $peer->{repo} } };
 
             # this child node has a valid parent list
-            $node = $commits{$peer};
+            $node = $commits{$id};
             last;    # stop at the first we find
         }
     }
