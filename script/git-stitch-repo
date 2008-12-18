@@ -127,15 +127,7 @@ while (@repos) {
     }
 
     # update the parents information
-    for my $parent ( map { $parent_map{$_} } @parents ) {
-        push @{ $commits{$parent}{children} }, $node->{name};
-        for my $repo_name ( keys %{ $commits{$parent}{parents} } ) {
-            $commits{ $node->{name} }{parents}{$repo_name}{$_} = 1
-                for keys %{ $commits{$parent}{parents}{$repo_name} || {} };
-        }
-        $commits{ $node->{name} }{parents}{ $commits{$parent}{repo} }{$parent}
-            = 1;
-    }
+    add_parents( $node => map { $commits{ $parent_map{$_} } } @parents );
 
     # dump the commit
     print $commit->as_string;
@@ -198,6 +190,23 @@ sub next_commit {
         print $block->as_string();
     }
     return $block;
+}
+
+# given a commit (item from %commits)
+# add the parents from the given commits to it
+sub add_parents {
+    my ( $node, @parents ) = @_;
+
+    for my $parent (@parents) {
+        push @{ $parent->{children} }, $node->{name};
+        for my $repo_name ( keys %{ $parent->{parents} } ) {
+            $node->{parents}{$repo_name}{$_} = 1
+                for keys %{ $parent->{parents}{$repo_name} || {} };
+        }
+        $node->{parents}{ $parent->{repo} }{ $parent->{name} } = 1;
+    }
+
+    return $node;
 }
 
 # find the last child of this node
