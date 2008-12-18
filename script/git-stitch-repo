@@ -94,6 +94,7 @@ while (@repos) {
         children => [],
         parents  => {},
         merge    => exists $commit->{merge},
+        block    => $commit,
     };
 
     # mark our original source
@@ -137,8 +138,13 @@ while (@repos) {
 
     # merge alien heads if possible
     if ( @heads > 1 ) {
+        my %merged;
         for my $head (@heads) {
             for my $other ( grep { $_->{repo} ne $head->{repo} } @heads ) {
+
+                # already merged?
+                my $key = join '-', sort $head->{name}, $other->{name};
+                next if $merged{$key};
 
                 # parents of $head in $head's repo contains
                 # all parents of $other in $head's repo
@@ -155,7 +161,9 @@ while (@repos) {
 
                 # we can create a new merge commit
                 # merging $head and $other
-                # FIXME
+                my $merge = merge_commit( $head, $other );
+                $merged{$key}++;
+                print $merge->as_string;
             }
         }
     }
@@ -190,6 +198,45 @@ sub next_commit {
         print $block->as_string();
     }
     return $block;
+}
+
+# create a new merge commit
+# update the global %commits database
+# return a Git::FastExport::Block object
+sub merge_commit {
+    my (@commits) = @_;
+
+    # add the new node to the commit database
+    my $merge = {
+        name     => $mark++,
+        repo     => '',        # no repo
+        branch   => '',        # no branch
+        children => [],        # no children yet
+        parents  => {},
+        merge    => 1,         # this is a merge commit
+    };
+    add_parents( $merge => @commits );
+
+    # create the corresponding Git::FastExport::Block object
+    my $author = 'git-stitch-repo <> ' . time . ' +0000';
+    $merge->{block} = bless {
+        type      => 'commit',
+        header    => 'commit ref/heads/master',
+        mark      => ["mark :$merge->{name}"],
+        author    => ["author $author"],
+        committer => ["committer $author"],
+        from      => ["from :$commits[0]{name}"],
+        merge     => ["merge :$commits[1]{name}"],
+        files     => [ map { @{ $commits[$_]{block}{files} } } 0, 1 ],
+        data      => "merge commit added by git-stitch-repo\n",
+        },
+        'Git::FastExport::Block';
+
+    # update the commit database
+    $commits{ $merge->{name} } = $merge;
+
+    # return the Git::FastExport::Block object
+    return $merge->{block};
 }
 
 # given a commit (item from %commits)
