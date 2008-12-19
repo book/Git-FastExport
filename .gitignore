@@ -2,7 +2,9 @@ blib
 _build
 Build
 *.bak
-META.yml
 Makefile
 cover_db
 pm_to_blib
+mess
+git-test
+Git-FastExport-*
