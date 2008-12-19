@@ -78,6 +78,19 @@ my @tests = (
         'A1 B1-A1 A2-B1 B2-A2 A3-B2 A4-B2 B3-A4 B4-A4 A5-B4A3 B5-B3 B6-A5 B7-B6B5 B8-B7 A6-B8 A7-A3 A8-A6',
         'A1 B1-A1 A2-B1 B2-A2 A3-B2 A4-B2 B3-A3 B4-A3 A5-A4B3 B5-A5 B6-B4 B7-B6B5 B8-B7 A6-B8 A7-B3 A8-A6',
     ],
+
+    # specially crafted examples
+    # 11 - 12
+    [   'A1 B2 A3-A1 A4-A1 B5-B2 A6-A1 B7-B2',
+        'master=A6 branch1=A3 branch2=A4 master=B5 branch1=B7',
+        'A1 B2-A1 A3-B2 A4-B2 B5-A4 A6-B2 B7-A4',
+        'A1 B2-A1 A3-B2 A4-B2 B5-A3 A6-B2 B7-A3',
+    ],
+    [   'A1 B1 C1 A2-A1 B2-B1 C2-C1 A3-A1 B3-B1 C3-C1 A4-A2A3 B4-B2B3 C4-C2C3',
+        'master=A4 master=B4 master=C4',
+        'A1 B1-A1 C1-B1 A2-C1 B2-A2 C2-B2 A3-C1 B3-A2 C3-B2 A4-B3A3 B4-C3A4 C4-C2B4',
+        'A1 B1-A1 C1-B1 A2-C1 B2-A2 C2-B2 A3-C1 B3-A2 C3-B2 A4-C2A3 B4-A4B3 C4-B4C3',
+    ],
 );
 
 # algorithms to test
