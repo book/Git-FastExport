@@ -187,10 +187,12 @@ sub add_parents {
 # that has either no child
 # or a child in our repo
 # or an alien child that has the same parent list
+my %past_select;
+
 sub last_alien_child {
     my ( $node, $branch, $parents ) = @_;
     my $repo = $node->{repo};
-    my $old = '';
+    my $old  = '';
 
     while ( $node ne $old ) {
         $old = $node;
@@ -215,14 +217,16 @@ sub last_alien_child {
                     keys %{ $parents->{ $peer->{repo} } };
 
             # this child node has a valid parent list
-            push @valid, $commits{$id};
+            push @valid, $id;
         }
 
-        $node
+        # compute the commit to attach to, using the request algorithm
+        my $node_id
             = $option{select} eq 'last'  ? $valid[-1]
             : $option{select} eq 'first' ? $valid[0]
-            :                              $valid[ rand @valid ]
+            : $past_select{"$node->{name} @valid"} ||= $valid[ rand @valid ]
             if @valid;
+        $node = $commits{$node_id};
     }
 
     # return last valid child
