@@ -118,9 +118,7 @@ while (@repos) {
 
     # map each parent to its last "alien" commit
     my %parent_map = map {
-        $_ =>
-            last_alien_child( $commits{$_}, $repo->{repo}, $branch, $parents )
-            ->{name}
+        $_ => last_alien_child( $commits{$_}, $branch, $parents )->{name}
     } @parents;
 
     # map parent marks
@@ -190,7 +188,8 @@ sub add_parents {
 # or a child in our repo
 # or an alien child that has the same parent list
 sub last_alien_child {
-    my ( $node, $repo, $branch, $parents ) = @_;
+    my ( $node, $branch, $parents ) = @_;
+    my $repo = $node->{repo};
     my $old = '';
 
     while ( $node ne $old ) {
