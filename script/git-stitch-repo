@@ -443,43 +443,6 @@ from the same commit in the resulting repository
 The current implementation can probably be improved. I'm very interested
 in test repositories that do not give the expected results.
 
-=head2 Lost merge
-
-One issue is that sometimes a merge commit is lost, because the
-merge has already be done by a previous merge.
-
-For example, stitching these two graphs (commit order is A1, B1, A2,
-B2, A3, B3, A4, B4):
-
-    A1--A2------A4                    B1--B2------B4
-     \         /                       \         /
-      `-----A3'                         `-----B3'
-
-can result (depending on the commit sequence) in:
-
-                             master-A
-                             '   ,master-B
-    A1--B1--A2--B2----------A4--B4
-         \                 /
-          `---------A3--B3'
-
-In this example, B4 is actually a merge between A4 and... A4.
-
-    $ git log -n 1 master-B
-    commit e8471a698212628fdb0f013205493c905ae5b144
-    Merge: 1051891... 1051891...
-    Author: Test <test@example.com>
-    Date:   Thu Dec 11 01:22:48 2008 +0100
-    
-        B4
-
-This is because the merge between B2 and B3 has already been done by
-the A4 merge.
-
-Removing that useless merge (which used to break some git tools)
-is on the TODO list for version 0.07. The release with a license to
-kill... merges. C<;-)>
-
 =head1 AUTHOR
 
 Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
