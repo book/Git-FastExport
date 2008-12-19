@@ -246,7 +246,7 @@ git-stitch-repo [ options ] repo1 repo2:dir2 ...
 =head1 OPTIONS
 
     --select < first | last | random >
-                 Algorithm for selection the attachment commit 
+                 Algorithm for selection the attachment commit
 
     --help       Print a short online help and exit
     --manual     Print the full manual page and exit
@@ -325,20 +325,19 @@ Note: in the following ASCII art graphs, horizontal order is chronological.
 
 Repository A:
 
-                topic
-                '    ,master
-          ,----A3---A5
+             ,topic      ,master
+          ,-A3------A5--A6
          /         /
-    A1--A2---A4---'
+    A1--A2------A4'
 
 Branch I<master> points to A5 and branch I<topic> points to A3.
 
 Repository B:
 
-                           ,topic    ,master
-           ,---------B3---B5---B7---B8
-          /                   /
-    B1---B2---B4---B6--------'
+                     ,topic  ,master
+          ,-B3------B5------B7--B8
+         /                 /
+    B1--B2------B4------B6'
 
 Branch I<master> points to B8 and branch I<topic> points to B5.
 
@@ -346,17 +345,61 @@ The RESULT repository should preserve chronology, commit relationships and
 branches as much as possible, while giving the impression that the
 directories F<A/> & F<B/> did live side-by-side all the time.
 
-Assuming additional timestamps not shown on the above graphs,
+Assuming additional timestamps not shown on the above graphs
+(the commit order is A1, B1, A2, B2, A3, A4, B3, B4, A5, B5, B6, B7, B8, A6),
 B<git-stitch-repo> will produce a B<git-fast-import> stream that will
-create the following history:
+create the following history, depending on the value of B<--select>:
 
-                                       ,topic-A
-                      ,---------------A3---B3 master-A
-                     /                      \ '    ,topic-B
-                    /         ,--------------A5---B5
-                   /         /                     \      ,master-B
-   A1---B1---A2---B2---A4---B4---B6-----------------B7---B8
+=over 4
 
+=item I<last> (default)
+
+                                         ,topic-B
+                          ,-B3----------B5----.
+                         /                     \      ,master-B
+    A1--B1--A2--B2------A4------B4--A5------B6--B7---B8--A6
+                 \                 /                      `master-A
+                  `-A3------------'
+                     `topic-A
+
+=item I<first>
+
+                      ,---------B4----------B6-.
+                     /       ,topic-A           \     ,master-B
+    A1--B1--A2--B2--A3------B3------A5--B5------B7---B8--A6
+                 \                 /     `topic-B         `master-A
+                  `-----A4--------'
+
+=item I<random>
+
+In this example, there are only two places where the selection process
+is triggered, and there are only two items to choose from each time.
+Therefore the I<random> selection algorithm will produce 4 possible
+different results.
+
+In addition to the results shown above (C<last+last> and C<first+first>),
+we can also obtain the two following graphs:
+
+C<first+last>:
+
+                     ,topic-A                         ,master-B
+    A1--B1--A2--B2--A3--------------A5------B6--B7---B8--A6
+                 \                 /           /          `master-A
+                  `-----A4------B4'     B5----'
+                         \             / `topic-B
+                          `-B3--------'
+
+C<last+first>:
+
+                                                      ,master-B
+    A1--B1--A2--B2------A4------B4----------B6--B7---B8--A6
+                 \       \                     /          `master-A
+                  \       `-B3------A5--B5----'
+                   \               /     `topic-B
+                    A3------------'
+                     `topic-A
+
+=back
 
 =head1 BUGS & IMPROVEMENTS
 
@@ -364,15 +407,43 @@ Any mathematician will tell you there are many many ways to stitch two
 trees together. This programs tries very hard not to create inconsistent
 history with regard to each input repository.
 
-The current implementation can (and will be) improved. I'm very interested
+The current implementation can probably be improved. I'm very interested
 in test repositories that do not give the expected results.
 
-One of the issues is that we currently refuse to stitch a node after
-a merge from another repository. For the current example, that would
-mean that any commit having A5 as a parent would be attached to B5,
-and not to B8.
+One of the issues is that sometimes a merge commit is lost, because the
+merge has already be done by a previous merge.
 
-Fixing this is in the TODO list.
+For example, stitching these two graphs (commit order is A1, B1, A2,
+B2, A3, B3, A4, B4):
+
+    A1--A2------A4                    B1--B2------B4
+     \         /                       \         /
+      `-----A3'                         `-----B3'
+
+can result (depending on the commit sequence) in:
+
+                             master-A
+                             '   ,master-B
+    A1--B1--A2--B2----------A4--B4
+         \                 /
+          `---------A3--B3'
+
+In this example, B4 is actually a merge between A4 and... A4.
+
+    $ git log -n 1 master-B
+    commit e8471a698212628fdb0f013205493c905ae5b144
+    Merge: 1051891... 1051891...
+    Author: Test <test@example.com>
+    Date:   Thu Dec 11 01:22:48 2008 +0100
+    
+        B4
+
+This is because the merge between B2 and B3 has already been done by
+the A4 merge.
+
+Removing that useless merge (which used to break some git tools)
+is on the TODO list for version 0.07. The release with a license to
+kill... merges. C<;-)>
 
 =head1 AUTHOR
 
