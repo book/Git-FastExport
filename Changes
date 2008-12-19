@@ -1,5 +1,17 @@
 Revision history for Perl extension Git::FastExport
 
+0.06 Sat Dec 20 00:07:44 CET 2008
+        [ENHANCEMENTS]
+        - git-stitch-repo: greatly improved the algorithm for finding
+          a suitable commit to attach to, avoiding inconsistencies:
+          git-stitch-repo can now stitch non-linear repositories
+          in a consistent way
+        - git-stitch-repo: added an option to change the attachment
+          commit selection algorithm
+        [DOCUMENTATION]
+        - documentation improvements on git-stitch-repo, with a lot
+          more ascii graphs
+
 0.05 Sun Oct  5 01:22:53 CEST 2008
         [ENHANCEMENTS]
         - made Git::FastExport::Block an independent module
