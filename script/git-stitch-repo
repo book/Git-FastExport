@@ -402,16 +402,50 @@ C<last+first>:
 
 =back
 
-=head1 BUGS & IMPROVEMENTS
+=head1 ALGORITHM AND CONSTRAINTS
 
 Any mathematician will tell you there are many many ways to stitch two
-trees together. This programs tries very hard not to create inconsistent
+DAG together. This programs tries very hard not to create inconsistent
 history with regard to each input repository.
+
+The algorithm used by B<git-stitch-repo> enforce the following rules
+when building the resulting repository:
+
+=over 4
+
+=item *
+
+a commit is attached as far as possible in the DAG, starting from the
+original parent
+
+
+=item *
+
+a commit is only attached to another commit in the resulting repository
+that has B<exactly> the same ancestors list as the original parent
+commits.
+
+=item *
+
+when there are several valid branches to follow when trying to find 
+a commit to attach to, use the selection process (last or first commit
+(at the time of attachement), or random commit)
+
+=item *
+
+branches starting from the same commit in a source repository will start
+from the same commit in the resulting repository
+
+=back
+
+=head1 BUGS & IMPROVEMENTS
 
 The current implementation can probably be improved. I'm very interested
 in test repositories that do not give the expected results.
 
-One of the issues is that sometimes a merge commit is lost, because the
+=head2 Lost merge
+
+One issue is that sometimes a merge commit is lost, because the
 merge has already be done by a previous merge.
 
 For example, stitching these two graphs (commit order is A1, B1, A2,
