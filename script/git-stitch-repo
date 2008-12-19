@@ -289,6 +289,9 @@ B<git-stich-repo> works perfectly with repositories that have a B<linear>
 history (no merges). It has successfully been tested with 16 linear
 repositories, and produced the expected result.
 
+The improvements to the stitching algorithm added in version 0.06 should
+make is suitable to work with repositories having branches and merges.
+
 =head2 Commit attachement algorithm
 
 B<git-stitch-repo> processes the input commits in B<--date-order>
@@ -434,14 +437,16 @@ a commit to attach to, use the selection process (last or first commit
 =item *
 
 branches starting from the same commit in a source repository will start
-from the same commit in the resulting repository
+from the same commit in the resulting repository (this particular rule
+can be lifted: adding an option for this in on the TODO list)
 
 =back
 
 =head1 BUGS & IMPROVEMENTS
 
-The current implementation can probably be improved. I'm very interested
-in test repositories that do not give the expected results.
+The current implementation can probably be improved, and more options
+added. I'm very interested in test repositories that do not give the
+expected results.
 
 =head1 AUTHOR
 
