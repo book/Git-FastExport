@@ -24,7 +24,7 @@ sub new_repo {
     my $wc = File::Spec->rel2abs( File::Spec->catfile( $dir, $name ) );
     mkpath $wc;
     chdir $wc;
-    `git-init`;
+    `git init`;
     chdir $cwd;
     my $repo = Git->repository( Directory => $wc );
     $repo->command( [qw( config user.email test@example.com )], $gitopts );

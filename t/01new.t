@@ -8,7 +8,7 @@ my $dir = tempdir( CLEANUP => 1 );
 
 # alas, this can't be done with Git.pm
 chdir $dir;
-`git-init`;
+`git init`;
 
 my $git = Git->repository( Directory => $dir );
 
