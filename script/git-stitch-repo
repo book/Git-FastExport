@@ -369,9 +369,9 @@ create the following history, depending on the value of B<--select>:
 =item I<first>
 
                       ,---------B4----------B6-.
-                     /       ,topic-A           \     ,master-B
+                     /                          \     ,master-B
     A1--B1--A2--B2--A3------B3------A5--B5------B7---B8--A6
-                 \                 /     `topic-B         `master-A
+                 \   `topic-A      /     `topic-B         `master-A
                   `-----A4--------'
 
 =item I<random>
