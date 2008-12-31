@@ -2,6 +2,33 @@ package Git::FastExport::Stitch;
 
 use strict;
 use warnings;
+use Carp;
+
+sub new {
+    my ( $class, $options, @args ) = @_;
+
+    # create the object
+    my $self = bless {
+
+        # internal structures
+        repo => {},
+        name => 'A',
+
+        # default options
+        select => 'last',
+        cache  => 1,
+
+    }, $class;
+
+    # set the options
+    for my $key (qw( select cache )) {
+        $self->{$key} = $options->{$key} if exists $options->{$key};
+    }
+    croak "Invalid value for 'select' option: '$self->{select}'"
+        if $self->{select} !~ /^(?:first|last|random)$/;
+
+    return $self;
+}
 
 1;
 
