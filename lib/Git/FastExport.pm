@@ -5,7 +5,7 @@ use Carp;
 
 use Git::FastExport::Block;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 'progress 1 objects';
 

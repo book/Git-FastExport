@@ -4,6 +4,10 @@ use strict;
 use warnings;
 use Carp;
 
+our $VERSION = '0.07';
+
+'progress 1 objects';
+
 sub new {
     my ( $class, $options, @args ) = @_;
 
@@ -30,7 +34,6 @@ sub new {
     return $self;
 }
 
-1;
 
 __END__
 
