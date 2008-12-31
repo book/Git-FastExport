@@ -15,6 +15,27 @@ my $gitopts = { STDERR => '' };
 
 1;
 
+sub description_of {
+
+    # interpolate with comma's in this scope
+    local $" = ', ';
+
+    # silence screaming about undefined values
+    no warnings 'uninitialized';
+
+    my @desc;
+    for my $v (@_) {
+        push @desc,
+            !defined $v ? '<undef>'
+            : $v     eq ''      ? "''"
+            : ref $v eq 'ARRAY' ? "[ @$v ]"
+            : ref $v eq 'HASH'  ? "{ @{[map{qq'$_ => $v->{$_}'}sort keys%$v]} }"
+            : $v;
+    }
+
+    return "@desc";
+}
+
 # create a new, empty repository
 sub new_repo {
     my ( $dir, $name ) = @_;
