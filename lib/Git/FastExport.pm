@@ -2,8 +2,6 @@ package Git::FastExport;
 use strict;
 use warnings;
 use Carp;
-use Cwd;
-use IPC::Open2;
 
 use Git::FastExport::Block;
 
