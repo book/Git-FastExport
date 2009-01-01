@@ -46,7 +46,8 @@ sub stitch {
     my $export
         = blessed($repo) && $repo->isa('Git::FastExport')
         ? $repo
-        : Git::FastExport->new($repo);
+        : eval { Git::FastExport->new($repo) };
+    $@ =~ s/ at .*\z//s, croak $@ if !$export;
 
     # initiate the Git::FastExport stream
     $export->fast_export() if !$export->{export_fh};
