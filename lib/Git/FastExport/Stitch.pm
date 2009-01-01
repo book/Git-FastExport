@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Carp;
 use Scalar::Util qw( blessed );
+use List::Util qw( first );
 use Git::FastExport;
 
 our $VERSION = '0.07';
@@ -17,8 +18,12 @@ sub new {
     my $self = bless {
 
         # internal structures
-        repo => {},
-        name => 'A',
+        mark     => 1_000_000,    # mark counter in the new repo
+        mark_map => {},
+        commits  => {},
+        repo     => {},
+        name     => 'A',
+        cache    => {},
 
         # default options
         select => 'last',
@@ -67,6 +72,111 @@ sub stitch {
     $self->_translate_block( $repo );
 
     return $self;
+}
+
+# return the next block in the stitched stream
+sub next_block {
+    my ($self) = @_;
+    my $repo = $self->{repo};
+
+    # keep a list of next blocks (per repo)
+    # any undef block means the stream is finished
+    delete $repo->{$_} for grep { !defined $repo->{$_}{block} } keys %$repo;
+
+    # no repo left, we're done
+    return if ! keys %$repo;
+
+    # return any non-commit block directly
+    if ( my $next
+        = first { $repo->{$_}{block}{type} ne 'commit' } keys %$repo )
+    {
+        my $block = $repo->{$next}{block};
+        $repo->{$next}{block} = $repo->{$next}{parser}->next_block();
+        $self->_translate_block( $next );
+        return $block;
+    }
+
+    # select the oldest alvailable commit
+    my ($next) = keys %$repo;
+    $next
+        = $repo->{$next}{block}{date} < $repo->{$_}{block}{date} ? $next : $_
+        for keys %$repo;
+    my $commit = $repo->{$next}{block};
+    $repo->{$next}{block} = $repo->{$next}{parser}->next_block();
+    $self->_translate_block( $next );
+
+    # prepare the attachement algorithm
+    $repo = $repo->{$next};
+    my $mark_map = $self->{mark_map};
+    my $commits  = $self->{commits};
+
+    # update marks & dir in files
+    for ( @{ $commit->{files} } ) {
+        s/^M (\d+) :(\d+)/M $1 :$mark_map->{$repo->{repo}}{$2}/;
+        if ( my $dir = $repo->{dir} ) {
+            s!^(M \d+ :\d+) (.*)!$1 $dir/$2!;    # filemodify
+            s!^D (.*)!D $dir/$1!;                # filedelete
+
+            # /!\ quotes may happen - die and fix if needed
+            die "Choked on quoted paths in $repo->{repo}! Culprit:\n$_\n"
+                if /^[CR] \S+ \S+ /;
+
+            # filecopy | filerename
+            s!^([CR]) (\S+) (\S+)!$1 $dir/$2 $dir/$3!;
+        }
+    }
+
+    # first commit in the old repo linked to latest commit in new repo
+    if ( $self->{last} && !$commit->{from} ) {
+        $commit->{from} = ["from :$self->{last}"];
+    }
+
+    # update historical information
+    my ($id) = $commit->{mark}[0] =~ /:(\d+)/g;
+    $self->{last} = $id;    # last commit applied
+    my $branch = ( split / /, $commit->{header} )[1];
+    my $node = $commits->{$id} = {
+        name     => $id,
+        repo     => $repo->{repo},
+        branch   => $branch,
+        children => [],
+        parents  => {},
+        merge    => exists $commit->{merge},
+    };
+
+    # mark our original source
+    $commit->{header} =~ s/$/-$repo->{name}/;
+
+    # this commit's parents
+    my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
+        @{ $commit->{merge} || [] };
+
+    # get the reference parent list used by _last_alien_child()
+    my $parents = {};
+    for my $parent (@parents) {
+        for my $repo ( keys %{ $commits->{$parent}{parents} } ) {
+            $parents->{$repo}{$_} = 1
+                for keys %{ $commits->{$parent}{parents}{$repo} };
+        }
+    }
+
+    # map each parent to its last "alien" commit
+    my %parent_map = map {
+        $_ => $self->_last_alien_child( $commits->{$_}, $branch, $parents )->{name}
+    } @parents;
+
+    # map parent marks
+    for ( @{ $commit->{from} || [] }, @{ $commit->{merge} || [] } ) {
+        if (m/^(from|merge) /) {
+            s/:(\d+)/:$parent_map{$1}/g;
+        }
+    }
+
+    # update the parents information
+    $self->_add_parents( $node => map { $commits->{ $parent_map{$_} } } @parents );
+
+    # dump the commit
+    return $commit;
 }
 
 sub _translate_block {
