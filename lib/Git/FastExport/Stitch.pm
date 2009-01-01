@@ -349,16 +349,18 @@ Return nothing at the end of stream.
 
 =head1 INTERNAL METHODS
 
-To run the stitching algorithm, C<Git::FastExport::Stitch> makes use of several internal methods.
-These are B<not> part of the public interface of the module, and are detailed below for those
-interested in the algorithm itself.
+To run the stitching algorithm, C<Git::FastExport::Stitch> makes
+use of several internal methods.  These are B<not> part of the public
+interface of the module, and are detailed below for those interested in
+the algorithm itself.
 
 =over 4
 
 =item _translate_block( $repo )
 
-Given a I<repo> key in the internal structure listing all the repositories to stitch together,
-this method "translates" the current block using the references (marks) of the resulting repository.
+Given a I<repo> key in the internal structure listing all the repositories
+to stitch together, this method "translates" the current block using
+the references (marks) of the resulting repository.
 
 To ease debugging, the translated mark count starts at C<1_000_000>.
 
