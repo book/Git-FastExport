@@ -8,7 +8,7 @@ use Git::FastExport::Stitch;
 my @valid_args = map {
     my %o = %$_;
     ( \%o, map { my %h = %o; $h{select} = $_; \%h } qw( first last random ) )
-} ( {}, { cache => '' }, { cache => 1 } );
+} ( {}, { cached => '' }, { cached => 1 } );
 
 my @tests = (
 

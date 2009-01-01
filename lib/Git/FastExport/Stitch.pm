@@ -22,12 +22,12 @@ sub new {
 
         # default options
         select => 'last',
-        cache  => 1,
+        cached => 1,
 
     }, $class;
 
     # set the options
-    for my $key (qw( select cache )) {
+    for my $key (qw( select cached )) {
         $self->{$key} = $options->{$key} if exists $options->{$key};
     }
     croak "Invalid value for 'select' option: '$self->{select}'"
