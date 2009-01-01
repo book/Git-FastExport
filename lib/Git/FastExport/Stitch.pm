@@ -50,7 +50,8 @@ sub stitch {
     $@ =~ s/ at .*\z//s, croak $@ if !$export;
 
     # initiate the Git::FastExport stream
-    $export->fast_export() if !$export->{export_fh};
+    $export->fast_export(qw( --progress=1 --all --date-order ))
+        if !$export->{export_fh};
 
     # do not stich a repo with itself
     $repo = $export->{source};
