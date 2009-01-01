@@ -89,6 +89,23 @@ sub _translate_block {
     }
 }
 
+# given a commit (item from $self->{commits})
+# add the parents from the given commits to it
+sub _add_parents {
+    my ( $self, $node, @parents ) = @_;
+
+    for my $parent (@parents) {
+        push @{ $parent->{children} }, $node->{name};
+        for my $repo_name ( keys %{ $parent->{parents} } ) {
+            $node->{parents}{$repo_name}{$_} = 1
+                for keys %{ $parent->{parents}{$repo_name} || {} };
+        }
+        $node->{parents}{ $parent->{repo} }{ $parent->{name} } = 1;
+    }
+
+    return $node;
+}
+
 # find the last child of this node
 # that has either no child
 # or a child in our repo
@@ -234,6 +251,11 @@ Given a I<repo> key in the internal structure listing all the repositories to st
 this method "translates" the current block using the references (marks) of the resulting repository.
 
 To ease debugging, the translated mark count starts at C<1_000_000>.
+
+=item _add_parents( $node, @parents )
+
+Add the given parents to the node, and update the internal structure
+containing the node lineage.
 
 =item _last_alien_child( $node, $branch, $parents )
 
