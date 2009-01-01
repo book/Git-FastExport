@@ -3,6 +3,8 @@ package Git::FastExport::Stitch;
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util qw( blessed );
+use Git::FastExport;
 
 our $VERSION = '0.07';
 
@@ -30,6 +32,36 @@ sub new {
     }
     croak "Invalid value for 'select' option: '$self->{select}'"
         if $self->{select} !~ /^(?:first|last|random)$/;
+
+    # process the remaining args
+    $self->stitch( splice @args, 0, 2 ) while @args;
+
+    return $self;
+}
+
+# add a new repo to stich in
+sub stitch {
+    my ( $self, $repo, $dir ) = @_;
+
+    my $export
+        = blessed($repo) && $repo->isa('Git::FastExport')
+        ? $repo
+        : Git::FastExport->new($repo);
+
+    # initiate the Git::FastExport stream
+    $export->fast_export() if !$export->{export_fh};
+
+    # do not stich a repo with itself
+    $repo = $export->{source};
+    croak "Already stitching repository $repo" if exists $self->{repo}{$repo};
+
+    # set up the internal structures
+    $export->{mapdir}            = $dir;
+    $self->{repo}{$repo}{repo}   = $repo;
+    $self->{repo}{$repo}{dir}    = $dir;
+    $self->{repo}{$repo}{parser} = $export;
+    $self->{repo}{$repo}{name}   = $self->{name}++;
+    $self->{repo}{$repo}{block}  = $export->next_block();
 
     return $self;
 }
