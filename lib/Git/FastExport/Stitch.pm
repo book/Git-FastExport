@@ -89,6 +89,57 @@ sub _translate_block {
     }
 }
 
+# find the last child of this node
+# that has either no child
+# or a child in our repo
+# or an alien child that has the same parent list
+sub _last_alien_child {
+    my ( $self, $node, $branch, $parents ) = @_;
+    my $commits = $self->{commits};
+
+    my $from = $node->{name};
+    my $repo = $node->{repo};
+    my $old  = '';
+
+    while ( $node ne $old ) {
+        $old = $node;
+
+        # no children nodes
+        return $node if ( !@{ $node->{children} } );
+
+        # some children nodes are local
+        return $node
+            if grep { $commits->{$_}{repo} eq $repo } @{ $node->{children} };
+
+        # all children are alien to us
+        my @valid;
+        for my $id ( @{ $node->{children} } ) {
+
+            my $peer = $commits->{$id};
+
+            # parents of $peer in $peer's repo contains
+            # all parents from $parent in $peer's repo
+            next
+                if grep { !exists $peer->{parents}{ $peer->{repo} }{$_} }
+                    keys %{ $parents->{ $peer->{repo} } };
+
+            # this child node has a valid parent list
+            push @valid, $id;
+        }
+
+        # compute the commit to attach to, using the requested algorithm
+        my $node_id = $self->{cache}{"$from $node->{name}"} ||=
+              $self->{select} eq 'last'  ? $valid[-1]
+            : $self->{select} eq 'first' ? $valid[0]
+            : $valid[ rand @valid ]
+            if @valid;
+        $node = $commits->{$node_id};
+    }
+
+    # return last valid child
+    return $node;
+}
+
 __END__
 
 =head1 NAME
@@ -183,6 +234,15 @@ Given a I<repo> key in the internal structure listing all the repositories to st
 this method "translates" the current block using the references (marks) of the resulting repository.
 
 To ease debugging, the translated mark count starts at C<1_000_000>.
+
+=item _last_alien_child( $node, $branch, $parents )
+
+Given a node, its "branch" name (actually, the reference given on the
+C<commit> line of the fast-export) and a structure describing it's
+lineage over the various source repositories, find a suitable commit to
+which attach it.
+
+This method is the heart of the stitching algorithm.
 
 =back
 
