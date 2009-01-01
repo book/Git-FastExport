@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Carp;
 
+use Git;
 use Git::FastExport::Block;
 
 our $VERSION = '0.07';
