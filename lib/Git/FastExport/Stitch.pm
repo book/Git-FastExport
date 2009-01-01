@@ -62,10 +62,30 @@ sub stitch {
     $self->{repo}{$repo}{parser} = $export;
     $self->{repo}{$repo}{name}   = $self->{name}++;
     $self->{repo}{$repo}{block}  = $export->next_block();
+    $self->_translate_block( $repo );
 
     return $self;
 }
 
+sub _translate_block {
+    my ($self, $repo ) = @_;
+    my $mark_map = $self->{mark_map};
+    my $parser = $self->{repo}{$repo}{parser};
+    my $block  = $self->{repo}{$repo}{block};
+
+    # map to the new mark
+    for ( @{ $block->{mark} || [] } ) {
+        s/:(\d+)/:$self->{mark}/
+            and $mark_map->{ $parser->{source} }{$1} = $self->{mark}++;
+    }
+
+    # update marks in from & merge
+    for ( @{ $block->{from} || [] }, @{ $block->{merge} || [] } ) {
+        if (m/^(from|merge) /) {
+            s/:(\d+)/:$mark_map->{$parser->{source}}{$1}/g;
+        }
+    }
+}
 
 __END__
 
@@ -146,6 +166,23 @@ Return nothing at the end of stream.
 =back
 
 =head1 STITCHING ALGORITHM
+
+=head1 INTERNAL METHODS
+
+To run the stitching algorithm, C<Git::FastExport::Stitch> makes use of several internal methods.
+These are B<not> part of the public interface of the module, and are detailed below for those
+interested in the algorithm itself.
+
+=over 4
+
+=item _translate_block( $repo )
+
+Given a I<repo> key in the internal structure listing all the repositories to stitch together,
+this method "translates" the current block using the references (marks) of the resulting repository.
+
+To ease debugging, the translated mark count starts at C<1_000_000>.
+
+=back
 
 =head1 SEE ALSO
 
