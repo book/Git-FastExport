@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
-use IPC::Open2;
 use File::Path;
 use t::Utils;
+use Git::FastExport::Stitch;
 
 # first, make sure we have the right git version
 use Git;
@@ -149,20 +149,18 @@ for my $n (@nums) {
         # create the destination repository
         my $repo = new_repo( $dir => "RESULT-$algo[$i]" );
 
-        # run git-stitch-repo on the source repositories
-        my ( $in, $out );
-        my $pid
-            = open2( $out, $in, $^X, "-Mblib", $gsr, '--select', $algo[$i],
-            map { $_->wc_path } @src );
+        # run the stitch algorithm on the source repositories
+        my $export = Git::FastExport::Stitch->new( { select => $algo[$i] } );
+        $export->stitch($_) for map { $_->wc_path } @src;
 
         # run git-fast-import on the destination repository
         my ( $fh, $c )
             = $repo->command_input_pipe( 'fast-import', '--quiet' );
 
         # pipe the output of git-stitch-repo into git-fast-import
-        while (<$out>) {
-            next if /^progress /;    # ignore progress info
-            print {$fh} $_;
+        while ( my $block = $export->next_block() ) {
+            next if $block->{type} eq 'progress';    # ignore progress info
+            print {$fh} $block->as_string();
         }
         $repo->command_close_pipe( $fh, $c );
 
