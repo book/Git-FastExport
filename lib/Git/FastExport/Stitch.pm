@@ -152,9 +152,7 @@ sub next_block {
 
     # map parent marks
     for ( @{ $commit->{from} || [] }, @{ $commit->{merge} || [] } ) {
-        if (m/^(from|merge) /) {
-            s/:(\d+)/:$parent_map{$1}/g;
-        }
+        s/:(\d+)/:$parent_map{$1}/g;
     }
 
     # update the parents information
@@ -174,15 +172,13 @@ sub _translate_block {
 
     # map to the new mark
     for ( @{ $block->{mark} || [] } ) {
-        s/:(\d+)/:$self->{mark}/
-            and $mark_map->{$repo}{$1} = $self->{mark}++;
+        s/:(\d+)/:$self->{mark}/;
+        $mark_map->{$repo}{$1} = $self->{mark}++;
     }
 
     # update marks in from & merge
     for ( @{ $block->{from} || [] }, @{ $block->{merge} || [] } ) {
-        if (m/^(from|merge) /) {
-            s/:(\d+)/:$mark_map->{$repo}{$1}/g;
-        }
+        s/:(\d+)/:$mark_map->{$repo}{$1}/g;
     }
 
     # update marks & dir in files
