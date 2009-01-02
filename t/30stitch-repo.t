@@ -106,6 +106,9 @@ plan tests => @nums * @algo;
 # the program we want to test
 my $gsr = File::Spec->rel2abs('script/git-stitch-repo');
 
+# a counter
+my $j = 0;
+
 for my $n (@nums) {
     my ( $src, $refs, @todo ) = @{ $tests[$n] };
     my @dst = splice @todo, 0, scalar @algo;
@@ -151,7 +154,26 @@ for my $n (@nums) {
 
         # run the stitch algorithm on the source repositories
         my $export = Git::FastExport::Stitch->new( { select => $algo[$i] } );
-        $export->stitch($_) for map { $_->wc_path } @src;
+
+        # try all possible parameters to stitch()
+        for my $src (@src) {
+            my $r;
+            if ( $j == 0 ) {
+                $r = $src->wc_path;    # a string
+            }
+            elsif ( $j == 1 ) {
+                $r = $src;             # a Git object
+            }
+            elsif ( $j == 2 ) {
+                $r = Git::FastExport->new($src);    # a Git::FastExport
+            }
+            elsif ( $j == 3 ) {
+                $r = Git::FastExport->new($src);             # an initialized
+                $r->fast_export(qw( --all --date-order ));   # Git::FastExport
+            }
+            $export->stitch($r);
+            $j = ++$j % 4;
+        }
 
         # run git-fast-import on the destination repository
         my ( $fh, $c )
