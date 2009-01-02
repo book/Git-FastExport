@@ -258,12 +258,13 @@ sub _last_alien_child {
         }
 
         # compute the commit to attach to, using the requested algorithm
-        my $node_id = $self->{cache}{"$from $node->{name}"} ||=
-              $self->{select} eq 'last'  ? $valid[-1]
-            : $self->{select} eq 'first' ? $valid[0]
-            : $valid[ rand @valid ]
-            if @valid;
-        $node = $commits->{$node_id};
+        if (@valid) {
+            my $node_id = $self->{cache}{"$from $node->{name}"} ||=
+                  $self->{select} eq 'last'  ? $valid[-1]
+                : $self->{select} eq 'first' ? $valid[0]
+                :                              $valid[ rand @valid ];
+            $node = $commits->{$node_id};
+        }
     }
 
     # return last valid child
