@@ -102,29 +102,14 @@ sub next_block {
         = $repo->{$next}{block}{date} < $repo->{$_}{block}{date} ? $next : $_
         for keys %$repo;
     my $commit = $repo->{$next}{block};
+
+    # fetch the next block
     $repo->{$next}{block} = $repo->{$next}{parser}->next_block();
     $self->_translate_block( $next );
 
     # prepare the attachement algorithm
     $repo = $repo->{$next};
-    my $mark_map = $self->{mark_map};
     my $commits  = $self->{commits};
-
-    # update marks & dir in files
-    for ( @{ $commit->{files} } ) {
-        s/^M (\d+) :(\d+)/M $1 :$mark_map->{$repo->{repo}}{$2}/;
-        if ( my $dir = $repo->{dir} ) {
-            s!^(M \d+ :\d+) (.*)!$1 $dir/$2!;    # filemodify
-            s!^D (.*)!D $dir/$1!;                # filedelete
-
-            # /!\ quotes may happen - die and fix if needed
-            die "Choked on quoted paths in $repo->{repo}! Culprit:\n$_\n"
-                if /^[CR] \S+ \S+ /;
-
-            # filecopy | filerename
-            s!^([CR]) (\S+) (\S+)!$1 $dir/$2 $dir/$3!;
-        }
-    }
 
     # first commit in the old repo linked to latest commit in new repo
     if ( $self->{last} && !$commit->{from} ) {
@@ -180,21 +165,39 @@ sub next_block {
 }
 
 sub _translate_block {
-    my ($self, $repo ) = @_;
+    my ( $self, $repo ) = @_;
     my $mark_map = $self->{mark_map};
-    my $parser = $self->{repo}{$repo}{parser};
-    my $block  = $self->{repo}{$repo}{block};
+    my $block    = $self->{repo}{$repo}{block};
+
+    # nothing to do
+    return if !defined $block;
 
     # map to the new mark
     for ( @{ $block->{mark} || [] } ) {
         s/:(\d+)/:$self->{mark}/
-            and $mark_map->{ $parser->{source} }{$1} = $self->{mark}++;
+            and $mark_map->{$repo}{$1} = $self->{mark}++;
     }
 
     # update marks in from & merge
     for ( @{ $block->{from} || [] }, @{ $block->{merge} || [] } ) {
         if (m/^(from|merge) /) {
-            s/:(\d+)/:$mark_map->{$parser->{source}}{$1}/g;
+            s/:(\d+)/:$mark_map->{$repo}{$1}/g;
+        }
+    }
+
+    # update marks & dir in files
+    for ( @{ $block->{files} } ) {
+        s/^M (\d+) :(\d+)/M $1 :$mark_map->{$repo}{$2}/;
+        if ( my $dir = $self->{repo}{$repo}{dir} ) {
+            s!^(M \d+ :\d+) (.*)!$1 $dir/$2!;    # filemodify
+            s!^D (.*)!D $dir/$1!;                # filedelete
+
+            # /!\ quotes may happen - die and fix if needed
+            die "Choked on quoted paths in $repo! Culprit:\n$_\n"
+                if /^[CR] \S+ \S+ /;
+
+            # filecopy | filerename
+            s!^([CR]) (\S+) (\S+)!$1 $dir/$2 $dir/$3!;
         }
     }
 }
