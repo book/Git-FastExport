@@ -177,17 +177,9 @@ sub create_merge_commit {
     $repo->command( 'checkout', '-q', $info->{sha1}{$parent} );
 
     # merge the other parents
-    try {
-        $repo->command_noisy( 'merge', '-n',
-            map { $info->{sha1}{$_} } @parents,
-        );
-    }
-    otherwise {
-        my $base = File::Spec->catfile( $info->{dir}, $name );
-        update_file( $base, $name );
-        $repo->command( 'add', $name );
-        $repo->command( 'commit', '-m', $child );
-    };
+    $repo->command_noisy( 'merge', '-n', '-s', 'ours', '-m', $child,
+        map { $info->{sha1}{$_} } @parents,
+    );
 
     $info->{sha1}{$child}
         = $repo->command_oneline(qw( log -n 1 --pretty=format:%H HEAD ));
