@@ -47,6 +47,7 @@ git-stitch-repo [ options ] repo1 repo2:dir2 ...
 
     --select < first | last | random >
                  Algorithm for selection the attachment commit
+    --no-cached  Disable caching of selected attachement commit
 
     --help       Print a short online help and exit
     --manual     Print the full manual page and exit
@@ -220,7 +221,6 @@ when building the resulting repository:
 a commit is attached as far as possible in the DAG, starting from the
 original parent
 
-
 =item *
 
 a commit is only attached to another commit in the resulting repository
@@ -230,14 +230,14 @@ commits.
 =item *
 
 when there are several valid branches to follow when trying to find 
-a commit to attach to, use the selection process (last or first commit
-(at the time of attachement), or random commit)
+a commit to attach to, use the selection process (I<last> or I<first>
+commit (at the time of attachement), or I<random> commit)
 
 =item *
 
 branches starting from the same commit in a source repository will start
 from the same commit in the resulting repository (this particular rule
-can be lifted: adding an option for this in on the TODO list)
+can be lifted: use the I<--no-cached> option)
 
 =back
 
@@ -246,6 +246,10 @@ can be lifted: adding an option for this in on the TODO list)
 The current implementation can probably be improved, and more options
 added. I'm very interested in test repositories that do not give the
 expected results.
+
+=head1 SEE ALSO
+
+L<Git::FastExport::Stitch>
 
 =head1 AUTHOR
 
@@ -259,7 +263,7 @@ under the same terms as Perl itself.
 
 =head1 COPYRIGHT
 
-Copyright 2008 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2008-2009 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 
