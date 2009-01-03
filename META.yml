@@ -1,6 +1,6 @@
 ---
 name: Git-FastExport
-version: 0.06
+version: 0.07
 author: []
 abstract: A module to parse the output of git-fast-export
 license: perl
@@ -11,10 +11,13 @@ requires:
 provides:
   Git::FastExport:
     file: lib/Git/FastExport.pm
-    version: 0.06
+    version: 0.07
   Git::FastExport::Block:
     file: lib/Git/FastExport/Block.pm
-    version: 0.06
+    version: 0.07
+  Git::FastExport::Stitch:
+    file: lib/Git/FastExport/Stitch.pm
+    version: 0.07
 generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

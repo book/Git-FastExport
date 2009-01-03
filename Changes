@@ -1,5 +1,17 @@
 Revision history for Perl extension Git::FastExport
 
+0.07 Sat Jan  3 06:35:52 CET 2009
+        [ENHANCEMENTS]
+        - moved the stitching algorithm in its own module:
+          Git::Fast:Export::Stitch
+        - git-stitch-repo is now a thin wrapper around it
+        [DOCUMENTATION]
+        - the stitching algorithm is documented in Git::FastExport::Stitch
+        - the use cases are documented in git-stitch-repo
+        [TESTS]
+        - fixed the test repositories code
+        - added tests involving stitching 3-way merges
+
 0.06 Sat Dec 20 00:07:44 CET 2008
         [ENHANCEMENTS]
         - git-stitch-repo: greatly improved the algorithm for finding
