@@ -27,12 +27,11 @@ sub new {
 
         # default options
         select => 'last',
-        cached => 1,
 
     }, $class;
 
     # set the options
-    for my $key (qw( select cached )) {
+    for my $key (qw( select )) {
         $self->{$key} = $options->{$key} if exists $options->{$key};
     }
     croak "Invalid value for 'select' option: '$self->{select}'"
@@ -315,9 +314,6 @@ The options hash defines options that will be used during the creation of the st
 The B<select> option defines the selection algorithm to be used when the I<last alien child>
 algorithm reaches a branch point. Valid values are: C<first>, C<last> and C<random>. The
 default value is C<last>.
-
-The B<cache> option determines if the result of the selection algorithm is cached or not.
-It is a boolean value. The default value is I<true>.
 
 See L<STITCHING ALGORITHM> for details about what these options really mean.
 

@@ -10,7 +10,7 @@ our $VERSION = $Git::FastExport::Stitch::VERSION;
 
 # basic command-line options
 my %option;
-GetOptions( \%option, 'help', 'manual', 'version', 'select=s', 'cached!' )
+GetOptions( \%option, 'help', 'manual', 'version', 'select=s' )
     or pod2usage( -verbose => 0 );
 print "git-stitch-repo version $VERSION\n" and exit if $option{version};
 pod2usage( -verbose => 1 ) if $option{help};
@@ -47,7 +47,6 @@ git-stitch-repo [ options ] repo1 repo2:dir2 ...
 
     --select < first | last | random >
                  Algorithm for selection the attachment commit
-    --no-cached  Disable caching of selected attachement commit
 
     --help       Print a short online help and exit
     --manual     Print the full manual page and exit
@@ -237,7 +236,7 @@ commit (at the time of attachement), or I<random> commit)
 
 branches starting from the same commit in a source repository will start
 from the same commit in the resulting repository (this particular rule
-can be lifted: use the I<--no-cached> option)
+can be lifted: adding an option for this in on the TODO list)
 
 =back
 
