@@ -18,9 +18,11 @@ my @tests = (
 
     # error cases
     [ [ { select => 'bam' } ], qr/Invalid value for 'select' option: 'bam'/ ],
+    [ [ {}, 'bonk' ], qr/^bonk is not a valid git repository at / ],
 );
 
-plan tests => 2 * @tests;
+
+plan tests => 2 * @tests + 3;
 
 for my $t (@tests) {
     my ( $args, $error ) = @$t;
@@ -38,4 +40,13 @@ for my $t (@tests) {
     }
 
 }
+
+# check we croak when stitching several times the same repo
+my $dir = File::Spec->rel2abs( File::Spec->catdir( 'git-test', '_' ) );
+my @r = create_repos( $dir => 'A1', 'master=A1' );
+
+my $export = eval { Git::FastExport::Stitch->new() };
+ok( eval { $export->stitch( $r[0] ) }, 'stitch( A ) passed' );
+ok( !eval { $export->stitch( $r[0] ) }, 'stitch( A ) failed' );
+like( $@, qr(^Already stitching repository .*A), 'Expected error message' );
 
