@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use t::Utils;
+use File::Path;
 use Git::FastExport::Stitch;
 
 # all possible valid options
@@ -43,6 +44,7 @@ for my $t (@tests) {
 
 # check we croak when stitching several times the same repo
 my $dir = File::Spec->rel2abs( File::Spec->catdir( 'git-test', '_' ) );
+rmtree( [ $dir ] );
 my @r = create_repos( $dir => 'A1', 'master=A1' );
 
 my $export = eval { Git::FastExport::Stitch->new() };
