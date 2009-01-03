@@ -165,7 +165,7 @@ possible to read from STDIN by doing:
 
 =head1 AUTHOR
 
-Philippe Bruhat (BooK)
+Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
 
 =head1 ACKNOWLEDGEMENTS
 
