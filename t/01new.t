@@ -1,4 +1,5 @@
 use Test::More;
+use Cwd;
 use Git;
 use Git::FastExport;
 use File::Temp qw( tempdir );
@@ -7,8 +8,10 @@ use File::Temp qw( tempdir );
 my $dir = tempdir( CLEANUP => 1 );
 
 # alas, this can't be done with Git.pm
+my $cwd = getcwd;
 chdir $dir;
 `git init`;
+chdir $cwd;
 
 my $git = Git->repository( Directory => $dir );
 
