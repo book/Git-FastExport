@@ -114,7 +114,7 @@ my @nums = 0 .. @tests - 1;
 @nums = grep { $_ < @tests } @ARGV if @ARGV;
 
 plan skip_all => 'No test selected' if !@nums;
-plan tests => @nums * @algo;
+plan tests => @nums * @algo * 2;
 
 # the program we want to test
 my $gsr = File::Spec->rel2abs('script/git-stitch-repo');
@@ -159,6 +159,19 @@ for my $n (@nums) {
         @src = create_repos( $dir => $src, $refs );
     }
 
+    # compute the expected result refs
+    my $expected_refs;
+    {
+        my @refs;
+        for my $ref ( split / /, $refs ) {
+            my ( $branch, $desc ) = split /=/, $ref;
+            next if !$desc;    # skip tags
+            my ($name) = $desc =~ /^([A-Z]+)/;
+            push @refs, "$branch-$name=$desc";
+        }
+        $expected_refs = join ' ', sort @refs;
+    }
+
     # test the 'last' and 'first' algorithms
     for my $i ( 0 .. $#algo ) {
 
@@ -200,15 +213,17 @@ for my $n (@nums) {
         $repo->command_close_pipe( $fh, $c );
 
         # get the description of the resulting repository
-        my $result = repo_description($repo);
+        my ($result, $result_refs) = repo_description($repo);
         if ( $todo[$i] ) {
         TODO: {
                 local $TODO = $todo[$i];
                 is( $result, $dst[$i], "$src => $dst[$i] ($algo[$i])" );
+                is( $result_refs, $expected_refs, "$expected_refs" );
             }
         }
         else {
             is( $result, $dst[$i], "$src => $dst[$i] ($algo[$i])" );
+            is( $result_refs, $expected_refs, "$expected_refs" );
         }
     }
 }

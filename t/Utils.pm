@@ -72,11 +72,21 @@ sub repo_description {
     }
     $repo->command_close_pipe( $fh, $c );
 
+    # get the heads and tags
+    my %head = reverse map { s{ refs/heads/}{ }; split / / }
+        $repo->command( 'show-ref', '--heads' );
+    my %tag = eval { reverse map { s{ refs/tags/}{ }; split / / }
+        $repo->command( 'show-ref', '--tags' ) };
+
+    # compute $refs
+    my $refs = join ' ', map( "$_=$log{$head{$_}}", sort keys %head ),
+        map( "$_>$log{$tag{$_}}", sort keys %tag );
+
     # replace SHA-1 by log name
     my $desc = join ' ', reverse @commits;
     $desc =~ s/(\w{40})/$log{$1}/g;
 
-    return $desc;
+    return wantarray ? ( $desc, $refs ) : $desc;
 }
 
 # split a description into descriptions of independent repositories
