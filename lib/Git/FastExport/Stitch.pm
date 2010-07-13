@@ -169,6 +169,10 @@ sub _translate_block {
     # nothing to do
     return if !defined $block;
 
+    # mark our original source
+    $block->{header} =~ s/$/-$self->{repo}{$repo}{name}/
+        if $block->{type} eq 'reset';
+
     # map to the new mark
     for ( @{ $block->{mark} || [] } ) {
         s/:(\d+)/:$self->{mark}/;
