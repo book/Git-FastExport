@@ -144,6 +144,9 @@ for my $n (@nums) {
             $build++ if !$repo || repo_description($repo) ne $desc;
         }
 
+        # sort repositories by name
+        @src = sort { $a->wc_path cmp $b->wc_path } @src;
+
         # remove the old RESULT dir
         rmtree( [ File::Spec->catdir( $dir, "RESULT-$_" ) ] ) for @algo;
     }
