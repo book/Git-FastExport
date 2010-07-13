@@ -14,6 +14,8 @@ my %fields = (
     blob       => [qw( mark data )],
     checkpoint => [],
     progress   => [],
+    feature    => [],
+    option     => [],
 );
 
 'progress 1 objects';

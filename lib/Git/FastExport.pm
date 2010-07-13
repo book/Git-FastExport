@@ -59,7 +59,7 @@ sub next_block {
     while (<$fh>) {
 
         # we've reached the beginning of the next block
-        if (/^(commit|tag|reset|blob|checkpoint|progress)\b/) {
+        if (/^(commit|tag|reset|blob|checkpoint|progress|feature|option)\b/) {
             s/^progress /progress [$self->{source}] /;
             $self->{header} = $_;
             last;
