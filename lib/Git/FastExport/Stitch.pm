@@ -188,15 +188,15 @@ sub _translate_block {
     for ( @{ $block->{files} } ) {
         s/^M (\d+) :(\d+)/M $1 :$mark_map->{$repo}{$2}/;
         if ( my $dir = $self->{repo}{$repo}{dir} ) {
-            s!^(M \d+ :\d+) (.*)!$1 $dir/$2!;    # filemodify
-            s!^D (.*)!D $dir/$1!;                # filedelete
+            s!^(M \d+ :\d+) (\"?)(.*)!$1 $2$dir/$3!;    # filemodify
+            s!^D (\"?)(.*)!D $1$dir/$2!;                # filedelete
 
             # /!\ quotes may happen - die and fix if needed
             die "Choked on quoted paths in $repo! Culprit:\n$_\n"
                 if /^[CR] \S+ \S+ /;
 
             # filecopy | filerename
-            s!^([CR]) (\S+) (\S+)!$1 $dir/$2 $dir/$3!;
+            s!^([CR]) (\"?)(\S+) (\"?)(\S+)!$1 $2$dir/$3 $4$dir/$5!;
         }
     }
 }
