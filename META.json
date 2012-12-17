@@ -1,0 +1,52 @@
+{
+   "abstract" : "A module to parse the output of git-fast-export",
+   "author" : [
+      "Philippe Bruhat (BooK), C<< <book@cpan.org> >>."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Git-FastExport",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Git" : "0.01"
+         }
+      }
+   },
+   "provides" : {
+      "Git::FastExport" : {
+         "file" : "lib/Git/FastExport.pm",
+         "version" : "0.08"
+      },
+      "Git::FastExport::Block" : {
+         "file" : "lib/Git/FastExport/Block.pm",
+         "version" : "0.07"
+      },
+      "Git::FastExport::Stitch" : {
+         "file" : "lib/Git/FastExport/Stitch.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/book/Git-FastExport"
+      }
+   },
+   "version" : "0.08"
+}

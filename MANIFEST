@@ -17,3 +17,4 @@ t/fast-export
 t/pod-coverage.t
 t/pod.t
 t/Utils.pm
+META.json

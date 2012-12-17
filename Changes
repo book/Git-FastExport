@@ -1,5 +1,12 @@
 Revision history for Perl extension Git::FastExport
 
+0.08 Mon Dec 17 2012
+        [ENHANCEMENTS]
+        - proper handling of double quotes in git fast-export output
+          (RT #81342)
+        [TESTS]
+        - made a number of tests more robust
+
 0.07 Sat Jan  3 06:35:52 CET 2009
         [ENHANCEMENTS]
         - moved the stitching algorithm in its own module:

@@ -1,24 +1,30 @@
 ---
-name: Git-FastExport
-version: 0.07
-author: []
-abstract: A module to parse the output of git-fast-export
+abstract: 'A module to parse the output of git-fast-export'
+author:
+  - 'Philippe Bruhat (BooK), C<< <book@cpan.org> >>.'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
 license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Git: 0.01
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Git-FastExport
 provides:
   Git::FastExport:
     file: lib/Git/FastExport.pm
-    version: 0.07
+    version: 0.08
   Git::FastExport::Block:
     file: lib/Git/FastExport/Block.pm
     version: 0.07
   Git::FastExport::Stitch:
     file: lib/Git/FastExport/Stitch.pm
     version: 0.07
-generated_by: Module::Build version 0.2808
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+requires:
+  Git: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/book/Git-FastExport
+version: 0.08
