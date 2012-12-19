@@ -389,11 +389,11 @@ Repository A:
          /         /
     A1--A2------A4'
 
-Branch I<master> points to A5 and branch I<topic> points to A3.
+Branch I<master> points to A6 and branch I<topic> points to A3.
 
 Repository B:
 
-                     ,topic  ,master
+                     ,topic      ,master
           ,-B3------B5------B7--B8
          /                 /
     B1--B2------B4------B6'
