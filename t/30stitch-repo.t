@@ -218,8 +218,7 @@ for my $n (@nums) {
         $cmd->close();
 
         # get the description of the resulting repository
-        my $git = Git->repository( Directory => $repo->work_tree );
-        my ( $result, $result_refs ) = repo_description($git);
+        my ( $result, $result_refs ) = repo_description($repo);
         if ( $todo[$i] ) {
         TODO: {
                 local $TODO = $todo[$i];
