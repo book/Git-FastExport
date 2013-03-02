@@ -4,17 +4,10 @@ use Test::More;
 use File::Path;
 use t::Utils;
 use Git::FastExport::Stitch;
+use Test::Git;
 
 # first, make sure we have the right git version
-use Git;
-my @v = split /\./, my $version = Git->version;
-
-plan skip_all => "Git version $version doesn't provide git-fast-export"
-    . ' -- Minimum version needed: 1.5.4'
-    if !(   $v[0] > 1
-            || ( $v[0] == 1
-                && ( $v[1] > 5 || ( $v[1] == 5 && $v[2] >= 4 ) ) )
-    );
+has_git('1.5.4');
 
 my @tests = (
 

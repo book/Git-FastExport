@@ -4,6 +4,9 @@ use Test::More;
 use t::Utils;
 use File::Path;
 use Git::FastExport::Stitch;
+use Test::Git;
+
+has_git();
 
 # all possible valid options
 my @valid_args = map {
