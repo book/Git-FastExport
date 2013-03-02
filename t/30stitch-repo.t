@@ -93,7 +93,7 @@ my @tests = (
     ],
 
     # 3-way merges
-    # 13-15
+    # 13-14
     [   'A1 A2-A1 A3-A1 A4-A1 A5-A4A3A2',
         'master=A5',
         'A1 A2-A1 A3-A1 A4-A1 A5-A4A3A2',
