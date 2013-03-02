@@ -159,7 +159,9 @@ for my $n (@nums) {
         my $nodes = 1 + $src =~ y/ //;
         diag "Building repositories - please wait $nodes seconds";
         rmtree( [$dir] );
-        @src = create_repos( $dir => $src, $refs );
+        @src
+            = map { Git->repository( Directory => $_->wc_path ) }
+            create_repos( $dir => $src, $refs );
     }
 
     # compute the expected result refs
@@ -205,18 +207,19 @@ for my $n (@nums) {
         }
 
         # run git-fast-import on the destination repository
-        my ( $fh, $c )
-            = $repo->command_input_pipe( 'fast-import', '--quiet' );
+        my $cmd = $repo->command( 'fast-import', '--quiet' );
+        my $fh = $cmd->{stdin};
 
         # pipe the output of git-stitch-repo into git-fast-import
         while ( my $block = $export->next_block() ) {
             next if $block->{type} eq 'progress';    # ignore progress info
             print {$fh} $block->as_string();
         }
-        $repo->command_close_pipe( $fh, $c );
+        $cmd->close();
 
         # get the description of the resulting repository
-        my ($result, $result_refs) = repo_description($repo);
+        my $git = Git->repository( Directory => $repo->work_tree );
+        my ( $result, $result_refs ) = repo_description($git);
         if ( $todo[$i] ) {
         TODO: {
                 local $TODO = $todo[$i];
