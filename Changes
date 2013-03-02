@@ -1,5 +1,9 @@
 Revision history for Perl extension Git::FastExport
 
+{{$NEXT}}
+        [PACKAGING]
+        - switch to Dist::Zilla for maintaining the distribution
+
 0.08 Mon Dec 17 2012
         [ENHANCEMENTS]
         - proper handling of double quotes in git fast-export output
