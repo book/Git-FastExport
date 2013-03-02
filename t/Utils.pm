@@ -66,24 +66,57 @@ sub repo_description {
     my %log;    # map sha1 to log message
     my @commits;
 
-    # process the whole tree
-    my ( $fh, $c )
-        = $repo->command_output_pipe( 'log', '--pretty=format:%H-%P-%s',
-        '--date-order', '--all' );
-    while (<$fh>) {
-        chomp;
-        my ( $h, $p, $log ) = split /-/, $_, 3;
-        $log{$h} = $log;
-        $p =~ y/ //d;
-        push @commits, $p ? "$log-$p" : $log;
-    }
-    $repo->command_close_pipe( $fh, $c );
+    my ( %head, %tag );
 
-    # get the heads and tags
-    my %head = reverse map { s{ refs/heads/}{ }; split / / }
-        $repo->command( 'show-ref', '--heads' );
-    my %tag = eval { reverse map { s{ refs/tags/}{ }; split / / }
-        $repo->command( 'show-ref', '--tags' ) };
+    # old Git-based code
+    if ( $repo->isa('Git') ) {
+
+        # process the whole tree
+        my ( $fh, $c )
+            = $repo->command_output_pipe( 'log', '--pretty=format:%H-%P-%s',
+            '--date-order', '--all' );
+        while (<$fh>) {
+            chomp;
+            my ( $h, $p, $log ) = split /-/, $_, 3;
+            $log{$h} = $log;
+            $p =~ y/ //d;
+            push @commits, $p ? "$log-$p" : $log;
+        }
+        $repo->command_close_pipe( $fh, $c );
+
+        # get the heads and tags
+        %head = reverse map { s{ refs/heads/}{ }; split / / }
+            $repo->command( 'show-ref', '--heads' );
+        %tag = eval {
+            reverse map { s{ refs/tags/}{ }; split / / }
+                $repo->command( 'show-ref', '--tags' );
+        };
+    }
+
+    # new Git::Repository-based code
+    else {
+
+        # process the whole tree
+        my $cmd = $repo->command( 'log', '--pretty=format:%H-%P-%s',
+            '--date-order', '--all' );
+        my $fh = $cmd->{stdout};
+        while (<$fh>) {
+            chomp;
+            my ( $h, $p, $log ) = split /-/, $_, 3;
+            $log{$h} = $log;
+            $p =~ y/ //d;
+            push @commits, $p ? "$log-$p" : $log;
+        }
+        $cmd->close();
+
+        # get the heads and tags
+        %head = reverse map { s{ refs/heads/}{ }; split / / }
+            $repo->run( 'show-ref', '--heads' );
+        %tag = eval {
+            reverse map { s{ refs/tags/}{ }; split / / }
+                $repo->run( 'show-ref', '--tags' );
+        };
+    }
 
     # compute $refs
     my $refs = join ' ', map( "$_=$log{$head{$_}}", sort keys %head ),
