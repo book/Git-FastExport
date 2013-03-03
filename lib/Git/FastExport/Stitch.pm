@@ -296,22 +296,22 @@ Git::FastExport::Stitch - Stitch together multiple git fast-export streams
 
 =head1 DESCRIPTION
 
-C<Git::FastExport::Stich> is a module that "stitches" together several
+L<Git::FastExport::Stich> is a module that "stitches" together several
 git fast-export streams. This module is the core of the B<git-stitch-repo>
 utility.
 
-C<Git::FastExport::Stitch> objects can be used as C<Git::FastExport>,
+L<Git::FastExport::Stitch> objects can be used as L<Git::FastExport>,
 since they support the same inteface for the C<next_block()> method.
 
 =head1 METHODS
 
-C<Git::FastExport::Stitch> supports the following methods:
+L<Git::FastExport::Stitch> supports the following methods:
 
 =over 4
 
 =item new( \%options, [ ... ] )
 
-Create a new C<Git::FastExport::Stitch> object.
+Create a new L<Git::FastExport::Stitch> object.
 
 The options hash defines options that will be used during the creation of the stitched repository.
 
@@ -328,9 +328,9 @@ pairs) to the C<stitch()> method.
 
 Add the given C<$repo> to the list of repositories to stitch in.
 
-C<$repo> can be either a directory, or a C<Git> object (both will
-be used to instantiate a C<Git::FastExport> object) or directly a
-C<Git::FastExport> object.
+C<$repo> can be either a directory, or a L<Git> object (both will
+be used to instantiate a L<Git::FastExport> object) or directly a
+L<Git::FastExport> object.
 
 The optional C<$dir> parameter will be used as the relative directory
 under which the trees of the source repository will be stored in the
@@ -339,7 +339,7 @@ stitched repository.
 =item next_block()
 
 Return the next block of the stitched repository, as a
-C<Git::FastExport::Block> object.
+L<Git::FastExport::Block> object.
 
 Return nothing at the end of stream.
 
@@ -349,7 +349,7 @@ Return nothing at the end of stream.
 
 =head2 Commit attachment
 
-C<Git::FastExport::Stitch> processes the input commits in B<--date-order>
+L<Git::FastExport::Stitch> processes the input commits in B<--date-order>
 fashion, and builds the new graph by attaching the new commit to another
 commit of the graph being constructed. It starts from the "original"
 parents of the node, and tries do follow the graph as far as possible.
@@ -406,7 +406,7 @@ directories F<A/> & F<B/> did live side-by-side all the time.
 
 Assuming additional timestamps not shown on the above graphs
 (the commit order is A1, B1, A2, B2, A3, A4, B3, B4, A5, B5, B6, B7, B8, A6),
-C<Git::FastExport::Stitch> will produce a B<git-fast-import> stream that will
+L<Git::FastExport::Stitch> will produce a B<git-fast-import> stream that will
 create the following history, depending on the value of B<--select>:
 
 =over 4
@@ -466,7 +466,7 @@ Any mathematician will tell you there are many many ways to stitch two
 DAG together. This programs tries very hard not to create inconsistent
 history with regard to each input repository.
 
-The algorithm used by C<Git::FastExport::Stitch> enforces the following
+The algorithm used by L<Git::FastExport::Stitch> enforces the following
 rules when building the resulting repository:
 
 =over 4
@@ -504,7 +504,7 @@ expected results.
 
 =head1 INTERNAL METHODS
 
-To run the stitching algorithm, C<Git::FastExport::Stitch> makes
+To run the stitching algorithm, L<Git::FastExport::Stitch> makes
 use of several internal methods. These are B<not> part of the public
 interface of the module, and are detailed below for those interested in
 the algorithm itself.

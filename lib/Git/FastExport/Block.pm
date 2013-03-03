@@ -47,12 +47,12 @@ Git::FastExport::Block - A block in a fast-export stream
 
 =head1 DESCRIPTION
 
-C<Git::FastExport::Block> represents blocks from a B<git-fast-export>
+L<Git::FastExport::Block> represents blocks from a B<git-fast-export>
 stream.
 
 Internally, it is a simple hash with keys pointing either to a string
 or a reference to an array of strings, which makes it very
-easing to edit (when obtained via C<Git::FastExport> C<next_block()>
+easing to edit (when obtained via L<Git::FastExport> C<next_block()>
 method) or create.
 
 The following two keys are pointing to strings:
@@ -113,7 +113,7 @@ which is conveniently stored in the C<type> key.
 
 =head1 METHODS
 
-A C<Git::FastExport::Block> structure is meant to be used as a hash,
+A L<Git::FastExport::Block> structure is meant to be used as a hash,
 and is not protected by an accessor/mutator interface.
 
 However, the module provides a method for ouputing blocks:

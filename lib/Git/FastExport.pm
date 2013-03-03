@@ -122,8 +122,8 @@ Git::FastExport - A module to parse the output of git-fast-export
 
 =head1 DESCRIPTION
 
-C<Git::FastExport> is a module that parses the output of
-B<git-fast-export> and returns C<Git::FastExport::Block> objects that
+L<Git::FastExport> is a module that parses the output of
+B<git-fast-export> and returns L<Git::FastExport::Block> objects that
 can be inspected or modified before being eventually passed on as the
 input to B<git-fast-import>.
 
@@ -137,8 +137,8 @@ This class provides the following methods:
 
 The constructor takes an optional git directory (a string used
 as a parameter to C<< Git->repository( Directory => ... ) >>)
-or C<Git> repository object, and returns
-a C<Git::FastExport> object attached to it.
+or L<Git> repository object, and returns
+a L<Git::FastExport> object attached to it.
 
 =item fast_export( @args )
 
@@ -148,13 +148,13 @@ arguments given in C<@args>.
 =item next_block()
 
 Return the next block in the B<git-fast-export> stream as a
-C<Git::FastExport::Block> object.
+L<Git::FastExport::Block> object.
 
 Return nothing at the end of stream.
 
-This methods reads from the C<export_fh> filehandle of the C<Git::FastExport>
+This methods reads from the C<export_fh> filehandle of the L<Git::FastExport>
 object. It is normally setup via the C<fast_export()> method, but it is
-possible to read from STDIN by doing:
+possible to read from C<STDIN> by doing:
 
     $export->{export_fh} = \*STDIN;
     while ( my $block = $export->next_block() ) {
