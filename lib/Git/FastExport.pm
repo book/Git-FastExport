@@ -30,20 +30,22 @@ sub fast_export {
 
     # call the fast-export command (no default arguments)
     $self->{command} = $repo->command( 'fast-export', @args );
+    $self->{export_fh} = $self->{command}->stdout;
 }
 
 sub next_block {
     my ($self) = @_;
-    die "fast_export() must be called before next_block()"
-        if !$self->{command};
+
+    my $fh = $self->{export_fh};
+    die "fast_export() must be called before next_block()" if !$fh;
 
     # are we done?
-    my $fh = $self->{command}->stdout;
     if ( eof $fh ) {
         if ( $self->{command} ) {
             $self->{command}->close;
             delete $self->{command};
         }
+        delete $self->{export_fh};
         return;
     }
 

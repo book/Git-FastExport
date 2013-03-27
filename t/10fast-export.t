@@ -236,17 +236,8 @@ plan tests => 1 + 3 * @blocks + 2;
 
 use_ok('Git::FastExport');
 
-# a mock Git::Repository::Command
-package Mock::Command;
-our @ISA = qw( Git::Repository::Command );
-sub new { bless { stdout => pop }, __PACKAGE__ }
-sub close { close $_[0]{stdout} }
-
-package main;
-
 my $export = Git::FastExport->new( test_repository() );    # unused repository
 open my $fh, 't/fast-export' or die "Can't open t/fast-export: $!";
-$export->{command} = Mock::Command->new($fh);    # breaking encapsulation!
 
 my @strings;
 {
@@ -261,6 +252,8 @@ my @strings;
     # we actually change the progress markers
     s/progress/progress []/g for @strings;
 }
+
+$export->{export_fh} = $fh;
 
 $_ = 'canari';
 
