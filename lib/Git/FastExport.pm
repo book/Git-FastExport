@@ -15,10 +15,9 @@ sub new {
     my ( $class, $repo ) = @_;
     my $self = bless { source => '' }, $class;
 
-    $self->{git}
-        = blessed $repo && $repo->isa('Git::Repository')
-        ? $repo
-        : Git::Repository->new( defined $repo ? ( work_tree => "$repo" ) : () );
+    $self->{git} = blessed $repo && $repo->isa('Git::Repository')
+        ? $repo    # below, use "$repo" for Path::Class paths
+        : Git::Repository->new( defined $repo ? ( { cwd => "$repo" } ) : () );
 
     return $self;
 }

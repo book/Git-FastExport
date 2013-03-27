@@ -22,7 +22,7 @@ my @tests = (
 
     # error cases
     [ [ { select => 'bam' } ], qr/Invalid value for 'select' option: 'bam'/ ],
-    [ [ {}, 'bonk' ], qr/^directory not found: / ],
+    [ [ {}, 'bonk' ], qr/^Can't chdir to .*bonk: / ],
 );
 
 

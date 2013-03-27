@@ -21,8 +21,8 @@ my @tests = (
 my @fails = (
 
     # desc, error regex, args
-    [ q('zlonk'), qr/^directory not found: .*zlonk/, 'zlonk' ],
-    [ q('zlonk'), qr/^directory not found: .*Zlonk=/, bless {}, 'Zlonk' ],
+    [ q('zlonk'), qr/^Can't chdir to .*zlonk/, 'zlonk' ],
+    [ q('zlonk'), qr/^Can't chdir to .*Zlonk=/, bless {}, 'Zlonk' ],
 );
 
 plan tests => 3 * @tests + 3 * @fails;
