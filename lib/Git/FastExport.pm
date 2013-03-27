@@ -108,11 +108,15 @@ Git::FastExport - A module to parse the output of git-fast-export
 
 =head1 SYNOPSIS
 
-    use Git;
+    use Git::Repository;
     use Git::FastExport;
 
-    my $repo = Git->repository( Repository => $path );
+    # get the object from a Git::Repository
+    my $repo = Git::Repository->new( work_tree => $path );
     my $export = Git::FastExport->new($repo);
+
+    # or simply from a path specification
+    my $export = Git::FastExport->new($path);
 
     while ( my $block = $export->next_block() ) {
 
@@ -135,10 +139,9 @@ This class provides the following methods:
 
 =item new( [ $repository ] )
 
-The constructor takes an optional git directory (a string used
-as a parameter to C<< Git->repository( Directory => ... ) >>)
-or L<Git> repository object, and returns
-a L<Git::FastExport> object attached to it.
+The constructor takes an optional L<Git::Repository> object,
+or a path (to a C<GIT_DIR> or C<GIT_WORK_TREE>), and returns a
+L<Git::FastExport> object attached to it.
 
 =item fast_export( @args )
 
@@ -154,7 +157,7 @@ Return nothing at the end of stream.
 
 This methods reads from the C<export_fh> filehandle of the L<Git::FastExport>
 object. It is normally setup via the C<fast_export()> method, but it is
-possible to read from C<STDIN> by doing:
+possible to make it read directly from C<STDIN> (or another filehandle) by doing:
 
     $export->{export_fh} = \*STDIN;
     while ( my $block = $export->next_block() ) {
@@ -175,7 +178,7 @@ under the same terms as Perl itself.
 
 =head1 COPYRIGHT
 
-Copyright 2008-2009 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2008-2013 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 
@@ -183,4 +186,3 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-
