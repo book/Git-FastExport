@@ -130,15 +130,13 @@ for my $n (@nums) {
         # are the source repositories correct?
         for my $desc ( split_description($src) ) {
             my ($name) = $desc =~ /^([A-Z]+)/;
-            push @src, my $repo = eval {
-                Git->repository(
-                    Directory => File::Spec->catdir( $dir, $name ) );
-            };
+            push @src, my $repo = Git::Repository->new(
+                    work_tree => File::Spec->catdir( $dir, $name ) );
             $build++ if !$repo || repo_description($repo) ne $desc;
         }
 
         # sort repositories by name
-        @src = sort { $a->wc_path cmp $b->wc_path } @src;
+        @src = sort { $a->work_tree cmp $b->work_tree } @src;
 
         # remove the old RESULT dir
         rmtree( [ File::Spec->catdir( $dir, "RESULT-$_" ) ] ) for @algo;
@@ -152,9 +150,7 @@ for my $n (@nums) {
         my $nodes = 1 + $src =~ y/ //;
         diag "Building repositories - please wait $nodes seconds";
         rmtree( [$dir] );
-        @src
-            = map { Git->repository( Directory => $_->wc_path ) }
-            create_repos( $dir => $src, $refs );
+        @src = create_repos( $dir => $src, $refs );
     }
 
     # compute the expected result refs
@@ -183,10 +179,10 @@ for my $n (@nums) {
         for my $src (@src) {
             my $r;
             if ( $j == 0 ) {
-                $r = $src->wc_path;    # a string
+                $r = $src->work_tree;    # a string
             }
             elsif ( $j == 1 ) {
-                $r = $src;             # a Git object
+                $r = $src;               # a Git object
             }
             elsif ( $j == 2 ) {
                 $r = Git::FastExport->new($src);    # a Git::FastExport

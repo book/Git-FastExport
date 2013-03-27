@@ -2,8 +2,9 @@ package Git::FastExport;
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util qw( blessed );
 
-use Git;
+use Git::Repository;
 use Git::FastExport::Block;
 
 our $VERSION = '0.08';
@@ -14,41 +15,39 @@ sub new {
     my ( $class, $repo ) = @_;
     my $self = bless { source => '' }, $class;
 
-    if ( defined $repo ) {
-        if ( !ref $repo ) {
-            my $dir = $repo;
-            $repo = eval { Git->repository( Directory => $dir ) }
-                or croak "$dir is not a valid git repository";
-        }
-        elsif ( !$repo->isa('Git') ) {
-            croak "$repo is not a Git object";
-        }
-        $self->{git} = $repo;
-    }
+    $self->{git}
+        = blessed $repo && $repo->isa('Git::Repository')
+        ? $repo
+        : Git::Repository->new( defined $repo ? ( work_tree => "$repo" ) : () );
+
     return $self;
 }
 
 sub fast_export {
     my ( $self, @args ) = @_;
     my $repo = $self->{git};
-    $self->{source} = $repo->wc_path || $repo->repo_path;
+    $self->{source} = $repo->work_tree || $repo->git_dir;
 
     # call the fast-export command (no default arguments)
-    ( $self->{export_fh}, $self->{ctx} )
-        = $repo->command_output_pipe( 'fast-export', @args );
+    $self->{command} = $repo->command( 'fast-export', @args );
 }
 
 sub next_block {
     my ($self) = @_;
-    my $block = bless {}, 'Git::FastExport::Block';
-    my $fh = $self->{export_fh};
+    die "fast_export() must be called before next_block()"
+        if !$self->{command};
 
+    # are we done?
+    my $fh = $self->{command}->stdout;
     if ( eof $fh ) {
-        $self->{git}->command_close_pipe( $fh, $self->{ctx} )
-            if $self->{git} && $self->{ctx};
-        delete @{$self}{qw( export_fh ctx )};
+        if ( $self->{command} ) {
+            $self->{command}->close;
+            delete $self->{command};
+        }
         return;
     }
+
+    my $block = bless {}, 'Git::FastExport::Block';
 
     # use the header from last time, or read it (first time)
     $block->{header} = $self->{header} ||= <$fh>;
