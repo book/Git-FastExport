@@ -46,15 +46,10 @@ sub description_of {
 # create a new, empty repository
 sub new_repo {
     my ( $dir, $name ) = @_;
-    my $cwd = getcwd;
-
-    # alas, this can't be done with Git.pm
     my $wc = File::Spec->rel2abs( File::Spec->catfile( $dir, $name ) );
     mkpath $wc;
-    chdir $wc;
-    Git::Repository->run('init');
-    my $repo = Git::Repository->new();
-    chdir $cwd;
+    Git::Repository->run('init', { cwd => $wc } );
+    my $repo = Git::Repository->new( work_tree => $wc );
     $repo->run(qw( config user.email test@example.com ));
     $repo->run(qw( config user.name  Test ));
     return $repo;
