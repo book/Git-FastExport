@@ -121,37 +121,10 @@ for my $n (@nums) {
 
     # a temporary directory for our tests
     my $dir = File::Spec->rel2abs( File::Spec->catdir( 'git-test', $n ) );
-
-    # check if we have cached the source repositories
-    my @src;
-    my $build = 0;
-    if ( -d $dir ) {
-
-        # are the source repositories correct?
-        for my $desc ( split_description($src) ) {
-            my ($name) = $desc =~ /^([A-Z]+)/;
-            push @src, my $repo = Git::Repository->new(
-                    work_tree => File::Spec->catdir( $dir, $name ) );
-            $build++ if !$repo || repo_description($repo) ne $desc;
-        }
-
-        # sort repositories by name
-        @src = sort { $a->work_tree cmp $b->work_tree } @src;
-
-        # remove the old RESULT dir
-        rmtree( [ File::Spec->catdir( $dir, "RESULT-$_" ) ] ) for @algo;
-    }
-    else {
-        $build = 1;
-    }
+    rmtree( [$dir] );
 
     # create the source repositories
-    if ($build) {
-        my $nodes = 1 + $src =~ y/ //;
-        diag "Building repositories - please wait $nodes seconds";
-        rmtree( [$dir] );
-        @src = create_repos( $dir => $src, $refs );
-    }
+    my @src = create_repos( $dir => $src, $refs );
 
     # compute the expected result refs
     my $expected_refs;
