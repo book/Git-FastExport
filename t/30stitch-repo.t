@@ -4,17 +4,10 @@ use Test::More;
 use File::Path;
 use t::Utils;
 use Git::FastExport::Stitch;
+use Test::Git;
 
 # first, make sure we have the right git version
-use Git;
-my @v = split /\./, my $version = Git->version;
-
-plan skip_all => "Git version $version doesn't provide git-fast-export"
-    . ' -- Minimum version needed: 1.5.4'
-    if !(   $v[0] > 1
-            || ( $v[0] == 1
-                && ( $v[1] > 5 || ( $v[1] == 5 && $v[2] >= 4 ) ) )
-    );
+has_git('1.5.4');
 
 my @tests = (
 
@@ -128,39 +121,10 @@ for my $n (@nums) {
 
     # a temporary directory for our tests
     my $dir = File::Spec->rel2abs( File::Spec->catdir( 'git-test', $n ) );
-
-    # check if we have cached the source repositories
-    my @src;
-    my $build = 0;
-    if ( -d $dir ) {
-
-        # are the source repositories correct?
-        for my $desc ( split_description($src) ) {
-            my ($name) = $desc =~ /^([A-Z]+)/;
-            push @src, my $repo = eval {
-                Git->repository(
-                    Directory => File::Spec->catdir( $dir, $name ) );
-            };
-            $build++ if !$repo || repo_description($repo) ne $desc;
-        }
-
-        # sort repositories by name
-        @src = sort { $a->wc_path cmp $b->wc_path } @src;
-
-        # remove the old RESULT dir
-        rmtree( [ File::Spec->catdir( $dir, "RESULT-$_" ) ] ) for @algo;
-    }
-    else {
-        $build = 1;
-    }
+    rmtree( [$dir] );
 
     # create the source repositories
-    if ($build) {
-        my $nodes = 1 + $src =~ y/ //;
-        diag "Building repositories - please wait $nodes seconds";
-        rmtree( [$dir] );
-        @src = create_repos( $dir => $src, $refs );
-    }
+    my @src = create_repos( $dir => $src, $refs );
 
     # compute the expected result refs
     my $expected_refs;
@@ -188,10 +152,10 @@ for my $n (@nums) {
         for my $src (@src) {
             my $r;
             if ( $j == 0 ) {
-                $r = $src->wc_path;    # a string
+                $r = $src->work_tree;    # a string
             }
             elsif ( $j == 1 ) {
-                $r = $src;             # a Git object
+                $r = $src;               # a Git object
             }
             elsif ( $j == 2 ) {
                 $r = Git::FastExport->new($src);    # a Git::FastExport
@@ -205,18 +169,18 @@ for my $n (@nums) {
         }
 
         # run git-fast-import on the destination repository
-        my ( $fh, $c )
-            = $repo->command_input_pipe( 'fast-import', '--quiet' );
+        my $cmd = $repo->command( 'fast-import', '--quiet' );
+        my $fh = $cmd->{stdin};
 
         # pipe the output of git-stitch-repo into git-fast-import
         while ( my $block = $export->next_block() ) {
             next if $block->{type} eq 'progress';    # ignore progress info
             print {$fh} $block->as_string();
         }
-        $repo->command_close_pipe( $fh, $c );
+        $cmd->close();
 
         # get the description of the resulting repository
-        my ($result, $result_refs) = repo_description($repo);
+        my ( $result, $result_refs ) = repo_description($repo);
         if ( $todo[$i] ) {
         TODO: {
                 local $TODO = $todo[$i];

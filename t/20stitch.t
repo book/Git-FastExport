@@ -4,6 +4,9 @@ use Test::More;
 use t::Utils;
 use File::Path;
 use Git::FastExport::Stitch;
+use Test::Git;
+
+has_git();
 
 # all possible valid options
 my @valid_args = map {
@@ -19,7 +22,7 @@ my @tests = (
 
     # error cases
     [ [ { select => 'bam' } ], qr/Invalid value for 'select' option: 'bam'/ ],
-    [ [ {}, 'bonk' ], qr/^bonk is not a valid git repository at / ],
+    [ [ {}, 'bonk' ], qr/^Can't chdir to .*bonk: / ],
 );
 
 
@@ -48,7 +51,7 @@ rmtree( [ $dir ] );
 my @r = create_repos( $dir => 'A1', 'master=A1' );
 
 my $export = eval { Git::FastExport::Stitch->new() };
-ok( eval { $export->stitch( $r[0] ) }, 'stitch( A ) passed' );
-ok( !eval { $export->stitch( $r[0] ) }, 'stitch( A ) failed' );
+ok( eval { $export->stitch( $r[0]->work_tree ) }, 'stitch( A ) passed' );
+ok( !eval { $export->stitch( $r[0]->work_tree ) }, 'stitch( A ) failed' );
 like( $@, qr(^Already stitching repository .*A), 'Expected error message' );
 

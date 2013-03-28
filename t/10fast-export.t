@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Git;
+
+# this script tests the parsing of fast-export block data
 
 my @latin = split m!^----\n!m, << 'EOT';
 perferendis
@@ -233,8 +236,9 @@ plan tests => 1 + 3 * @blocks + 2;
 
 use_ok('Git::FastExport');
 
-my $export = Git::FastExport->new();
+my $export = Git::FastExport->new( test_repository() );    # unused repository
 open my $fh, 't/fast-export' or die "Can't open t/fast-export: $!";
+
 my @strings;
 {
     open my $gh, 't/fast-export' or die "Can't open t/fast-export: $!";

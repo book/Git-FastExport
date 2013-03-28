@@ -3,17 +3,24 @@ use warnings;
 use File::Path;
 use File::Spec;
 use Cwd;
-use Git;
-use Error qw( :try );
+use Git::Repository;
 
 # some data for the file content
 my @data = <DATA>;
 my $idx  = 0;
-
-# Git.pm options for silencing git
-my $gitopts = { STDERR => '' };
+my $time = time;
 
 1;
+
+sub options {
+    $time++;
+    return {
+        env => {
+            GIT_AUTHOR_DATE    => $time,
+            GIT_COMMITTER_DATE => $time,
+        }
+    };
+}
 
 sub description_of {
 
@@ -39,17 +46,12 @@ sub description_of {
 # create a new, empty repository
 sub new_repo {
     my ( $dir, $name ) = @_;
-    my $cwd = getcwd;
-
-    # alas, this can't be done with Git.pm
     my $wc = File::Spec->rel2abs( File::Spec->catfile( $dir, $name ) );
     mkpath $wc;
-    chdir $wc;
-    `git init`;
-    chdir $cwd;
-    my $repo = Git->repository( Directory => $wc );
-    $repo->command( [qw( config user.email test@example.com )], $gitopts );
-    $repo->command( [qw( config user.name  Test )],             $gitopts );
+    Git::Repository->run('init', { cwd => $wc } );
+    my $repo = Git::Repository->new( work_tree => $wc );
+    $repo->run(qw( config user.email test@example.com ));
+    $repo->run(qw( config user.name  Test ));
     return $repo;
 }
 
@@ -59,10 +61,12 @@ sub repo_description {
     my %log;    # map sha1 to log message
     my @commits;
 
+    my ( %head, %tag );
+
     # process the whole tree
-    my ( $fh, $c )
-        = $repo->command_output_pipe( 'log', '--pretty=format:%H-%P-%s',
+    my $cmd = $repo->command( 'log', '--pretty=format:%H-%P-%s',
         '--date-order', '--all' );
+    my $fh = $cmd->{stdout};
     while (<$fh>) {
         chomp;
         my ( $h, $p, $log ) = split /-/, $_, 3;
@@ -70,13 +74,15 @@ sub repo_description {
         $p =~ y/ //d;
         push @commits, $p ? "$log-$p" : $log;
     }
-    $repo->command_close_pipe( $fh, $c );
+    $cmd->close();
 
     # get the heads and tags
-    my %head = reverse map { s{ refs/heads/}{ }; split / / }
-        $repo->command( 'show-ref', '--heads' );
-    my %tag = eval { reverse map { s{ refs/tags/}{ }; split / / }
-        $repo->command( 'show-ref', '--tags' ) };
+    %head = reverse map { s{ refs/heads/}{ }; split / / }
+        $repo->run( 'show-ref', '--heads' );
+    %tag = eval {
+        reverse map { s{ refs/tags/}{ }; split / / }
+            $repo->run( 'show-ref', '--tags' );
+    };
 
     # compute $refs
     my $refs = join ' ', map( "$_=$log{$head{$_}}", sort keys %head ),
@@ -122,12 +128,11 @@ sub create_repos {
         else {                     # simple, linear commit
             create_linear_commit( $info, $child[0], $parent[0] );
         }
-        sleep 1;
     }
 
     # checkout a new dummy branch in each repo
     for my $repo ( values %{ $info->{repo} } ) {
-        $repo->command( [ 'checkout', '-b', 'dummy' ], $gitopts );
+        $repo->run( 'checkout', '-q', '-b', 'dummy' );
     }
 
     # setup the refs (branches & tags)
@@ -136,21 +141,19 @@ sub create_repos {
         my ($repo_name) = $commit =~ /^([A-Z]+)/;
         my $repo = $info->{repo}{$repo_name};
         if ( $type eq '=' ) {    # branch
-            $repo->command( [ branch => '-D', $name ], $gitopts )
-                if grep {/^..$name$/} $repo->command('branch');
-            $repo->command( [ branch => $name, $info->{sha1}{$commit} ],
-                $gitopts );
+            $repo->run( branch => '-D', $name )
+                if grep {/^..$name$/} $repo->run('branch');
+            $repo->run( branch => $name, $info->{sha1}{$commit} );
         }
         else {                   # tag
-            $repo->command( [ tag => $name, $info->{sha1}{$commit} ],
-                $gitopts );
+            $repo->run( tag => $name, $info->{sha1}{$commit} );
         }
     }
 
     # delete the dummy branch and checkout master in each repo
     for my $repo ( values %{ $info->{repo} } ) {
-        $repo->command( [ 'checkout', 'master' ], $gitopts );
-        $repo->command( [ branch => '-D', 'dummy' ], $gitopts );
+        $repo->run( 'checkout', '-q', 'master' );
+        $repo->run( branch => '-D', 'dummy' );
     }
 
     # return the repository objects
@@ -168,13 +171,13 @@ sub create_linear_commit {
     }
 
     # checkout the parent commit
-    $repo->command( 'checkout', '-q', $info->{sha1}{$parent} ) if $parent;
+    $repo->run( 'checkout', $info->{sha1}{$parent} ) if $parent;
     my $base = File::Spec->catfile( $info->{dir}, $name );
     update_file( $base, $name );
-    $repo->command( 'add', $name );
-    $repo->command( 'commit', '-m', $child );
+    $repo->run( 'add', $name );
+    $repo->run( 'commit', '-m', $child, options() );
     $info->{sha1}{$child}
-        = $repo->command_oneline(qw( log -n 1 --pretty=format:%H HEAD ));
+        = $repo->run(qw( log -n 1 --pretty=format:%H HEAD ));
 }
 
 sub create_merge_commit {
@@ -184,15 +187,15 @@ sub create_merge_commit {
 
     # checkout the first parent
     my $parent = shift @parents;
-    $repo->command( 'checkout', '-q', $info->{sha1}{$parent} );
+    $repo->run( 'checkout', '-q', $info->{sha1}{$parent} );
 
     # merge the other parents
-    $repo->command_noisy( 'merge', '-n', '-s', 'ours', '-m', $child,
+    $repo->run( 'merge', '-n', '-s', 'ours', '-m', $child, options(),
         map { $info->{sha1}{$_} } @parents,
     );
 
     $info->{sha1}{$child}
-        = $repo->command_oneline(qw( log -n 1 --pretty=format:%H HEAD ));
+        = $repo->run(qw( log -n 1 --pretty=format:%H HEAD ));
 }
 
 sub update_file {

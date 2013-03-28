@@ -1,39 +1,35 @@
 use Test::More;
-use Cwd;
-use Git;
+use Cwd qw( cwd );
+use Test::Git;
+use Git::Repository;
 use Git::FastExport;
 use File::Temp qw( tempdir );
 
+has_git();
+
 # setup a temporary git repo
-my $dir = tempdir( CLEANUP => 1 );
-
-# alas, this can't be done with Git.pm
-my $cwd = getcwd;
-chdir $dir;
-`git init`;
-chdir $cwd;
-
-my $git = Git->repository( Directory => $dir );
+my $r = test_repository();
 
 my @tests = (
 
     # desc, args
-    [''],
-    [ "Git->new( Directory => $dir )", $git ],
-    [ $dir, $dir ],
+    [ 'Git::Repository', $r ],
+    [ 'directory', $r->work_tree ],
+    [ '' ],
 );
 
 my @fails = (
 
-    # desc, error, regex, args
-    [ q('zlonk'), qr/^zlonk is not a valid git repository/, 'zlonk' ],
-    [ q('zlonk'), qr/^Zlonk=HASH\S+ is not a Git object/, bless {}, 'Zlonk' ],
-
-    # [q(''), ''], # should fail (Git.pm issue)
-    # [q(0), 0],   # should fail (Git.pm issue)
+    # desc, error regex, args
+    [ q('zlonk'), qr/^Can't chdir to .*zlonk/, 'zlonk' ],
+    [ q('zlonk'), qr/^Can't chdir to .*Zlonk=/, bless {}, 'Zlonk' ],
 );
 
 plan tests => 3 * @tests + 3 * @fails;
+
+my $home = cwd();
+
+chdir $r->work_tree;
 
 for my $t (@tests) {
     my ( $desc, @args ) = @$t;
@@ -42,7 +38,6 @@ for my $t (@tests) {
         "Git::FastExport->new($desc)" );
     is( $@, '', "No error calling Git::FastExport->new($desc)" );
     isa_ok( $export, 'Git::FastExport' );
-
 }
 
 # some failure tests
@@ -55,3 +50,4 @@ for my $t (@fails) {
     is( $export, undef, 'No object created' );
 }
 
+chdir $home;
