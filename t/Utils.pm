@@ -49,7 +49,7 @@ sub new_repo {
     my $wc = File::Spec->rel2abs( File::Spec->catfile( $dir, $name ) );
     mkpath $wc;
     Git::Repository->run('init', { cwd => $wc } );
-    my $repo = Git::Repository->new( work_tree => $wc );
+    my $repo = Git::Repository->new( work_tree => $wc, { quiet => 1 } );
     $repo->run(qw( config user.email test@example.com ));
     $repo->run(qw( config user.name  Test ));
     return $repo;
