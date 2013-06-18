@@ -7,8 +7,6 @@ use Scalar::Util qw( blessed );
 use List::Util qw( first );
 use Git::FastExport;
 
-our $VERSION = '0.07';
-
 'progress 1 objects';
 
 sub new {

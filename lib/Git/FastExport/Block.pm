@@ -5,8 +5,6 @@ use warnings;
 
 my $LF = "\012";
 
-our $VERSION = '0.07';
-
 my %fields = (
     commit     => [qw( mark author committer data from merge files )],
     tag        => [qw( from tagger data )],
