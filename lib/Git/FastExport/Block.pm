@@ -39,17 +39,19 @@ __END__
 
 # ABSTRACT: A block in a fast-export stream
 
-=head1 SYNOSPSIS
+=head1 SYNOPSIS
+
+This package is used internally by L<Git::FastExport>.
 
 =head1 DESCRIPTION
 
-L<Git::FastExport::Block> represents blocks from a B<git-fast-export>
+L<Git::FastExport::Block> represents blocks from a B<git fast-export>
 stream.
 
 Internally, it is a simple hash with keys pointing either to a string
 or a reference to an array of strings, which makes it very
 easing to edit (when obtained via L<Git::FastExport> C<next_block()>
-method) or create.
+method) or create blocks in a B<git fast-export> stream.
 
 The following two keys are pointing to strings:
 
@@ -107,18 +109,21 @@ tagger
 Of course, which keys are present depend on the type of the block,
 which is conveniently stored in the C<type> key.
 
+All other keys are ignored.
+
 =head1 METHODS
 
 A L<Git::FastExport::Block> structure is meant to be used as a hash,
 and is not protected by an accessor/mutator interface.
+Or a constructor.
 
-However, the module provides a method for ouputing blocks:
+However, the module provides a method for outputing blocks:
 
 =over 4
 
 =item as_string()
 
-Return the block as a string suitable for B<git-fast-import>.
+Return the block as a string suitable for B<git fast-import>.
 
 =back
 
