@@ -104,7 +104,7 @@ tagger
 
 =back
 
-Of course, which keys are present depend on the type of the block, 
+Of course, which keys are present depend on the type of the block,
 which is conveniently stored in the C<type> key.
 
 =head1 METHODS
@@ -138,4 +138,3 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-
