@@ -171,7 +171,7 @@ sub create_linear_commit {
     }
 
     # checkout the parent commit
-    $repo->run( 'checkout', $info->{sha1}{$parent} ) if $parent;
+    $repo->run( 'checkout', '-q', $info->{sha1}{$parent} ) if $parent;
     my $base = File::Spec->catfile( $info->{dir}, $name );
     update_file( $base, $name );
     $repo->run( 'add', $name );
