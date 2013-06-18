@@ -37,9 +37,7 @@ sub as_string {
 
 __END__
 
-=head1 NAME
-
-Git::FastExport::Block - A block in a fast-export stream
+# ABSTRACT: A block in a fast-export stream
 
 =head1 SYNOSPSIS
 
@@ -123,10 +121,6 @@ However, the module provides a method for ouputing blocks:
 Return the block as a string suitable for B<git-fast-import>.
 
 =back
-
-=head1 AUTHOR
-
-Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
 
 =head1 ACKNOWLEDGEMENTS
 

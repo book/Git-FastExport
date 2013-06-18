@@ -100,9 +100,7 @@ sub next_block {
 
 __END__
 
-=head1 NAME
-
-Git::FastExport - A module to parse the output of git-fast-export
+# ABSTRACT: A module to parse the output of git-fast-export
 
 =head1 SYNOPSIS
 
@@ -160,10 +158,6 @@ possible to read from STDIN by doing:
     }
 
 =back
-
-=head1 AUTHOR
-
-Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
 
 =head1 ACKNOWLEDGEMENTS
 

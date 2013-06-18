@@ -270,9 +270,7 @@ sub _last_alien_child {
 
 __END__
 
-=head1 NAME
-
-Git::FastExport::Stitch - Stitch together multiple git fast-export streams
+# ABSTRACT: Stitch together multiple git fast-export streams
 
 =head1 SYNOPSIS
 
@@ -536,10 +534,6 @@ This method is the heart of the stitching algorithm.
 =head1 SEE ALSO
 
 B<git-stitch-repo>
-
-=head1 AUTHOR
-
-Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
 
 =head1 COPYRIGHT
 
