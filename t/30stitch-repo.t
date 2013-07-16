@@ -109,9 +109,6 @@ my @nums = 0 .. @tests - 1;
 plan skip_all => 'No test selected' if !@nums;
 plan tests => @nums * @algo * 2;
 
-# the program we want to test
-my $gsr = File::Spec->rel2abs('script/git-stitch-repo');
-
 # a counter
 my $j = 0;
 
