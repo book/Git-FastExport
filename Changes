@@ -1,6 +1,17 @@
 Revision history for Perl extension Git::FastExport
 
 {{$NEXT}}
+
+0.09 Fri Jul 19 2013
+        [ENHANCEMENTS]
+        - use Git::Repository instead of Git.pm to interact with Git
+        [TESTS]
+        - improve the test repositories generation, no need to sleep
+          between commits (and no need to cache the repositories)
+        - moved pod tests to the release stage
+        [DOCUMENTATION]
+        - fix small errors in the ascii-art graphs
+        - improve inter-documentation linkage by using L<> instead of C<>
         [PACKAGING]
         - switch to Dist::Zilla for maintaining the distribution
 
