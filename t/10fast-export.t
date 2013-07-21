@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use Test::Git;
 
+has_git;
+
 # this script tests the parsing of fast-export block data
 
 my @latin = split m!^----\n!m, << 'EOT';
