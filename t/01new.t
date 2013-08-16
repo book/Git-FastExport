@@ -5,7 +5,7 @@ use Git::Repository;
 use Git::FastExport;
 use File::Temp qw( tempdir );
 
-has_git();
+has_git( '1.5.0' );
 
 # setup a temporary git repo
 my $r = test_repository();

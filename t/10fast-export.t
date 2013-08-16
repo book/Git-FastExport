@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Test::Git;
 
-has_git;
+has_git( '1.5.0' );
 
 # this script tests the parsing of fast-export block data
 
