@@ -2,6 +2,11 @@ Revision history for Perl extension Git::FastExport
 
 {{$NEXT}}
 
+0.100 Sat Sep 7 2013
+        [TESTS]
+        - t/compile.t is obsoleted by the Test::Compile dzil plugin
+        - tests using test_repository() require a git >= 1.5.0
+
 0.09 Fri Jul 19 2013
         [ENHANCEMENTS]
         - use Git::Repository instead of Git.pm to interact with Git
