@@ -6,7 +6,7 @@ use File::Path;
 use Git::FastExport::Stitch;
 use Test::Git;
 
-has_git();
+has_git('1.5.4');
 
 # all possible valid options
 my @valid_args = map {
