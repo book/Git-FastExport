@@ -16,8 +16,6 @@ my %fields = (
     option     => [],
 );
 
-'progress 1 objects';
-
 sub as_string {
     my ($self) = @_;
     my $string = $self->{header} . $LF;
@@ -34,6 +32,8 @@ sub as_string {
     }
     return $string .= $self->{footer} || '';
 }
+
+'progress 1 objects';
 
 __END__
 

@@ -7,8 +7,6 @@ use Scalar::Util qw( blessed );
 use Git::Repository;
 use Git::FastExport::Block;
 
-'progress 1 objects';
-
 sub new {
     my ( $class, $repo ) = @_;
     my $self = bless { source => '' }, $class;
@@ -97,6 +95,8 @@ sub next_block {
 
     return $block;
 }
+
+'progress 1 objects';
 
 __END__
 

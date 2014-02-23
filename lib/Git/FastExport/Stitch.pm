@@ -7,8 +7,6 @@ use Scalar::Util qw( blessed );
 use List::Util qw( first );
 use Git::FastExport;
 
-'progress 1 objects';
-
 sub new {
     my ( $class, $options, @args ) = @_;
 
@@ -267,6 +265,8 @@ sub _last_alien_child {
     # return last valid child
     return $node;
 }
+
+'progress 1 objects';
 
 __END__
 
