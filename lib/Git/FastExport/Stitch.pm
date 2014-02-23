@@ -112,8 +112,7 @@ sub next_block {
     }
 
     # update historical information
-    my ($sid) = $commit->{mark}[0] =~ /:(\d+)/g;
-    my $id = 0+ $sid;
+    my ($id) = $commit->{mark}[0] =~ /:(\d+)/g;
     $self->{last} = $id;    # last commit applied
     my $branch = ( split / /, $commit->{header} )[1];
     my $node = $commits->{$id} = {
