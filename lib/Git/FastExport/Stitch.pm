@@ -134,9 +134,16 @@ sub next_block {
     # get the reference parent list used by _last_alien_child()
     my $parents = {};
     for my $parent (@parents) {
-        for my $repo ( keys %{ $commits->{$parent}{parents} } ) {
-            push @{ $parents->{$repo} }, $_
-                for @{ $commits->{$parent}{parents}{$repo} || [] };
+        if ( $commits->{$parent}{repo} eq $node->{repo} ) {
+            push @{ $parents->{ $node->{repo} } }, $parent;
+        }
+        else {    # record the parents from the other repositories
+            for my $repo ( grep $_ ne $node->{repo},
+                keys %{ $commits->{$parent}{parents} } )
+            {
+                push @{ $parents->{$repo} },
+                    @{ $commits->{$parent}{parents}{$repo} || [] };
+            }
         }
     }
 
@@ -204,14 +211,7 @@ sub _add_parents {
 
     for my $parent (@parents) {
         push @{ $parent->{children} }, $node->{name};
-        for my $repo_name ( keys %{ $parent->{parents} } ) {
-            push @{ $node->{parents}{$repo_name} }, $_
-                for @{ $parent->{parents}{$repo_name} || [] };
-        }
         push @{ $node->{parents}{ $parent->{repo} } }, $parent->{name};
-        my %seen;    # uniq
-        @{ $node->{parents}{ $parent->{repo} } } = grep !$seen{$_}++,
-            @{ $node->{parents}{ $parent->{repo} } };
     }
 
     return $node;
