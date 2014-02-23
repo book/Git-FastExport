@@ -112,7 +112,8 @@ sub next_block {
     }
 
     # update historical information
-    my ($id) = $commit->{mark}[0] =~ /:(\d+)/g;
+    my ($sid) = $commit->{mark}[0] =~ /:(\d+)/g;
+    my $id = 0+ $sid;
     $self->{last} = $id;    # last commit applied
     my $branch = ( split / /, $commit->{header} )[1];
     my $node = $commits->{$id} = {
@@ -135,8 +136,8 @@ sub next_block {
     my $parents = {};
     for my $parent (@parents) {
         for my $repo ( keys %{ $commits->{$parent}{parents} } ) {
-            $parents->{$repo}{$_} = 1
-                for keys %{ $commits->{$parent}{parents}{$repo} };
+            push @{ $parents->{$repo} }, $_
+                for @{ $commits->{$parent}{parents}{$repo} || [] };
         }
     }
 
@@ -205,10 +206,13 @@ sub _add_parents {
     for my $parent (@parents) {
         push @{ $parent->{children} }, $node->{name};
         for my $repo_name ( keys %{ $parent->{parents} } ) {
-            $node->{parents}{$repo_name}{$_} = 1
-                for keys %{ $parent->{parents}{$repo_name} || {} };
+            push @{ $node->{parents}{$repo_name} }, $_
+                for @{ $parent->{parents}{$repo_name} || [] };
         }
-        $node->{parents}{ $parent->{repo} }{ $parent->{name} } = 1;
+        push @{ $node->{parents}{ $parent->{repo} } }, $parent->{name};
+        my %seen;    # uniq
+        @{ $node->{parents}{ $parent->{repo} } } = grep !$seen{$_}++,
+            @{ $node->{parents}{ $parent->{repo} } };
     }
 
     return $node;
@@ -244,9 +248,11 @@ sub _last_alien_child {
 
             # parents of $peer in $peer's repo contains
             # all parents from $parent in $peer's repo
+            my %pparents;
+            @{pparents}{ @{ $peer->{parents}{ $peer->{repo} } || [] } } = ();
             next
-                if grep { !exists $peer->{parents}{ $peer->{repo} }{$_} }
-                    keys %{ $parents->{ $peer->{repo} } };
+                if grep !exists $pparents{$_},
+                @{ $parents->{ $peer->{repo} } };
 
             # this child node has a valid parent list
             push @valid, $id;
