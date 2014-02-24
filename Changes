@@ -2,6 +2,12 @@ Revision history for Perl extension Git::FastExport
 
 {{$NEXT}}
 
+0.102 Mon Feb 24 2014
+        [ENHANCEMENTS]
+        - changed the data structure used by Git::FastExport::Stitch
+          internally, which should save a lot of memory when processing
+          large repositories (RT #93200)
+
 0.101 Sat Nov 23 2013
         [TESTS]
         - tests using `git fast-export` require a git >= 1.5.4
