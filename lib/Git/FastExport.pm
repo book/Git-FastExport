@@ -1,4 +1,5 @@
 package Git::FastExport;
+
 use strict;
 use warnings;
 use Carp;
