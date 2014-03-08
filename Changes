@@ -2,6 +2,11 @@ Revision history for Perl extension Git::FastExport
 
 {{$NEXT}}
 
+0.103 Sat Mar 8 2014
+        [ENHANCEMENTS]
+        - declared that the script/ directory contains scripts to install
+          (thanks to Aristotle Pagaltzis)
+
 0.102 Mon Feb 24 2014
         [ENHANCEMENTS]
         - changed the data structure used by Git::FastExport::Stitch
