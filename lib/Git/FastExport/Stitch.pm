@@ -177,7 +177,7 @@ sub _translate_block {
 
     # mark our original source
     $block->{header} =~ s/$/-$self->{repo}{$repo}{name}/
-        if $block->{type} eq 'reset';
+        if $block->{type} =~ /^(?:reset|tag)$/;
 
     # map to the new mark
     for ( @{ $block->{mark} || [] } ) {
