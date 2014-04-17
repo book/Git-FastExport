@@ -130,7 +130,10 @@ for my $n (@nums) {
         for my $ref ( split / /, $refs ) {
             my ( $name, $type, $desc ) = split /([>=])/, $ref;
             my ($orig) = $desc =~ /^([A-Z]+)/;
-            push @refs, "$name-$orig$type$desc";
+            ( $name, my $msg ) = split /:/, $name;    # annotated tag?
+            push @refs, $msg
+                ? "$name-$orig:$msg$type$desc"
+                : "$name-$orig$type$desc";
         }
         $expected_refs = join ' ', sort @refs;
     }
