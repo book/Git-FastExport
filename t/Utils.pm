@@ -95,9 +95,10 @@ sub repo_description {
     }
 
     # compute $refs
-    my $refs = join ' ', map( "$_=$log{$head{$_}}", sort keys %head ),
-        map( "$_:$atag{$_}[1]>$log{$atag{$_}[0]}", sort keys %atag ),
-        map( "$_>$log{$tag{$_}}", sort keys %tag );
+    my $refs = join ' ', sort
+        map( "$_=$log{$head{$_}}",                 keys %head ),
+        map( "$_:$atag{$_}[1]>$log{$atag{$_}[0]}", keys %atag ),
+        map( "$_>$log{$tag{$_}}",                  keys %tag );
 
     # replace SHA-1 by log name
     my $desc = join ' ', reverse @commits;
