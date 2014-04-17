@@ -128,10 +128,9 @@ for my $n (@nums) {
     {
         my @refs;
         for my $ref ( split / /, $refs ) {
-            my ( $branch, $desc ) = split /=/, $ref;
-            next if !$desc;    # skip tags
-            my ($name) = $desc =~ /^([A-Z]+)/;
-            push @refs, "$branch-$name=$desc";
+            my ( $name, $type, $desc ) = split /([>=])/, $ref;
+            my ($orig) = $desc =~ /^([A-Z]+)/;
+            push @refs, "$name-$orig$type$desc";
         }
         $expected_refs = join ' ', sort @refs;
     }
