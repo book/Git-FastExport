@@ -16,7 +16,7 @@ my @tests = (
     # 0 - 3
     [ 'A1 A2-A1 A3-A2', 'master=A3', 'A1 A2-A1 A3-A2', 'A1 A2-A1 A3-A2', ],
     [   'A1 A2-A1 A3-A2 B1 B2-B1 B3-B2',
-        'master=A3 master=B3',
+        'master=A3 master=B3 tag>A2',
         'A1 A2-A1 A3-A2 B1-A3 B2-B1 B3-B2',
         'A1 A2-A1 A3-A2 B1-A3 B2-B1 B3-B2',
     ],
@@ -39,7 +39,7 @@ my @tests = (
         'A1 A2-A1 A3-A1 A4-A2A3',
     ],
     [   'A1 A2-A1 A3-A1 A4-A2A3 B1 B2-B1 B3-B1 B4-B2B3',
-        'master=A4 master=B4',
+        'master=A4 master=B4 v1>B1 v1>A1',
         'A1 A2-A1 A3-A1 A4-A2A3 B1-A4 B2-B1 B3-B1 B4-B2B3',
         'A1 A2-A1 A3-A1 A4-A2A3 B1-A4 B2-B1 B3-B1 B4-B2B3',
     ],
