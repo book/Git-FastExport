@@ -217,10 +217,8 @@ sub _last_alien_child {
 
     my $from = $node->{name};
     my $repo = $node->{repo};
-    my $old  = '';
 
-    while ( $node ne $old ) {
-        $old = $node;
+    while (1) {
 
         # no children nodes
         return $node if ( !@{ $node->{children} } );
