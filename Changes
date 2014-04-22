@@ -2,6 +2,12 @@ Revision history for Perl extension Git::FastExport
 
 {{$NEXT}}
 
+0.104 Tue Apr 22 2014
+        [ENHANCEMENTS]
+        - proper support for annotated tags (RT #94816)
+        [TESTS]
+        - added tests for annotated tags
+
 0.103 Sat Mar 8 2014
         [ENHANCEMENTS]
         - declared that the script/ directory contains scripts to install
