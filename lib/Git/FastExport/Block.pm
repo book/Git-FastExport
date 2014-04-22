@@ -135,7 +135,7 @@ under the same terms as Perl itself.
 
 =head1 COPYRIGHT
 
-Copyright 2008-2013 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2008-2014 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 
