@@ -6,6 +6,7 @@ use Pod::Usage;
 use Getopt::Long;
 use Git::FastExport::Stitch;
 use File::Spec::Functions qw( rel2abs );
+use File::Basename;
 
 our $VERSION = $Git::FastExport::Stitch::VERSION;
 
@@ -26,7 +27,8 @@ while (@ARGV) {
     $dir ||= '';
 
     # add the repository to the list of repositories to stitch
-    $export->stitch( $repo => $dir );
+    #  using the src directory as the tag suffix.
+    $export->stitch( $repo => $dir, basename($repo) );
 }
 
 # run the stitching algorithm
