@@ -137,6 +137,32 @@ sub next_block {
     my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
         @{ $commit->{merge} || [] };
 
+    #Call out to build the parents rewrite map
+    my %parent_map = $self->_map_parents($node,  \@parents);
+
+    # map parent marks
+    for ( @{ $commit->{from} || [] }, @{ $commit->{merge} || [] } ) {
+        s/:(\d+)/:$parent_map{$1}/g;
+    }
+
+    # update the parents information
+    for my $parent ( map { $commits->{ $parent_map{$_} } } @parents ) {
+        push @{ $parent->{children} }, $node->{name};
+        push @{ $node->{parents}{ $parent->{repo} } }, $parent->{name};
+    }
+
+    # dump the commit
+    return $commit;
+}
+
+sub _map_parents {
+    my ( $self, $node , $parents_ary) = @_;
+    my @parents = @$parents_ary;
+    my $commits = $self->{commits};
+    my $branch = $node->{branch};
+    my $repo = $node->{repo};
+
+
     # get the reference parent list used by _last_alien_child()
     my $parents = {};
     for my $parent (@parents) {
@@ -154,24 +180,12 @@ sub next_block {
     }
 
     # map each parent to its last "alien" commit
-    my %parent_map = map {
+    return map {
         $_ => $self->_last_alien_child( $commits->{$_}, $branch, $parents )->{name}
     } @parents;
 
-    # map parent marks
-    for ( @{ $commit->{from} || [] }, @{ $commit->{merge} || [] } ) {
-        s/:(\d+)/:$parent_map{$1}/g;
-    }
-
-    # update the parents information
-    for my $parent ( map { $commits->{ $parent_map{$_} } } @parents ) {
-        push @{ $parent->{children} }, $node->{name};
-        push @{ $node->{parents}{ $parent->{repo} } }, $parent->{name};
-    }
-
-    # dump the commit
-    return $commit;
 }
+
 
 sub _translate_block {
     my ( $self, $repo ) = @_;
