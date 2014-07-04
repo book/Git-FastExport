@@ -16,6 +16,15 @@ sub new {
         ? $repo    # below, use "$repo" for Path::Class paths
         : Git::Repository->new( defined $repo ? ( { cwd => "$repo" } ) : () );
 
+    # git fast-export appeared in git 1.5.4
+    if ( $self->{git}->version_lt('1.5.4') ) {
+        my $opt = $self->{git}->options->{git};
+        my ($git) = $opt
+            ? ref $opt ? "@$opt" : $opt
+            : $self->{git}->command("version")->cmdline;
+        croak "Git version 1.5.4 required for git fast-export. '$git' is only version ${\$self->{git}->version}";
+    }
+
     return $self;
 }
 
