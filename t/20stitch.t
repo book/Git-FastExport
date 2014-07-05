@@ -12,7 +12,10 @@ has_git('1.5.4');
 my @valid_args = map {
     my %o = %$_;
     ( \%o, map { my %h = %o; $h{select} = $_; \%h } qw( first last random ) )
-} ( {}, { cached => '' }, { cached => 1 } );
+}  map  {
+    my %o = %$_;
+    ( \%o, map { my %h = %o; $h{datetype} = $_; \%h } qw( authored_date commit_date ) )
+}( {}, { cached => '' }, { cached => 1 } );
 
 my @tests = (
 
@@ -22,6 +25,7 @@ my @tests = (
 
     # error cases
     [ [ { select => 'bam' } ], qr/Invalid value for 'select' option: 'bam'/ ],
+    [ [ { datetype => 'bam' } ], qr/Invalid value for 'datetype' option: 'bam'/ ],
     [ [ {}, 'bonk' ], qr/^Can't chdir to .*bonk: / ],
 );
 
