@@ -13,11 +13,15 @@ my $time = time;
 1;
 
 sub options {
-    $time++;
+    my ($rebased ) = @_;
+    # move time forward by two steps , to ensure space for advanced/rebasedcommits.
+    $time += 2;
+    my $rebase_off = $rebased ? 3 : 0;
+
     return {
         env => {
             GIT_AUTHOR_DATE    => $time,
-            GIT_COMMITTER_DATE => $time,
+            GIT_COMMITTER_DATE => $time + $rebase_off,
         }
     };
 }
@@ -126,7 +130,7 @@ sub create_repos {
 
     for my $commit ( split / /, $desc ) {
         my ( $child, $parent ) = split /-/, $commit;
-        my @child = $child =~ /([A-Z]+\d+)/g;
+        my @child = $child =~ /([A-Z]+\d+\+?)/g;
         my @parent = $parent =~ /([A-Z]+\d+)/g if $parent;
 
         die "bad node description" if @child > 1 && @parent > 1;
@@ -176,6 +180,7 @@ sub create_repos {
 sub create_linear_commit {
     my ( $info, $child, $parent ) = @_;
     my ($name) = $child =~ /^([A-Z]+)/g;
+    my $rebased = $child =~ /\+$/;
 
     # create the repo if needed
     my $repo = $info->{repo}{$name};
@@ -188,7 +193,7 @@ sub create_linear_commit {
     my $base = File::Spec->catfile( $info->{dir}, $name );
     update_file( $base, $name );
     $repo->run( 'add', $name );
-    $repo->run( 'commit', '-m', $child, options() );
+    $repo->run( 'commit', '-m', $child, options($rebased) );
     $info->{sha1}{$child}
         = $repo->run(qw( log -n 1 --pretty=format:%H HEAD ));
 }
@@ -196,6 +201,8 @@ sub create_linear_commit {
 sub create_merge_commit {
     my ( $info, $child, @parents ) = @_;
     my ($name) = $child =~ /^([A-Z]+)/g;
+    my $rebased = $child =~ /\+$/;
+
     my $repo = $info->{repo}{$name};
 
     # checkout the first parent
@@ -203,7 +210,7 @@ sub create_merge_commit {
     $repo->run( 'checkout', '-q', $info->{sha1}{$parent} );
 
     # merge the other parents
-    $repo->run( 'merge', '-n', '-s', 'ours', '-m', $child, options(),
+    $repo->run( 'merge', '-n', '-s', 'ours', '-m', $child, options($rebased),
         map { $info->{sha1}{$_} } @parents,
     );
 

@@ -6,12 +6,13 @@ use Pod::Usage;
 use Getopt::Long;
 use Git::FastExport::Stitch;
 use File::Spec::Functions qw( rel2abs );
+use File::Basename;
 
 our $VERSION = $Git::FastExport::Stitch::VERSION;
 
 # basic command-line options
 my %option;
-GetOptions( \%option, 'help', 'manual', 'version', 'select=s' )
+GetOptions( \%option, 'help', 'manual', 'version', 'select=s'  , 'datetype=s' )
     or pod2usage( -verbose => 0 );
 print "git-stitch-repo version $VERSION\n" and exit if $option{version};
 pod2usage( -verbose => 1 ) if $option{help};
@@ -26,7 +27,8 @@ while (@ARGV) {
     $dir ||= '';
 
     # add the repository to the list of repositories to stitch
-    $export->stitch( $repo => $dir );
+    #  using the src directory as the tag suffix.
+    $export->stitch( $repo => $dir, basename($repo) );
 }
 
 # run the stitching algorithm

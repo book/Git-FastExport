@@ -23,16 +23,21 @@ sub new {
 
         # default options
         select => 'last',
+        datetype => 'commit_date',
 
     }, $class;
 
     # set the options
-    for my $key (qw( select )) {
+    for my $key (qw( select datetype )) {
         $self->{$key} = $options->{$key} if exists $options->{$key};
     }
     croak "Invalid value for 'select' option: '$self->{select}'"
         if $self->{select} !~ /^(?:first|last|random)$/;
 
+    croak "Invalid value for 'datetype' option: '$self->{datetype}'"
+        if $self->{datetype} !~ /^(?:authored_date|commit_date)$/;
+    
+    $self->{datetype} = 'date' if ($self->{datetype} eq "commit_date");
     # process the remaining args
     $self->stitch( splice @args, 0, 2 ) while @args;
 
@@ -41,7 +46,7 @@ sub new {
 
 # add a new repo to stich in
 sub stitch {
-    my ( $self, $repo, $dir ) = @_;
+    my ( $self, $repo, $dir, $name ) = @_;
 
     my $export
         = blessed($repo) && $repo->isa('Git::FastExport')
@@ -62,7 +67,7 @@ sub stitch {
     $self->{repo}{$repo}{repo}   = $repo;
     $self->{repo}{$repo}{dir}    = $dir;
     $self->{repo}{$repo}{parser} = $export;
-    $self->{repo}{$repo}{name}   = $self->{name}++;
+    $self->{repo}{$repo}{name}   = $name || $self->{name}++;
     $self->{repo}{$repo}{block}  = $export->next_block();
     $self->_translate_block( $repo );
 
@@ -93,9 +98,10 @@ sub next_block {
 
     # select the oldest available commit
     my ($next) = keys %$repo;
-    $next
-        = $repo->{$next}{block}{date} < $repo->{$_}{block}{date} ? $next : $_
-        for keys %$repo;
+    for ( keys %$repo ) {
+        $next
+            = $repo->{$next}{block}{$self->{datetype}} < $repo->{$_}{block}{$self->{datetype}} ? $next : $_ ;
+    }
     my $commit = $repo->{$next}{block};
 
     # fetch the next block
@@ -131,6 +137,32 @@ sub next_block {
     my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
         @{ $commit->{merge} || [] };
 
+    #Call out to build the parents rewrite map
+    my %parent_map = $self->_map_parents($node,  \@parents);
+
+    # map parent marks
+    for ( @{ $commit->{from} || [] }, @{ $commit->{merge} || [] } ) {
+        s/:(\d+)/:$parent_map{$1}/g;
+    }
+
+    # update the parents information
+    for my $parent ( map { $commits->{ $parent_map{$_} } } @parents ) {
+        push @{ $parent->{children} }, $node->{name};
+        push @{ $node->{parents}{ $parent->{repo} } }, $parent->{name};
+    }
+
+    # dump the commit
+    return $commit;
+}
+
+sub _map_parents {
+    my ( $self, $node , $parents_ary) = @_;
+    my @parents = @$parents_ary;
+    my $commits = $self->{commits};
+    my $branch = $node->{branch};
+    my $repo = $node->{repo};
+
+
     # get the reference parent list used by _last_alien_child()
     my $parents = {};
     for my $parent (@parents) {
@@ -148,24 +180,12 @@ sub next_block {
     }
 
     # map each parent to its last "alien" commit
-    my %parent_map = map {
+    return map {
         $_ => $self->_last_alien_child( $commits->{$_}, $branch, $parents )->{name}
     } @parents;
 
-    # map parent marks
-    for ( @{ $commit->{from} || [] }, @{ $commit->{merge} || [] } ) {
-        s/:(\d+)/:$parent_map{$1}/g;
-    }
-
-    # update the parents information
-    for my $parent ( map { $commits->{ $parent_map{$_} } } @parents ) {
-        push @{ $parent->{children} }, $node->{name};
-        push @{ $node->{parents}{ $parent->{repo} } }, $parent->{name};
-    }
-
-    # dump the commit
-    return $commit;
 }
+
 
 sub _translate_block {
     my ( $self, $repo ) = @_;
@@ -313,7 +333,7 @@ See L<STITCHING ALGORITHM> for details about what these options really mean.
 The remaining parameters (if any) are taken to be parameters (passed by
 pairs) to the C<stitch()> method.
 
-=item stitch( $repo, $dir )
+=item stitch( $repo, $dir , $name )
 
 Add the given C<$repo> to the list of repositories to stitch in.
 
@@ -325,6 +345,8 @@ The optional C<$dir> parameter will be used as the relative directory
 under which the trees of the source repository will be stored in the
 stitched repository.
 
+And further optional parameter C<$name> set the internal name for C<$repo>
+which is used as a suffix on refs copied from C<$repo>
 =item next_block()
 
 Return the next block of the stitched repository, as a
