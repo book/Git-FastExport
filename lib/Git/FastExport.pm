@@ -141,20 +141,25 @@ input to B<git-fast-import>.
 
 This class provides the following methods:
 
-=over 4
+=head2 new
 
-=item new( [ $repository ] )
+    my $export = Git::FastExport->new($repo);
 
 The constructor takes an optional L<Git::Repository> object,
 or a path (to a C<GIT_DIR> or C<GIT_WORK_TREE>), and returns a
 L<Git::FastExport> object attached to it.
 
-=item fast_export( @args )
+=head2 fast_export
+
+    # example @args: qw< --progress=1 --all --date-order >
+    $export->fast_export(@args);
 
 Initialize a B<git-fast-export> command on the repository, using the
 arguments given in C<@args>.
 
-=item next_block()
+=head2 next_block
+
+    my $block = $export->next_block();
 
 Return the next block in the B<git-fast-export> stream as a
 L<Git::FastExport::Block> object.
@@ -169,8 +174,6 @@ possible to make it read directly from C<STDIN> (or another filehandle) by doing
     while ( my $block = $export->next_block() ) {
         ...
     }
-
-=back
 
 =head1 ACKNOWLEDGEMENTS
 

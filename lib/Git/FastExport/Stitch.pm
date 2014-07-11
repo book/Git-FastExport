@@ -296,9 +296,9 @@ since they support the same inteface for the C<next_block()> method.
 
 L<Git::FastExport::Stitch> supports the following methods:
 
-=over 4
+=head2 new
 
-=item new( \%options, [ ... ] )
+    my $export = Git::FastExport::Stitch->new( \%option );
 
 Create a new L<Git::FastExport::Stitch> object.
 
@@ -313,7 +313,10 @@ See L<STITCHING ALGORITHM> for details about what these options really mean.
 The remaining parameters (if any) are taken to be parameters (passed by
 pairs) to the C<stitch()> method.
 
-=item stitch( $repo, $dir )
+=head2 stitch
+
+    # add the repository to the list of repositories to stitch
+    $export->stitch( $repo => $dir );
 
 Add the given C<$repo> to the list of repositories to stitch in.
 
@@ -325,14 +328,14 @@ The optional C<$dir> parameter will be used as the relative directory
 under which the trees of the source repository will be stored in the
 stitched repository.
 
-=item next_block()
+=head2 next_block
+
+    my $block = $export->next_block();
 
 Return the next block of the stitched repository, as a
 L<Git::FastExport::Block> object.
 
 Return nothing at the end of stream.
-
-=back
 
 =head1 STITCHING ALGORITHM
 
@@ -498,9 +501,9 @@ use of several internal methods. These are B<not> part of the public
 interface of the module, and are detailed below for those interested in
 the algorithm itself.
 
-=over 4
+=head2 _translate_block
 
-=item _translate_block( $repo )
+    $self->_translate_block( $repo );
 
 Given a I<repo> key in the internal structure listing all the repositories
 to stitch together, this method "translates" the current block using
@@ -508,7 +511,9 @@ the references (marks) of the resulting repository.
 
 To ease debugging, the translated mark count starts at C<1_000_000>.
 
-=item _last_alien_child( $node, $branch, $parents )
+=head2 _last_alien_child
+
+    my $commit = $self->_last_alien_child( $node, $branch, $parents )
 
 Given a node, its "branch" name (actually, the reference given on the
 C<commit> line of the fast-export) and a structure describing it's
@@ -516,8 +521,6 @@ lineage over the various source repositories, find a suitable commit to
 which attach it.
 
 This method is the heart of the stitching algorithm.
-
-=back
 
 =head1 SEE ALSO
 

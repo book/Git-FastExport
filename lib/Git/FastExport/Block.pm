@@ -119,13 +119,11 @@ Or a constructor.
 
 However, the module provides a method for outputing blocks:
 
-=over 4
+=head2 as_string
 
-=item as_string()
+     print $block->as_string;
 
 Return the block as a string suitable for B<git fast-import>.
-
-=back
 
 =head1 ACKNOWLEDGEMENTS
 
