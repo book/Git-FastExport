@@ -50,7 +50,7 @@ stream.
 
 Internally, it is a simple hash with keys pointing either to a string
 or a reference to an array of strings, which makes it very
-easing to edit (when obtained via L<Git::FastExport> C<next_block()>
+easy to edit (when obtained via L<Git::FastExport> C<next_block()>
 method) or create blocks in a B<git fast-export> stream.
 
 The following two keys are pointing to strings:
