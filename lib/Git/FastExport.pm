@@ -132,7 +132,7 @@ __END__
 
 =head1 DESCRIPTION
 
-L<Git::FastExport> is a module that parses the output of
+Git::FastExport is a module that parses the output of
 B<git-fast-export> and returns L<Git::FastExport::Block> objects that
 can be inspected or modified before being eventually passed on as the
 input to B<git-fast-import>.
@@ -147,7 +147,7 @@ This class provides the following methods:
 
 The constructor takes an optional L<Git::Repository> object,
 or a path (to a C<GIT_DIR> or C<GIT_WORK_TREE>), and returns a
-L<Git::FastExport> object attached to it.
+Git::FastExport object attached to it.
 
 =head2 fast_export
 
@@ -166,7 +166,7 @@ L<Git::FastExport::Block> object.
 
 Return nothing at the end of stream.
 
-This methods reads from the C<export_fh> filehandle of the L<Git::FastExport>
+This methods reads from the C<export_fh> filehandle of the Git::FastExport
 object. It is normally setup via the C<fast_export()> method, but it is
 possible to make it read directly from C<STDIN> (or another filehandle) by doing:
 

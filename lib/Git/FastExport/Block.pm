@@ -45,7 +45,7 @@ This package is used internally by L<Git::FastExport>.
 
 =head1 DESCRIPTION
 
-L<Git::FastExport::Block> represents blocks from a B<git fast-export>
+Git::FastExport::Block represents blocks from a B<git fast-export>
 stream.
 
 Internally, it is a simple hash with keys pointing either to a string
@@ -113,7 +113,7 @@ All other keys are ignored.
 
 =head1 METHODS
 
-A L<Git::FastExport::Block> structure is meant to be used as a hash,
+A Git::FastExport::Block structure is meant to be used as a hash,
 and is not protected by an accessor/mutator interface.
 Or a constructor.
 
