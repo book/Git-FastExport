@@ -109,7 +109,7 @@ tagger
 Of course, which keys are present depend on the type of the block,
 which is conveniently stored in the C<type> key.
 
-All other keys are ignored.
+All other keys are ignored by C<L</as_string>>.
 
 =head1 METHODS
 
