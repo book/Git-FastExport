@@ -5,6 +5,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw( blessed );
 use List::Util qw( first );
+use File::Basename qw( basename );
 use Git::FastExport;
 
 sub new {
@@ -18,7 +19,7 @@ sub new {
         mark_map => {},
         commits  => {},
         repo     => {},
-        name     => 'A',
+        name     => {},
         cache    => {},
 
         # default options
@@ -57,11 +58,25 @@ sub stitch {
     $repo = $export->{source};
     croak "Already stitching repository $repo" if exists $self->{repo}{$repo};
 
+    # pick the refs suffix:
+    # use basename without the .git extension or non ASCII characters
+    my $name = basename( $repo, '.git' );
+    $name =~ y/-A-Za-z0-9_/-/cs;
+    $name =~ s/^-|-$//g;
+    $dir ||= $name;    # pick up a default name for the directory
+
+    # check if the name is not used already and pick a replacement if it is
+    if ( exists $self->{name}{$name} ) {
+        my $suffix = "A";
+        $suffix++ while ( exists $self->{name}{"$name-$suffix"} );
+        $name .= "-$suffix";
+    }
+
     # set up the internal structures
     $self->{repo}{$repo}{repo}   = $repo;
     $self->{repo}{$repo}{dir}    = $dir;
     $self->{repo}{$repo}{parser} = $export;
-    $self->{repo}{$repo}{name}   = $self->{name}++;
+    $self->{repo}{$repo}{name}   = $name;
     $self->{repo}{$repo}{block}  = $export->next_block();
     $self->_translate_block( $repo );
 
@@ -93,7 +108,7 @@ sub next_block {
     # select the oldest available commit
     my ($next) = keys %$repo;
     $next
-        = $repo->{$next}{block}{date} < $repo->{$_}{block}{date} ? $next : $_
+        = $repo->{$next}{block}{committer_date} < $repo->{$_}{block}{committer_date} ? $next : $_
         for keys %$repo;
     my $commit = $repo->{$next}{block};
 
@@ -327,6 +342,11 @@ L<Git::FastExport> object.
 The optional C<$dir> parameter will be used as the relative directory
 under which the trees of the source repository will be stored in the
 stitched repository.
+
+The basename of the C<$repo> repository (mapped to ASCII without the
+F<.git> suffix) is used as the internal name for C<$repo>. This internal
+name is used as a suffix on refs copied from C<$repo>. When there's a
+collision, an extra suffix (C<-A>, C<-B>, etc.) is added.
 
 =head2 next_block
 

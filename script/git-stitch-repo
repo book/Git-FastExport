@@ -6,6 +6,7 @@ use Pod::Usage;
 use Getopt::Long;
 use Git::FastExport::Stitch;
 use File::Spec::Functions qw( rel2abs );
+use File::Basename;
 
 our $VERSION = $Git::FastExport::Stitch::VERSION;
 
