@@ -109,7 +109,7 @@ sub next_block {
     # select the oldest available commit
     my ($next) = keys %$repo;
     $next
-        = $repo->{$next}{block}{date} < $repo->{$_}{block}{date} ? $next : $_
+        = $repo->{$next}{block}{committer_date} < $repo->{$_}{block}{committer_date} ? $next : $_
         for keys %$repo;
     my $commit = $repo->{$next}{block};
 

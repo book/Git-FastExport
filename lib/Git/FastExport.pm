@@ -90,11 +90,9 @@ sub next_block {
 
     # post-processing
     if ( $block->{type} eq 'commit' ) {
-        ( $block->{date} )
+        ( $block->{committer_date} )
             = $block->{committer}[0] =~ /^committer [^>]*> (\d+) [-+]\d+$/g;
-    }
-    if ( $block->{type} eq 'commit' ) {
-        ( $block->{authored_date} )
+        ( $block->{author_date} )
             = $block->{author}[0] =~ /^author [^>]*> (\d+) [-+]\d+$/g;
     }
 
