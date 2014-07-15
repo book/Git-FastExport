@@ -58,7 +58,6 @@ sub stitch {
     croak "Already stitching repository $repo" if exists $self->{repo}{$repo};
 
     # set up the internal structures
-    $export->{mapdir}            = $dir;
     $self->{repo}{$repo}{repo}   = $repo;
     $self->{repo}{$repo}{dir}    = $dir;
     $self->{repo}{$repo}{parser} = $export;
