@@ -192,7 +192,8 @@ sub _translate_block {
     # update marks & dir in files
     for ( @{ $block->{files} } ) {
         s/^M (\d+) :(\d+)/M $1 :$mark_map->{$repo}{$2}/;
-        if ( my $dir = $self->{repo}{$repo}{dir} ) {
+        my $dir = $self->{repo}{$repo}{dir};
+        if ( defined $dir && $dir ne '' ) {
             s!^(M \d+ :\d+) (\"?)(.*)!$1 $2$dir/$3!;    # filemodify
             s!^D (\"?)(.*)!D $1$dir/$2!;                # filedelete
 
