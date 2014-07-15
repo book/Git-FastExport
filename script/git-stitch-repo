@@ -27,8 +27,7 @@ while (@ARGV) {
     $dir ||= '';
 
     # add the repository to the list of repositories to stitch
-    #  using the src directory as the tag suffix.
-    $export->stitch( $repo => $dir, basename($repo) );
+    $export->stitch( $repo => $dir );
 }
 
 # run the stitching algorithm

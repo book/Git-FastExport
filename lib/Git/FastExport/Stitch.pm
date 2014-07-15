@@ -5,6 +5,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw( blessed );
 use List::Util qw( first );
+use File::Basename qw( basename );
 use Git::FastExport;
 
 sub new {
@@ -18,7 +19,7 @@ sub new {
         mark_map => {},
         commits  => {},
         repo     => {},
-        name     => 'A',
+        name     => {},
         cache    => {},
 
         # default options
@@ -41,7 +42,7 @@ sub new {
 
 # add a new repo to stich in
 sub stitch {
-    my ( $self, $repo, $dir, $name ) = @_;
+    my ( $self, $repo, $dir ) = @_;
 
     my $export
         = blessed($repo) && $repo->isa('Git::FastExport')
@@ -57,12 +58,26 @@ sub stitch {
     $repo = $export->{source};
     croak "Already stitching repository $repo" if exists $self->{repo}{$repo};
 
+    # pick the refs suffix:
+    # use basename without the .git extension or non ASCII characters
+    my $name = basename( $repo, '.git' );
+    $name =~ y/-A-Za-z0-9_/-/cs;
+    $name =~ s/^-|-$//g;
+    $dir ||= $name;    # pick up a default name for the directory
+
+    # check if the name is not used already and pick a replacement if it is
+    if ( exists $self->{name}{$name} ) {
+        my $suffix = "A";
+        $suffix++ while ( exists $self->{name}{"$name-$suffix"} );
+        $name .= "-$suffix";
+    }
+
     # set up the internal structures
     $export->{mapdir}            = $dir;
     $self->{repo}{$repo}{repo}   = $repo;
     $self->{repo}{$repo}{dir}    = $dir;
     $self->{repo}{$repo}{parser} = $export;
-    $self->{repo}{$repo}{name}   = $name || $self->{name}++;
+    $self->{repo}{$repo}{name}   = $name;
     $self->{repo}{$repo}{block}  = $export->next_block();
     $self->_translate_block( $repo );
 
@@ -313,7 +328,7 @@ See L<STITCHING ALGORITHM> for details about what these options really mean.
 The remaining parameters (if any) are taken to be parameters (passed by
 pairs) to the C<stitch()> method.
 
-=item stitch( $repo, $dir , $name )
+=item stitch( $repo, $dir )
 
 Add the given C<$repo> to the list of repositories to stitch in.
 
@@ -325,8 +340,11 @@ The optional C<$dir> parameter will be used as the relative directory
 under which the trees of the source repository will be stored in the
 stitched repository.
 
-And further optional parameter C<$name> set the internal name for C<$repo>
-which is used as a suffix on refs copied from C<$repo>
+The basename of the C<$repo> repository (mapped to ASCII without the
+F<.git> suffix) is used as the internal name for C<$repo>. This internal
+name is used as a suffix on refs copied from C<$repo>. When there's a
+collision, an extra suffix (C<-A>, C<-B>, etc.) is added.
+
 =item next_block()
 
 Return the next block of the stitched repository, as a
