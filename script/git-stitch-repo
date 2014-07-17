@@ -38,7 +38,7 @@ while ( my $block = $export->next_block() ) {
 __END__
 
 
-# ABSTRACT: Stitch several git repositories into a git-fast-import stream
+# ABSTRACT: Stitch several git repositories into a git fast-import stream
 
 =head1 SYNOPSIS
 
@@ -55,9 +55,9 @@ git-stitch-repo [ options ] repo1:dir1 repo2:dir2 ...
 
 =head1 DESCRIPTION
 
-B<git-stitch-repo> will process the output of C<git-fast-export --all
+B<git-stitch-repo> will process the output of C<git fast-export --all
 --date-order> on the git repositories given on the command-line,
-and create a stream suitable for B<git-fast-import> that will create
+and create a stream suitable for B<git fast-import> that will create
 a new repository containing all the commits in a new commit tree
 that respects the history of all the source repositories.
 
