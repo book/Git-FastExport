@@ -128,11 +128,11 @@ sub next_block {
     # update historical information
     my ($id) = $commit->{mark}[0] =~ /:(\d+)/g;
     $self->{last} = $id;    # last commit applied
-    my $branch = ( split / /, $commit->{header} )[1];
+    my $ref = ( split / /, $commit->{header} )[1];
     my $node = $commits->{$id} = {
         name     => $id,
         repo     => $repo->{repo},
-        branch   => $branch,
+        ref      => $ref,
         children => [],
         parents  => {},
         merge    => exists $commit->{merge},
@@ -163,7 +163,7 @@ sub next_block {
 
     # map each parent to its last "alien" commit
     my %parent_map = map {
-        $_ => $self->_last_alien_child( $commits->{$_}, $branch, $parents )->{name}
+        $_ => $self->_last_alien_child( $commits->{$_}, $ref, $parents )->{name}
     } @parents;
 
     # map parent marks
@@ -227,7 +227,7 @@ sub _translate_block {
 # or a child in our repo
 # or an alien child that has the same parent list
 sub _last_alien_child {
-    my ( $self, $node, $branch, $parents ) = @_;
+    my ( $self, $node, $ref, $parents ) = @_;
     my $commits = $self->{commits};
 
     my $from = $node->{name};
@@ -533,9 +533,9 @@ To ease debugging, the translated mark count starts at C<1_000_000>.
 
 =head2 _last_alien_child
 
-    my $commit = $self->_last_alien_child( $node, $branch, $parents )
+    my $commit = $self->_last_alien_child( $node, $ref, $parents )
 
-Given a node, its "branch" name (actually, the reference given on the
+Given a node, its ref name (actually, the reference given on the
 C<commit> line of the fast-export) and a structure describing it's
 lineage over the various source repositories, find a suitable commit to
 which attach it.
