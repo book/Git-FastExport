@@ -42,7 +42,7 @@ __END__
 
 =head1 SYNOPSIS
 
-git-stitch-repo [ options ] repo1 repo2:dir2 ...
+git-stitch-repo [ options ] repo1:dir1 repo2:dir2 ...
 
 =head1 OPTIONS
 
@@ -67,8 +67,8 @@ Typical usage is like this:
     A  B
     $ mkdir RESULT
     $ cd RESULT
-    $ git-init
-    $ git-stitch-repo ../A:A ../B:B | git-fast-import
+    $ git init
+    $ git-stitch-repo ../A:A ../B:B | git fast-import
 
 The C<RESULT> repository will contain all commits from repositories A
 and B, with the files from A in subdirectory F<A/> and the files from
