@@ -24,7 +24,6 @@ my $export = Git::FastExport::Stitch->new( \%option );
 while (@ARGV) {
     my ( $repo, $dir ) = split /:/, shift @ARGV, 2;
     $repo = rel2abs($repo);
-    $dir ||= '';
 
     # add the repository to the list of repositories to stitch
     $export->stitch( $repo => $dir );
@@ -68,11 +67,14 @@ Typical usage is like this:
     $ mkdir RESULT
     $ cd RESULT
     $ git init
-    $ git-stitch-repo ../A:A ../B:B | git fast-import
+    $ git-stitch-repo ../A ../B ../C:X ../R: | git fast-import
 
-The C<RESULT> repository will contain all commits from repositories A
-and B, with the files from A in subdirectory F<A/> and the files from
-B in subdirectory F<B/>.
+The F<RESULT> repository will contain all commits from repositories
+F<../A> F<../B> F<../C> & F<../R>, with the paths of the files rewritten:
+the files from the F<../A> repository will be in subdirectory F<A/> of
+the new repository, the files from F<../B> in its subdirectory F<B/>,
+the files from F<../C> in subdirectory F<X/>, and the files from F<../R>
+in its root directory.
 
     $ git checkout master-A
     warning: You appear to be on a branch yet to be born.
