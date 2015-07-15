@@ -97,6 +97,16 @@ my @tests = (
         'A1 B1-A1 A2-B1 A3-B1 B2-A3 A4-B1 B3-A3 A5-A4B3A2 B4-B2A5',
         'A1 B1-A1 A2-B1 A3-B1 B2-A2 A4-B1 B3-A2 A5-A4A3B2 B4-A5B3',
     ],
+
+    # keep masters together
+    # 15
+    [ 'A1 B1 A2-A1 B2-B1 B3-B2 A3-A2 B4-B2',
+      'master=A3 master=B4 topic=B3',
+      'A1 B1-A1 A2-B1 B2-A2 B3-B2 A3-B2 B4-A3',
+      'A1 B1-A1 A2-B1 B2-A2 B3-B2 A3-B2 B4-A3',
+      'commits that belong to shared branches should remain together',
+      'commits that belong to shared branches should remain together',
+    ]
 );
 
 # algorithms to test
