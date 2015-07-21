@@ -536,7 +536,7 @@ To ease debugging, the translated mark count starts at C<1_000_000>.
     my $commit = $self->_last_alien_child( $node, $ref, $parents )
 
 Given a node, its ref name (actually, the reference given on the
-C<commit> line of the fast-export) and a structure describing it's
+C<commit> line of the fast-export) and a structure describing its
 lineage over the various source repositories, find a suitable commit to
 which attach it.
 
