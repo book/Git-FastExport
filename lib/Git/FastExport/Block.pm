@@ -14,6 +14,7 @@ my %fields = (
     progress   => [],
     feature    => [],
     option     => [],
+    done       => [],
 );
 
 sub as_string {
