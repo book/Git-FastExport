@@ -37,7 +37,9 @@ sub as_string {
 
 __END__
 
-# ABSTRACT: A block in a fast-export stream
+=head1 NAME
+
+Git::FastExport::Block - A block in a fast-export stream
 
 =head1 SYNOPSIS
 

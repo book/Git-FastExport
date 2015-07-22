@@ -112,7 +112,9 @@ sub next_block {
 
 __END__
 
-# ABSTRACT: A module to parse the output of git-fast-export
+=head1 NAME
+
+Git::FastExport - A parser for git fast-export streams
 
 =head1 SYNOPSIS
 

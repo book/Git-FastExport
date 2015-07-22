@@ -278,7 +278,9 @@ sub _last_alien_child {
 
 __END__
 
-# ABSTRACT: Stitch together multiple git fast-export streams
+=head1 NAME
+
+Git::FastExport::Stitch - Stitch together multiple git fast-export streams
 
 =head1 SYNOPSIS
 
