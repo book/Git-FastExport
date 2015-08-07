@@ -63,7 +63,7 @@ sub stitch {
     my $name = basename( $repo, '.git' );
     $name =~ y/-A-Za-z0-9_/-/cs;
     $name =~ s/^-|-$//g;
-    $dir = $name if not defined $name;    # pick up a default name for the directory
+    $dir = $name if not defined $dir; # pick up a default name for the directory
 
     # check if the name is not used already and pick a replacement if it is
     if ( exists $self->{name}{$name} ) {
