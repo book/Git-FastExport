@@ -1,9 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Git;
 
-has_git( '1.5.0' );
+use Git::FastExport;
 
 # this script tests the parsing of fast-export block data
 
@@ -100,7 +99,7 @@ my @blocks = (
         footer => "\012",
     },
     {   type   => 'progress',
-        header => 'progress [] 5 objects',
+        header => 'progress 5 objects',
     },
     {   type   => 'commit',
         header => 'commit refs/heads/master',
@@ -163,7 +162,7 @@ my @blocks = (
         footer => "\012",
     },
     {   type   => 'progress',
-        header => 'progress [] 10 objects',
+        header => 'progress 10 objects',
     },
     {   type   => 'blob',
         header => 'blob',
@@ -217,7 +216,7 @@ my @blocks = (
         footer => "\012",
     },
     {   type   => 'progress',
-        header => 'progress [] 15 objects',
+        header => 'progress 15 objects',
     },
     {   type   => 'commit',
         header => 'commit refs/heads/master',
@@ -242,12 +241,10 @@ my @blocks = (
     },
 );
 
-plan tests => 1 + 3 * @blocks + 2;
+plan tests => 3 * @blocks + 2;
 
-use_ok('Git::FastExport');
-
-my $export = Git::FastExport->new( test_repository() );    # unused repository
 open my $fh, 't/fast-export' or die "Can't open t/fast-export: $!";
+my $export = Git::FastExport->new($fh);
 
 my @strings;
 {
@@ -259,11 +256,7 @@ my @strings;
         /(?<=\012\012)|(?<=progress . objects\012)|(?<=progress .. objects\012)/m,
         $string;
 
-    # we actually change the progress markers
-    s/progress/progress []/g for @strings;
 }
-
-$export->{export_fh} = $fh;
 
 $_ = 'canari';
 

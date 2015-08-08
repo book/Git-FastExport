@@ -9,55 +9,24 @@ use Git::Repository;
 use Git::FastExport::Block;
 
 sub new {
-    my ( $class, $repo ) = @_;
-    my $self = bless { source => '' }, $class;
-
-    $self->{git} = blessed $repo && $repo->isa('Git::Repository')
-        ? $repo    # below, use "$repo" for Path::Class paths
-        : Git::Repository->new( defined $repo ? ( { cwd => "$repo" } ) : () );
-
-    # git fast-export appeared in git 1.5.4
-    if ( $self->{git}->version_lt('1.5.4') ) {
-        my $opt = $self->{git}->options->{git};
-        my ($git) = $opt
-            ? ref $opt ? "@$opt" : $opt
-            : $self->{git}->command("version")->cmdline;
-        croak "Git version 1.5.4 required for git fast-export. '$git' is only version ${\$self->{git}->version}";
-    }
-
-    return $self;
-}
-
-sub fast_export {
-    my ( $self, @args ) = @_;
-    my $repo = $self->{git};
-    $self->{source} = $repo->work_tree || $repo->git_dir;
-
-    # call the fast-export command (no default arguments)
-    $self->{command} = $repo->command( 'fast-export', @args );
-    $self->{export_fh} = $self->{command}->stdout;
+    my ( $class, $handle ) = @_;
+    return bless { stream => $handle }, $class;
 }
 
 sub next_block {
     my ($self) = @_;
-
-    my $fh = $self->{export_fh};
-    die "fast_export() must be called before next_block()" if !$fh;
-
-    # are we done?
-    if ( eof $fh ) {
-        if ( $self->{command} ) {
-            $self->{command}->close;
-            delete $self->{command};
-        }
-        delete $self->{export_fh};
-        return;
-    }
+    my $fh = $self->{stream};
+    return if !defined $fh;
 
     my $block = bless {}, 'Git::FastExport::Block';
 
-    # use the header from last time, or read it (first time)
-    $block->{header} = $self->{header} ||= <$fh>;
+    # pick up the header from the previous round, or read it (first time)
+    $self->{header} ||= <$fh>;
+    $block->{header} = delete $self->{header};
+
+    # nothing left to process
+    return if !defined $block->{header};
+
     chomp $block->{header};
     ( $block->{type} ) = $block->{header} =~ /^(\w+)/g;
 
@@ -66,7 +35,7 @@ sub next_block {
 
         # we've reached the beginning of the next block
         if (/^(commit|tag|reset|blob|checkpoint|progress|feature|option)\b/) {
-            s/^progress /progress [$self->{source}] /;
+            s/^progress /progress [$self->{source}] / if exists $self->{source};
             $self->{header} = $_;
             last;
         }

@@ -2,6 +2,7 @@ package Git::FastExport::Stitch;
 
 use strict;
 use warnings;
+use Cwd qw( cwd );
 use Carp;
 use Scalar::Util qw( blessed );
 use List::Util qw( first );
@@ -44,26 +45,37 @@ sub new {
 sub stitch {
     my ( $self, $repo, $dir ) = @_;
 
-    my $export
-        = blessed($repo) && $repo->isa('Git::FastExport')
-        ? $repo
-        : eval { Git::FastExport->new($repo) };
+    # $repo is either a Git::Repository object or a valid path
+    my $export = blessed($repo) && $repo->isa('Git::Repository')
+      ? $repo     # a Git::Repository object
+      : eval {    # assume a path
+        my $r;
+        my $orig = cwd;
+
+        # chdir and create a Git::Repository object there
+        if ( defined $repo ) {
+            chdir $repo or croak "Can't chdir to $repo: $!";
+            $r = Git::Repository->new();
+            chdir $orig or croak "Can't chdir back to $orig: $!";
+        }
+        else { die "Undefined repository path" }
+        $r;
+      };
     $@ =~ s/ at .*\z//s, croak $@ if !$export;
 
-    # initiate the Git::FastExport stream
-    $export->fast_export(qw( --progress=1 --all --date-order ))
-        if !$export->{export_fh};
-
     # do not stich a repo with itself
-    $repo = $export->{source};
+    $repo = $export->git_dir;
     croak "Already stitching repository $repo" if exists $self->{repo}{$repo};
 
     # pick the refs suffix:
-    # use basename without the .git extension or non ASCII characters
-    my $name = basename( $repo, '.git' );
+    # use base directory without the .git extension or non ASCII characters
+    my @parts = File::Spec->splitdir( ( File::Spec->splitpath( $repo, 1 ) )[1] );
+    my $name = pop @parts;
+    $name = pop @parts if $name eq '.git';
+    $name =~ s/\.git$//;
     $name =~ y/-A-Za-z0-9_/-/cs;
     $name =~ s/^-|-$//g;
-    $dir = $name if not defined $dir; # pick up a default name for the directory
+    $dir = $name if not defined $dir;
 
     # check if the name is not used already and pick a replacement if it is
     if ( exists $self->{name}{$name} ) {
@@ -72,13 +84,19 @@ sub stitch {
         $name .= "-$suffix";
     }
 
+    # initiate the Git::FastExport stream
+    my $stream =
+      $export->command(qw( fast-export --progress=1 --all --date-order ))
+      ->stdout;
+
     # set up the internal structures
     $self->{repo}{$repo}{repo}   = $repo;
     $self->{repo}{$repo}{dir}    = $dir;
-    $self->{repo}{$repo}{parser} = $export;
+    $self->{repo}{$repo}{git}    = $export;
+    $self->{repo}{$repo}{parser} = Git::FastExport->new($stream);
     $self->{repo}{$repo}{name}   = $name;
-    $self->{repo}{$repo}{block}  = $export->next_block();
-    $self->_translate_block( $repo );
+    $self->{repo}{$repo}{block}  = $self->{repo}{$repo}{parser}->next_block();
+    $self->_translate_block($repo);
 
     return $self;
 }

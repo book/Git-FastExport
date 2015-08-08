@@ -26,7 +26,7 @@ my @tests = (
 );
 
 
-plan tests => 2 * @tests + 3;
+plan tests => 2 * @tests + 5;
 
 for my $t (@tests) {
     my ( $args, $error ) = @$t;
@@ -52,6 +52,9 @@ my @r = create_repos( $dir => 'A1', 'master=A1' );
 
 my $export = eval { Git::FastExport::Stitch->new() };
 ok( eval { $export->stitch( $r[0]->work_tree ) }, 'stitch( A ) passed' );
+diag $@ if $@;
 ok( !eval { $export->stitch( $r[0]->work_tree ) }, 'stitch( A ) failed' );
+like( $@, qr(^Already stitching repository .*A), 'Expected error message' );
+ok( !eval { $export->stitch( $r[0] ) }, 'stitch( A ) failed' );
 like( $@, qr(^Already stitching repository .*A), 'Expected error message' );
 

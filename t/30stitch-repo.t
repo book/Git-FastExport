@@ -151,20 +151,16 @@ for my $n (@nums) {
         for my $src (@src) {
             my $r;
             if ( $j == 0 ) {
-                $r = $src->work_tree;    # a string
+                $r = $src->work_tree;    # a work tree
             }
             elsif ( $j == 1 ) {
+                $r = $src->git_dir;      # a git dir
+            }
+            else {
                 $r = $src;               # a Git object
             }
-            elsif ( $j == 2 ) {
-                $r = Git::FastExport->new($src);    # a Git::FastExport
-            }
-            elsif ( $j == 3 ) {
-                $r = Git::FastExport->new($src);             # an initialized
-                $r->fast_export(qw( --all --date-order ));   # Git::FastExport
-            }
             $export->stitch($r);
-            $j = ++$j % 4;
+            $j = ++$j % 3;
         }
 
         # run git-fast-import on the destination repository
