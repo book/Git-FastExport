@@ -2,6 +2,19 @@ Revision history for Perl extension Git::FastExport
 
 {{$NEXT}}
 
+0.106 Sat Aug 8 2015
+    [INCOMPATIBLE CHANGES]
+    - Git::FastExport is now a stream parser, and does not run
+      `git fast-export` on its own
+    - removed the fast_export() method from Git::FastExport
+    [ENHANCEMENTS]
+    - added support for delimited format in 'data' commands
+    - added support for the 'done' feature
+    - git-stitch-repo now allows stitching repos into the root directory
+      (thanks to ARISTOTLE)
+    [DOCUMENTATION]
+    - added list of contributors to the META file
+
 0.105 Sat Jul 19 2014
     [ENHANCEMENTS]
     - fail early if git does not have a git fast-export command
