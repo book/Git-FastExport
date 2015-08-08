@@ -8,6 +8,8 @@ use Scalar::Util qw( blessed );
 use Git::Repository;
 use Git::FastExport::Block;
 
+my $LF = "\012";
+
 sub new {
     my ( $class, $handle ) = @_;
     return bless { stream => $handle }, $class;
@@ -34,7 +36,7 @@ sub next_block {
     while (<$fh>) {
 
         # we've reached the beginning of the next block
-        if (/^(commit|tag|reset|blob|checkpoint|progress|feature|option)\b/) {
+        if (/^(commit|tag|reset|blob|checkpoint|progress|feature|option|done)\b/) {
             s/^progress /progress [$self->{source}] / if exists $self->{source};
             $self->{header} = $_;
             last;
@@ -43,13 +45,29 @@ sub next_block {
         chomp;
 
         # special case of data block
-        if (/^data (\d+)/) {
-            my $bytes= 0 + $1;
-            if ($bytes) {
-                local $/ = \$bytes;
-                $block->{data} = <$fh>;
-            } else {
-                $block->{data} = "";
+        if (/^data (.*)/) {
+            if ( substr( $1, 0, 2 ) eq '<<' ) {    # Delimited format
+
+                # 'data' SP '<<' <delim> LF
+                # <raw> LF
+                # <delim> LF
+                # LF?
+                my $delim = substr( $1, 2 );
+                local $/ = "$LF$delim$LF";
+                chomp( $block->{data} = <$fh> );
+            }
+            else {                                 # Exact byte count format
+
+                # 'data' SP <count> LF
+                # <raw> LF?
+                my $bytes = $1;
+                if ($bytes) {
+                    local $/ = \$bytes;
+                    $block->{data} = <$fh>;
+                }
+                else {
+                    $block->{data} = "";
+                }
             }
         }
         elsif (/^(?:[MDRC] |deleteall)/) {
