@@ -565,7 +565,7 @@ B<git-stitch-repo>
 
 =head1 COPYRIGHT
 
-Copyright 2008-2014 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2008-2015 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 
