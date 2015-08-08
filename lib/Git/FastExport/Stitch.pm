@@ -308,10 +308,8 @@ Git::FastExport::Stitch - Stitch together multiple git fast-export streams
     # stitch in several git fast-export streams
     # a git directory
     $export->stitch( A => 'A' );
-    # a Git repository object
-    $export->stitch( Git->repository( Directory => 'B' ) => 'B' );
-    # a Git::FastExport object
-    $export->stitch( Git::FastExport->new('C') => 'C' );
+    # a Git::Repository object
+    $export->stitch( Git::Repository->new( work_tree => 'B' ) => 'B' );
 
     # output the stitched stream
     while ( my $block = $export->next_block() ) {
@@ -355,9 +353,8 @@ pairs) to the C<stitch()> method.
 
 Add the given C<$repo> to the list of repositories to stitch in.
 
-C<$repo> can be either a directory, or a L<Git> object (both will
-be used to instantiate a L<Git::FastExport> object) or directly a
-L<Git::FastExport> object.
+C<$repo> can be either a directory, or a L<Git::Repository> object
+(both will be used to instantiate a L<Git::FastExport> object).
 
 The optional C<$dir> parameter will be used as the relative directory
 under which the trees of the source repository will be stored in the

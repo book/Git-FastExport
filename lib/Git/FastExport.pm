@@ -90,13 +90,14 @@ Git::FastExport - A parser for git fast-export streams
     use Git::Repository;
     use Git::FastExport;
 
-    # get the object from a Git::Repository
-    my $repo = Git::Repository->new( work_tree => $path );
-    my $export = Git::FastExport->new($repo);
+    # get the fast-export stream from a Git::Repository
+    my $r  = Git::Repository->new();
+    my $fh = $r->command(qw( fast-export --progress=1 --date-order --all ))->stdout;
 
-    # or simply from a path specification
-    my $export = Git::FastExport->new($path);
+    # create the parser object
+    my $export = Git::FastExport->new($fh);
 
+    # extract blocks from the fast-import stream
     while ( my $block = $export->next_block() ) {
 
         # do something with $block
@@ -116,37 +117,21 @@ This class provides the following methods:
 
 =head2 new
 
-    my $export = Git::FastExport->new($repo);
+    my $export = Git::FastExport->new($fh);
 
-The constructor takes an optional L<Git::Repository> object,
-or a path (to a C<GIT_DIR> or C<GIT_WORK_TREE>), and returns a
-Git::FastExport object attached to it.
-
-=head2 fast_export
-
-    # example @args: qw< --progress=1 --all --date-order >
-    $export->fast_export(@args);
-
-Initialize a B<git-fast-export> command on the repository, using the
-arguments given in C<@args>.
+The constructor takes an open filehandle and returns a
+C<Git::FastExport> object attached to it.
 
 =head2 next_block
 
     my $block = $export->next_block();
 
-Return the next block in the B<git-fast-export> stream as a
+Returns the next block in the B<git-fast-export> stream as a
 L<Git::FastExport::Block> object.
 
 Return nothing at the end of stream.
 
-This methods reads from the C<export_fh> filehandle of the Git::FastExport
-object. It is normally setup via the C<fast_export()> method, but it is
-possible to make it read directly from C<STDIN> (or another filehandle) by doing:
-
-    $export->{export_fh} = \*STDIN;
-    while ( my $block = $export->next_block() ) {
-        ...
-    }
+This methods reads from the filehandle of the Git::FastExport object.
 
 =head1 ACKNOWLEDGEMENTS
 
