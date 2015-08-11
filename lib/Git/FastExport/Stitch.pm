@@ -84,6 +84,10 @@ sub stitch {
         $name .= "-$suffix";
     }
 
+    # git fast-export appeared in git 1.5.4
+    croak "stitch() requires a git version greater or equal to 1.5.4, this is only version ${\$export->version}"
+      if $export->version_lt('1.5.4');
+
     # initiate the Git::FastExport stream
     my $stream =
       $export->command(qw( fast-export --progress=1 --all --date-order ))
