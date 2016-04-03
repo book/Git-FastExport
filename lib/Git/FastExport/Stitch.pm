@@ -567,6 +567,10 @@ This method is the heart of the stitching algorithm.
 
 B<git-stitch-repo>
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
 =head1 COPYRIGHT
 
 Copyright 2008-2015 Philippe Bruhat (BooK), All Rights Reserved.

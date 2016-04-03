@@ -134,6 +134,10 @@ The original version of this module was created as part of my work
 for BOOKING.COM, which authorized its publication/distribution
 under the same terms as Perl itself.
 
+=head1 AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
 =head1 COPYRIGHT
 
 Copyright 2008-2014 Philippe Bruhat (BooK), All Rights Reserved.
