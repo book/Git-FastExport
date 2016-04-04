@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: git-stitch-repo
 use strict;
 use warnings;
