@@ -37,7 +37,9 @@ while ( my $block = $export->next_block() ) {
 __END__
 
 
-# ABSTRACT: Stitch several git repositories into a git fast-import stream
+=head1 NAME
+
+git-stitch-repo - Stitch several git repositories into a git fast-import stream
 
 =head1 SYNOPSIS
 
