@@ -2,7 +2,7 @@ Revision history for Perl extension Git::FastExport
 
 {{$NEXT}}
 
-0.106 Sat Aug 8 2015
+0.106 2015-08-08 BOOK
     [INCOMPATIBLE CHANGES]
     - Git::FastExport is now a stream parser, and does not run
       `git fast-export` on its own
@@ -15,7 +15,7 @@ Revision history for Perl extension Git::FastExport
     [DOCUMENTATION]
     - added list of contributors to the META file
 
-0.105 Sat Jul 19 2014
+0.105 2014-07-19 BOOK
     [ENHANCEMENTS]
     - fail early if git does not have a git fast-export command
     - improved naming of the references in the new repository (Roger Gammans)
@@ -26,33 +26,33 @@ Revision history for Perl extension Git::FastExport
     - removed self-links from the documentation
     - various documentation improvements (including some by Jean-Baptiste Mestelan)
 
-0.104 Tue Apr 22 2014
+0.104 2014-04-22 BOOK
     [ENHANCEMENTS]
     - proper support for annotated tags (RT #94816)
     [TESTS]
     - added tests for annotated tags
 
-0.103 Sat Mar 8 2014
+0.103 2014-03-08 BOOK
     [ENHANCEMENTS]
     - declared that the script/ directory contains scripts to install
       (thanks to Aristotle Pagaltzis)
 
-0.102 Mon Feb 24 2014
+0.102 2014-02-24 BOOK
     [ENHANCEMENTS]
     - changed the data structure used by Git::FastExport::Stitch
       internally, which should save a lot of memory when processing
       large repositories (RT #93200)
 
-0.101 Sat Nov 23 2013
+0.101 2013-11-23 BOOK
     [TESTS]
     - tests using `git fast-export` require a git >= 1.5.4
 
-0.100 Sat Sep 7 2013
+0.100 2013-09-07 BOOK
     [TESTS]
     - t/compile.t is obsoleted by the Test::Compile dzil plugin
     - tests using test_repository() require a git >= 1.5.0
 
-0.09 Fri Jul 19 2013
+0.09 2013-07-19 BOOK
     [ENHANCEMENTS]
     - use Git::Repository instead of Git.pm to interact with Git
     [TESTS]
@@ -65,14 +65,14 @@ Revision history for Perl extension Git::FastExport
     [PACKAGING]
     - switch to Dist::Zilla for maintaining the distribution
 
-0.08 Mon Dec 17 2012
+0.08 2012-12-17 BOOK
     [ENHANCEMENTS]
     - proper handling of double quotes in git fast-export output
       (RT #81342)
     [TESTS]
     - made a number of tests more robust
 
-0.07 Sat Jan  3 06:35:52 CET 2009
+0.07 2009-01-03 BOOK
     [ENHANCEMENTS]
     - moved the stitching algorithm in its own module:
       Git::Fast:Export::Stitch
@@ -84,7 +84,7 @@ Revision history for Perl extension Git::FastExport
     - fixed the test repositories code
     - added tests involving stitching 3-way merges
 
-0.06 Sat Dec 20 00:07:44 CET 2008
+0.06 2008-12-19 BOOK
     [ENHANCEMENTS]
     - git-stitch-repo: greatly improved the algorithm for finding
       a suitable commit to attach to, avoiding inconsistencies:
@@ -96,7 +96,7 @@ Revision history for Perl extension Git::FastExport
     - documentation improvements on git-stitch-repo, with a lot
       more ascii graphs
 
-0.05 Sun Oct  5 01:22:53 CEST 2008
+0.05 2008-10-04 BOOK
     [ENHANCEMENTS]
     - made Git::FastExport::Block an independent module
     [TESTS]
@@ -104,7 +104,7 @@ Revision history for Perl extension Git::FastExport
       the tests. This speed up considerably this test script after
       the first run (from 2 minutes to 2 seconds)
 
-0.04 Wed Aug 20 22:04:30 CEST 2008
+0.04 2008-08-20 BOOK
     [ENHANCEMENTS]
     - git-stitch-repo: fixed a bug that caused many commits/branches
       to be lost because different branches were given the same name.
@@ -114,20 +114,20 @@ Revision history for Perl extension Git::FastExport
     - t/30stitch-repot.t actually tests the results of running
       git-stitch-repo on several different configurations
 
-0.03 Mon Jul  7 19:29:23 CEST 2008
+0.03 2008-07-07 BOOK
     [ENHANCEMENTS]
     - git-stitch-repo: fixed a segmentation fault that occured
       at program destruction, because of a huge self-referential
       hash of hashes
 
-0.02 Fri Jul  4 11:03:54 CEST 2008
+0.02 2008-07-04 BOOK
     [DOCUMENTATION]
     - added a README file
     - added documentation for git-stitch-repo
     [TESTS]
     - added t/00load.t and t/01new.t to increase test coverage
 
-0.01 Thu Jun 26 14:00:01 CEST 2008
+0.01 2008-06-26 BOOK
     [FEATURES]
     - process git-fast-export output
     - uses the Git.pm module provided with git
