@@ -4,9 +4,9 @@ use Test::More;
 use t::Utils;
 use File::Path;
 use Git::FastExport::Stitch;
-use Test::Git;
+use Test::Requires::Git;
 
-has_git('1.5.4');
+test_requires_git('1.5.4');
 
 # all possible valid options
 my @valid_args = map {

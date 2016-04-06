@@ -4,10 +4,10 @@ use Test::More;
 use File::Path;
 use t::Utils;
 use Git::FastExport::Stitch;
-use Test::Git;
+use Test::Requires::Git;
 
 # first, make sure we have the right git version
-has_git('1.5.4');
+test_requires_git('1.5.4');
 
 my @tests = (
 
