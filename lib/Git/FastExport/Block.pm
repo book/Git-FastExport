@@ -38,6 +38,8 @@ sub as_string {
 
 __END__
 
+=pod
+
 =head1 NAME
 
 Git::FastExport::Block - A block in a fast-export stream

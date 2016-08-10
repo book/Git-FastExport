@@ -36,6 +36,7 @@ while ( my $block = $export->next_block() ) {
 
 __END__
 
+=pod
 
 =head1 NAME
 
