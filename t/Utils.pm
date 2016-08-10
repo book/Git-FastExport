@@ -77,11 +77,9 @@ sub repo_description {
 
     # get the heads and tags
     %head = reverse map { s{ refs/heads/}{ }; split / / }
-        $repo->run( 'show-ref', '--heads' );
-    %tag = eval {
-        reverse map { s{ refs/tags/}{ }; split / / }
-            $repo->run( 'show-ref', '--tags' );
-    };
+      $repo->run( 'show-ref', '--heads' );
+    %tag = reverse map { s{ refs/tags/}{ }; split / / }
+      $repo->run( 'show-ref', '--tags' );
 
     # look for annotated tags
     my %atag;
