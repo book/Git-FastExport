@@ -99,18 +99,6 @@ sub repo_description {
     return wantarray ? ( $desc, $refs ) : $desc;
 }
 
-# split a description into descriptions of independent repositories
-sub split_description {
-    my ($desc) = @_;
-    my %desc;
-
-    for my $node ( split / /, $desc ) {
-        my ($repo) = $node =~ /^([A-Z]+)/;
-        push @{ $desc{$repo} }, $node;
-    }
-    return map { join ' ', @$_ } values %desc;
-}
-
 # create a set of repositories from a given description
 sub create_repos {
     my ( $dir, $desc, $refs ) = @_;
