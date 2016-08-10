@@ -123,31 +123,18 @@ sub create_repos {
         create_commit( $info, $child, @parent );
     }
 
-    # checkout a new dummy branch in each repo
-    for my $repo ( values %{ $info->{repo} } ) {
-        $repo->run( 'checkout', '-q', '-b', 'dummy' );
-    }
-
     # setup the refs (branches & tags)
     for my $ref ( split / /, $refs ) {
         my ( $name, $type, $commit ) = split /([>=])/, $ref;
         my ($repo_name) = $commit =~ /^([A-Z]+)/;
         my $repo = $info->{repo}{$repo_name};
         if ( $type eq '=' ) {    # branch
-            $repo->run( branch => '-D', $name )
-                if grep {/^..$name$/} $repo->run('branch');
-            $repo->run( branch => $name, $info->{sha1}{$commit} );
+            $repo->run( 'update-ref', "refs/heads/$name", $info->{sha1}{$commit} );
         }
         else {                   # tag
             ($name, my $msg) = split /:/, $name;
             $repo->run( tag => ( '-m' => $msg )x!! $msg, $name, $info->{sha1}{$commit} );
         }
-    }
-
-    # delete the dummy branch and checkout master in each repo
-    for my $repo ( values %{ $info->{repo} } ) {
-        $repo->run( 'checkout', '-q', 'master' );
-        $repo->run( branch => '-D', 'dummy' );
     }
 
     # return the repository objects
