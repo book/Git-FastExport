@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use File::Path;
 use File::Spec;
-use Cwd;
 use Git::Repository;
 
 # record the sha1 of the empty tree
