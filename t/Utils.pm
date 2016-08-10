@@ -5,13 +5,11 @@ use File::Spec;
 use Cwd;
 use Git::Repository;
 
-# some data for the file content
-my @data = <DATA>;
-my $idx  = 0;
+# record the sha1 of the empty tree
+my $TREE;
+
+# cheap trick to ensure increasing commit dates
 my $time = time;
-
-1;
-
 sub options {
     $time++;
     return {
@@ -52,6 +50,7 @@ sub new_repo {
     my $repo = Git::Repository->new( work_tree => $wc, { quiet => 1 } );
     $repo->run(qw( config user.email test@example.com ));
     $repo->run(qw( config user.name  Test ));
+    $TREE = $repo->run( mktree => { input => '' } );    # add the empty commit
     return $repo;
 }
 
@@ -126,20 +125,8 @@ sub create_repos {
 
     for my $commit ( split / /, $desc ) {
         my ( $child, $parent ) = split /-/, $commit;
-        my @child = $child =~ /([A-Z]+\d+)/g;
         my @parent = $parent =~ /([A-Z]+\d+)/g if $parent;
-
-        die "bad node description" if @child > 1 && @parent > 1;
-
-        if ( @child > 1 ) {    # branch point
-            create_linear_commit( $info, $_, $parent[0] ) for @child;
-        }
-        elsif ( @parent > 1 ) {    # merge point
-            create_merge_commit( $info, $child[0], @parent );
-        }
-        else {                     # simple, linear commit
-            create_linear_commit( $info, $child[0], $parent[0] );
-        }
+        create_commit( $info, $child, @parent );
     }
 
     # checkout a new dummy branch in each repo
@@ -173,131 +160,19 @@ sub create_repos {
     return map { $info->{repo}{$_} } sort keys %{ $info->{repo} };
 }
 
-sub create_linear_commit {
-    my ( $info, $child, $parent ) = @_;
-    my ($name) = $child =~ /^([A-Z]+)/g;
-
-    # create the repo if needed
-    my $repo = $info->{repo}{$name};
-    if ( !$repo ) {
-        $repo = $info->{repo}{$name} = new_repo( $info->{dir} => $name );
-    }
-
-    # checkout the parent commit
-    $repo->run( 'checkout', '-q', $info->{sha1}{$parent} ) if $parent;
-    my $base = File::Spec->catfile( $info->{dir}, $name );
-    update_file( $base, $name );
-    $repo->run( 'add', $name );
-    $repo->run( 'commit', '-m', $child, options() );
-    $info->{sha1}{$child}
-        = $repo->run(qw( log -n 1 --pretty=format:%H HEAD ));
-}
-
-sub create_merge_commit {
+sub create_commit {
     my ( $info, $child, @parents ) = @_;
     my ($name) = $child =~ /^([A-Z]+)/g;
-    my $repo = $info->{repo}{$name};
 
-    # checkout the first parent
-    my $parent = shift @parents;
-    $repo->run( 'checkout', '-q', $info->{sha1}{$parent} );
+    # get the repository, or create a new one
+    my $repo = $info->{repo}{$name} ||= new_repo( $info->{dir} => $name );
 
-    # merge the other parents
-    $repo->run( 'merge', '-n', '-s', 'ours', '-m', $child, options(),
-        map { $info->{sha1}{$_} } @parents,
+    # create the commit (with the empty tree)
+    $info->{sha1}{$child} = $repo->run(
+        'commit-tree' => $TREE,
+        { input => $child }, options(),
+        map +( '-p' => $info->{sha1}{$_} ), @parents
     );
-
-    $info->{sha1}{$child}
-        = $repo->run(qw( log -n 1 --pretty=format:%H HEAD ));
 }
 
-sub update_file {
-    my ($file) = File::Spec->catfile(@_);
-    open my $fh, '>', $file or die "Can't open $file: $!";
-    print $fh $data[ $idx++ % @data ];
-    close $fh;
-}
-
-__DATA__
-aieee
-aiieee
-awk
-awkkkkkk
-bam
-bang
-bang_eth
-bap
-biff
-bloop
-blurp
-boff
-bonk
-clange
-clank
-clank_est
-clash
-clunk
-clunk_eth
-crash
-crr_aaack
-crraack
-cr_r_a_a_ck
-crunch
-crunch_eth
-eee_yow
-flrbbbbb
-glipp
-glurpp
-kapow
-kayo
-ker_plop
-ker_sploosh
-klonk
-krunch
-ooooff
-ouch
-ouch_eth
-owww
-pam
-plop
-pow
-powie
-qunckkk
-rakkk
-rip
-slosh
-sock
-spla_a_t
-splatt
-sploosh
-swa_a_p
-swish
-swoosh
-thunk
-thwack
-thwacke
-thwape
-thwapp
-touche
-uggh
-urkk
-urkkk
-vronk
-whack
-whack_eth
-wham_eth
-whamm
-whap
-zam
-zamm
-zap
-zapeth
-zgruppp
-zlonk
-zlopp
-zlott
-zok
-zowie
-zwapp
-z_zwap
-zzzzzwap
+1;
