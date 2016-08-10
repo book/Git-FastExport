@@ -62,18 +62,14 @@ sub repo_description {
 
     my ( %head, %tag );
 
-    # process the whole tree
-    my $cmd = $repo->command( 'log', '--pretty=format:%H-%P-%s',
-        '--date-order', '--all' );
-    my $fh = $cmd->{stdout};
-    while (<$fh>) {
-        chomp;
+    # extract the relevant information from the repository
+    do {
         my ( $h, $p, $log ) = split /-/, $_, 3;
         $log{$h} = $log;
         $p =~ y/ //d;
         push @commits, $p ? "$log-$p" : $log;
-    }
-    $cmd->close();
+      }
+      for $repo->run(qw( log --pretty=format:%H-%P-%s --date-order --all ));
 
     # get the heads and tags
     %head = reverse map { s{ refs/heads/}{ }; split / / }
