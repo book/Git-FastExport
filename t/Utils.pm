@@ -95,7 +95,7 @@ sub repo_description {
 
     # replace SHA-1 by log name
     my $desc = join ' ', reverse @commits;
-    $desc =~ s/(\w{40})/$log{$1}/g;
+    $desc =~ s/([0-9a-f]{40})/$log{$1}/g;
 
     return wantarray ? ( $desc, $refs ) : $desc;
 }
