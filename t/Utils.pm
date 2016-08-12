@@ -1,24 +1,14 @@
 use strict;
 use warnings;
-use File::Path;
+
 use File::Spec;
+use File::Path qw( mkpath );
+use File::Temp qw( tempdir );
 use Git::Repository;
 
-# record the sha1 of the empty tree
-my $TREE;
+my $TREE;    # sha1 of the empty tree
 
-# cheap trick to ensure increasing commit dates
-my $time = time;
-sub options {
-    $time++;
-    return {
-        env => {
-            GIT_AUTHOR_DATE    => $time,
-            GIT_COMMITTER_DATE => $time,
-        }
-    };
-}
-
+# helper function for nicer test messages
 sub description_of {
 
     # interpolate with comma's in this scope
@@ -41,21 +31,20 @@ sub description_of {
 }
 
 # create a new, empty repository
-sub new_repo {
-    my ( $dir, $name ) = @_;
-    my $wc = File::Spec->rel2abs( File::Spec->catfile( $dir, $name ) );
-    mkpath $wc;
-    Git::Repository->run('init', { cwd => $wc } );
-    my $repo = Git::Repository->new( work_tree => $wc, { quiet => 1 } );
-    $repo->run(qw( config user.email test@example.com ));
-    $repo->run(qw( config user.name  Test ));
-    $TREE = $repo->run( mktree => { input => '' } );    # add the empty commit
-    return $repo;
+sub create_repository {
+    my ($dir) = @_;
+    mkpath $dir;
+    Git::Repository->run( 'init', { cwd => $dir } );
+    my $r = Git::Repository->new( work_tree => $dir, { quiet => 1 } );
+    $r->run(qw( config user.email test@example.com ));
+    $r->run(qw( config user.name  Test ));
+    $TREE = $r->run( mktree => { input => '' } );    # add the empty tree
+    return $r;
 }
 
 # produce a text description of a given repository
-sub repo_description {
-    my ($repo) = @_;
+sub describe_repository {
+    my ($r) = @_;
     my %log;    # map sha1 to log message
     my @commits;
 
@@ -68,18 +57,18 @@ sub repo_description {
         $p =~ y/ //d;
         push @commits, $p ? "$log-$p" : $log;
       }
-      for $repo->run(qw( log --pretty=format:%H-%P-%s --date-order --all ));
+      for $r->run(qw( log --pretty=format:%H-%P-%s --date-order --all ));
 
     # get the heads and tags
     %head = reverse map { s{ refs/heads/}{ }; split / / }
-      $repo->run( 'show-ref', '--heads' );
+      $r->run( 'show-ref', '--heads' );
     %tag = reverse map { s{ refs/tags/}{ }; split / / }
-      $repo->run( 'show-ref', '--tags' );
+      $r->run( 'show-ref', '--tags' );
 
     # look for annotated tags
     my %atag;
     for my $tag ( keys %tag ) {
-        if ( my @tag = eval { $repo->run( 'cat-file', tag => $tag ) } ) {
+        if ( my @tag = eval { $r->run( 'cat-file', tag => $tag ) } ) {
             my ($commit) = ( split / /, $tag[0] )[-1];    # tagged a commit
             $atag{$tag} = [ $commit, $tag[-1] ];          # 1-line msg
             delete $tag{$tag};
@@ -94,53 +83,69 @@ sub repo_description {
 
     # replace SHA-1 by log name
     my $desc = join ' ', reverse @commits;
-    $desc =~ s/([0-9a-f]{40})/$log{$1}/g;
+    $desc =~ s/([a-f0-9]{40})/$log{$1}/g;
 
     return wantarray ? ( $desc, $refs ) : $desc;
 }
 
-# create a set of repositories from a given description
-sub create_repos {
-    my ( $dir, $desc, $refs ) = @_;
-    my $info = { dir => $dir, repo => {}, sha1 => {} };
+# A repository description is a string constructed as follows:
+# - each repository is named after an uppercase letter (A .. Z)
+# - commits are numbered (A1, B1, A2, etc)
+# - a commit's parent are prepended to it using a dash: A1-A2
+# - commits are listed in chronological order, separated by a space
+#
+# References are defined with another string (and space-separated):
+# - branches:         master=A4
+# - lightweight tags: tag1>B3
+# - annotated tags:   tag2:mesg>A2
+#
+sub build_repositories {
+    my ( $commits, $refs, $dir ) = @_;
+    $dir ||= tempdir( CLEANUP => 1 );
+    my $now = time;
 
-    for my $commit ( split / /, $desc ) {
+    my ( %r, %sha );
+    for my $commit ( split / /, $commits ) {
         my ( $child, $parent ) = split /-/, $commit;
-        my @parent = $parent =~ /([A-Z]+\d+)/g if $parent;
-        create_commit( $info, $child, @parent );
+        my ($name) = $child =~ /^([A-Z]+)/g;
+        my @parents = $parent =~ /([A-Z]+\d+)/g if $parent;
+
+        # create the repository if needed
+        my $r = $r{$name} ||= create_repository(
+            File::Spec->rel2abs( File::Spec->catfile( $dir, $name ) ) );
+
+        # create the commit (using the empty tree)
+        $now++;    # advance time to ensure increasing commit dates
+        $sha{$child} = $r->run(
+            'commit-tree' => $TREE,
+            {
+                input => $child,
+                env   => {
+                    GIT_AUTHOR_DATE    => $now,
+                    GIT_COMMITTER_DATE => $now,
+                },
+            },
+            map +( '-p' => $sha{$_} ),
+            @parents
+        );
     }
 
     # setup the refs (branches & tags)
     for my $ref ( split / /, $refs ) {
         my ( $name, $type, $commit ) = split /([>=])/, $ref;
         my ($repo_name) = $commit =~ /^([A-Z]+)/;
-        my $repo = $info->{repo}{$repo_name};
+        my $r = $r{$repo_name};
         if ( $type eq '=' ) {    # branch
-            $repo->run( 'update-ref', "refs/heads/$name", $info->{sha1}{$commit} );
+            $r->run( 'update-ref', "refs/heads/$name", $sha{$commit} );
         }
         else {                   # tag
             ($name, my $msg) = split /:/, $name;
-            $repo->run( tag => ( '-m' => $msg )x!! $msg, $name, $info->{sha1}{$commit} );
+            $r->run( tag => ( '-m' => $msg )x!! $msg, $name, $sha{$commit} );
         }
     }
 
     # return the repository objects
-    return map { $info->{repo}{$_} } sort keys %{ $info->{repo} };
-}
-
-sub create_commit {
-    my ( $info, $child, @parents ) = @_;
-    my ($name) = $child =~ /^([A-Z]+)/g;
-
-    # get the repository, or create a new one
-    my $repo = $info->{repo}{$name} ||= new_repo( $info->{dir} => $name );
-
-    # create the commit (with the empty tree)
-    $info->{sha1}{$child} = $repo->run(
-        'commit-tree' => $TREE,
-        { input => $child }, options(),
-        map +( '-p' => $info->{sha1}{$_} ), @parents
-    );
+    return values %r;
 }
 
 1;

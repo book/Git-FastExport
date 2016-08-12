@@ -121,7 +121,7 @@ for my $n (@nums) {
     rmtree( [$dir] );
 
     # create the source repositories
-    my @src = create_repos( $dir => $src, $refs );
+    my @src = build_repositories( $src, $refs, $dir );
 
     # compute the expected result refs
     my $expected_refs;
@@ -142,7 +142,7 @@ for my $n (@nums) {
     for my $i ( 0 .. $#algo ) {
 
         # create the destination repository
-        my $repo = new_repo( $dir => "RESULT-$algo[$i]" );
+        my $repo = create_repository( File::Spec->catdir( $dir => "RESULT-$algo[$i]" ) );
 
         # run the stitch algorithm on the source repositories
         my $export = Git::FastExport::Stitch->new( { select => $algo[$i] } );
@@ -175,7 +175,7 @@ for my $n (@nums) {
         $cmd->close();
 
         # get the description of the resulting repository
-        my ( $result, $result_refs ) = repo_description($repo);
+        my ( $result, $result_refs ) = describe_repository($repo);
         if ( $todo[$i] ) {
         TODO: {
                 local $TODO = $todo[$i];

@@ -48,7 +48,7 @@ for my $t (@tests) {
 # check we croak when stitching several times the same repo
 my $dir = File::Spec->rel2abs( File::Spec->catdir( 'git-test', '_' ) );
 rmtree( [ $dir ] );
-my @r = create_repos( $dir => 'A1', 'master=A1' );
+my @r = build_repositories( 'A1', 'master=A1', $dir );
 
 my $export = eval { Git::FastExport::Stitch->new() };
 ok( eval { $export->stitch( $r[0]->work_tree ) }, 'stitch( A ) passed' );
