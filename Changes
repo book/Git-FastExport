@@ -2,6 +2,16 @@ Revision history for Perl extension Git::FastExport
 
 {{$NEXT}}
 
+0.107 2016-08-13 BOOK
+    [TESTS]
+    - Now uses test_requires_git (Test::Requires::Git) instead of has_git (Test::Git)
+    - Replaced t/00load.t by the Test::Compile dzil plugin
+    - Simplified the set of git commands used in t/Utils.pm to generate
+      the test repositories and greatly refactored the code
+    - Added TODO tests exposing the issue in RT #70695 and RT #95755
+    [DOCUMENTATION]
+    - Updated release header lines to follow CPAN::Changes::Spec
+
 0.106 2015-08-08 BOOK
     [INCOMPATIBLE CHANGES]
     - Git::FastExport is now a stream parser, and does not run
