@@ -186,17 +186,20 @@ for my $n (@nums) {
 
         # get the description of the resulting repository
         my ( $result, $result_refs ) = describe_repository($repo);
+
+        # check the DAG
         if ( $todo[$i] ) {
         TODO: {
                 local $TODO = $todo[$i];
                 is( $result, $dst[$i], "$src => $dst[$i] ($algo[$i])" );
-                is( $result_refs, $expected_refs, "$expected_refs" );
             }
         }
         else {
             is( $result, $dst[$i], "$src => $dst[$i] ($algo[$i])" );
-            is( $result_refs, $expected_refs, "$expected_refs" );
         }
+
+        # check the refs
+        is( $result_refs, $expected_refs, "$expected_refs" );
     }
 }
 
