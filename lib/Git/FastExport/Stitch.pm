@@ -90,8 +90,26 @@ sub stitch {
 
     # initiate the Git::FastExport stream
     my $stream =
-      $export->command(qw( fast-export --progress=1 --all --date-order ))
+      $export->command(split " ", "fast-export --all --date-order --export-marks=/tmp/marks-$name")
       ->stdout;
+
+    # Force fast-export to finish by dumping everything to memory.
+    # This ensures that the export-marks file is written, so we can read it.
+    my $dump_content = do { local $/; <$stream> };
+    close($stream);
+    open($stream, '<', \$dump_content);
+
+    my %mark_hashes;
+    open(FILE, "/tmp/marks-$name");
+    while(<FILE>) {
+      chomp;
+      my @entry =  split / /, $_;
+      $mark_hashes{substr($entry[0],1)} = $entry[1];
+    }
+    $self->{repo}{$repo}{mark_hashes} = \%mark_hashes;
+
+    close(FILE);
+    unlink("/tmp/marks-$name");
 
     # set up the internal structures
     $self->{repo}{$repo}{repo}   = $repo;
@@ -162,6 +180,17 @@ sub next_block {
 
     # mark our original source
     $commit->{header} =~ s/$/-$repo->{name}/;
+    my @comment = split /\n/, $commit->{data};
+    # Insert an additional blank line to separate the original ID if the commit
+    # has a description body.
+    if (@comment > 1) { push @comment, ""; }
+    $commit->{data} = join "\n", @comment;
+
+    if ($repo->{name} ne "root") {
+      $commit->{data} =
+        "[$repo->{name}] " . $commit->{data} . "\nOriginal commit:\n" .
+          $repo->{mark_hashes}{$commit->{original_mark}}."\n";
+    }
 
     # this commit's parents
     my @parents = map {/:(\d+)/g} @{ $commit->{from} || [] },
@@ -219,6 +248,7 @@ sub _translate_block {
     for ( @{ $block->{mark} || [] } ) {
         s/:(\d+)/:$self->{mark}/;
         $mark_map->{$repo}{$1} = $self->{mark}++;
+        $block->{original_mark} = $1;
     }
 
     # update marks in from & merge
