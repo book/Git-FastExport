@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-use t::Utils;
+use lib 't/lib';
+use TestUtils;
 use File::Path;
 use Git::FastExport::Stitch;
 use Test::Requires::Git;
