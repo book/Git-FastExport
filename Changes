@@ -2,6 +2,12 @@ Revision history for Perl extension Git::FastExport
 
 {{$NEXT}}
 
+0.108 2019-12-31 BOOK
+    [ENHANCEMENTS]
+    - Do not modify the directory name when stitching repositories (Fix RT#129540)
+    [TESTS]
+    - Ensure the test suite works when @INC does not contain '.'
+
 0.107 2016-08-13 BOOK
     [TESTS]
     - Now uses test_requires_git (Test::Requires::Git) instead of has_git (Test::Git)
