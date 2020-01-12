@@ -58,10 +58,11 @@ sub stitch {
             $r = Git::Repository->new();
             chdir $orig or croak "Can't chdir back to $orig: $!";
         }
-        else { die "Undefined repository path" }
+        else { croak "Undefined repository path" }
         $r;
       };
-    $@ =~ s/ at .*\z//s, croak $@ if !$export;
+    $@ =~ s/ at .*\z//s;
+    croak $@ if !$export;
 
     # do not stich a repo with itself
     $repo = $export->git_dir;
@@ -174,7 +175,7 @@ sub next_block {
             push @{ $parents->{ $node->{repo} } }, $parent;
         }
         else {    # record the parents from the other repositories
-            for my $repo ( grep $_ ne $node->{repo},
+            for my $repo ( grep { $_ ne $node->{repo} }
                 keys %{ $commits->{$parent}{parents} } )
             {
                 push @{ $parents->{$repo} },
@@ -275,7 +276,7 @@ sub _last_alien_child {
             my %pparents;
             @{pparents}{ @{ $peer->{parents}{ $peer->{repo} } || [] } } = ();
             next
-                if grep !exists $pparents{$_},
+                if grep { !exists $pparents{$_} }
                 @{ $parents->{ $peer->{repo} } };
 
             # this child node has a valid parent list
