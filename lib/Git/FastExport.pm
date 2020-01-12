@@ -66,7 +66,7 @@ sub next_block {
                     $block->{data} = <$fh>;
                 }
                 else {
-                    $block->{data} = "";
+                    $block->{data} = '';
                 }
             }
         }
